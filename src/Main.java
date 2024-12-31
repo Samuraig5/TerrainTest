@@ -1,11 +1,18 @@
+import Controls.Controller;
+import Rendering.Scene;
+import Rendering.SceneRenderer;
+import WorldSpace.Object3D;
+import WorldSpace.Point3D;
+import WorldSpace.Vector3D;
+
 import javax.swing.*;
-import java.util.Scanner;
+import java.util.Random;
 
 public class Main {
 
     public static void main(String[] args)
     {
-        JFrame frame = new JFrame("Rotating 3D Cube");
+        JFrame frame = new JFrame("Terrain Test");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 800);
 
@@ -28,11 +35,24 @@ public class Main {
                 {0, 4}, {1, 5}, {2, 6}, {3, 7}  // Connectors
         };
         Object3D cube = new Object3D(points, edges);
-        cube.translate(new Vector3D(300, 300, 0));
+        //cube.translate(new Vector3D(300, 300, 0));
         testScene.addObject(cube);
 
         SceneRenderer renderer = new SceneRenderer(testScene);
+        renderer.setFocusable(true);
+
+        double cameraX = -300;
+        double cameraY = -300;
+        testScene.getCamera().translate(new Vector3D(cameraX, cameraY, 0));
+
+        Controller controller = new Controller();
+        renderer.addKeyListener(controller);
+        renderer.requestFocusInWindow();
+
+        controller.attachTranslatable(testScene.getCamera());
+
         frame.add(renderer);
         frame.setVisible(true);
+
     }
 }

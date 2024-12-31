@@ -1,3 +1,5 @@
+package Rendering;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -23,7 +25,7 @@ public class SceneRenderer extends JPanel
             paintActiveScene(g);
         }
         else {
-            System.err.println("SceneRenderer: No scene is loaded!");
+            System.err.println("Rendering.SceneRenderer: No scene is loaded!");
         }
     }
 

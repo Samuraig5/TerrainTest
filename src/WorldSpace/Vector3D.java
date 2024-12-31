@@ -1,6 +1,6 @@
-import java.util.Vector;
+package WorldSpace;
 
-public class Vector3D
+public class Vector3D implements Translatable
 {
     protected double x;
     protected double y;
@@ -15,10 +15,15 @@ public class Vector3D
     public double x() {return x;}
     public double y() {return y;}
     public double z() {return z;}
-
+    @Override
     public void translate(Vector3D delta){
         this.x += delta.x;
         this.y += delta.y;
         this.z += delta.z;
+    }
+    public void translate(double deltaX, double deltaY, double deltaZ){
+        this.x += deltaX;
+        this.y += deltaY;
+        this.z += deltaZ;
     }
 }

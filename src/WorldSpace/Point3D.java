@@ -1,4 +1,6 @@
-class Point3D extends Vector3D{
+package WorldSpace;
+
+public class Point3D extends Vector3D {
 
 
     public Point3D(double x, double y, double z) {
