@@ -10,7 +10,12 @@ import java.util.List;
 public class Scene
 {
     List<Object3D> objects = new ArrayList<>();
-    Camera camera = new Camera(new Vector3D(0,0,0), new Vector3D(0,0,0));
+    Camera camera;
+
+    public Scene(Camera camera)
+    {
+        this.camera = camera;
+    }
 
     public void addObject(Object3D object)
     {

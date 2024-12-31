@@ -1,24 +1,49 @@
 package Controls;
 
+import Rendering.Scene;
+import Rendering.SceneRenderer;
+import WorldSpace.Rotatable;
 import WorldSpace.Translatable;
 import WorldSpace.Vector3D;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Controller implements KeyListener
+public class Controller implements KeyListener, MouseListener, MouseMotionListener
 {
-    private List<Translatable> attachedTranslatables = new ArrayList<>();
+    private final List<Translatable> attachedTranslatables = new ArrayList<>();
+    private final List<Rotatable> attachedRotatables = new ArrayList<>();
+
+    private boolean rightMousePressed = false;
+    private int lastMouseX, lastMouseY;
+
+    public Controller(SceneRenderer renderer)
+    {
+        renderer.addKeyListener(this);
+        renderer.addMouseListener(this);
+        renderer.addMouseMotionListener(this);
+    }
 
     public void attachTranslatable(Translatable translatable){attachedTranslatables.add(translatable);}
+    public void setAttachedRotatables(Rotatable rotatable) {attachedRotatables.add(rotatable);}
+    private void updateTranslatables(Vector3D delta)
+    {
+        for (Translatable trans : attachedTranslatables) {
+            trans.translate(delta);
+        }
+    }
+    public void updateRotatables(Vector3D rotation)
+    {
+        for (Rotatable rot : attachedRotatables) {
+            rot.rotate(rotation);
+        }
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
         double step = 10; // Camera movement speed
         Vector3D delta = new Vector3D(0,0,0);
-        System.out.println("Out");
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W -> delta.translate(0, 0, step); // Move forward
             case KeyEvent.VK_S -> delta.translate(0, 0, -step); // Move backward
@@ -40,10 +65,54 @@ public class Controller implements KeyListener
         // No action needed for key typing in this example
     }
 
-    private void updateTranslatables(Vector3D delta)
-    {
-        for (Translatable trans : attachedTranslatables) {
-            trans.translate(delta);
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON3) { // Right mouse button
+            rightMousePressed = true;
+            lastMouseX = e.getX();
+            lastMouseY = e.getY();
         }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON3) { // Right mouse button
+            rightMousePressed = false;
+        }
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        System.out.println("Wa");
+        if (rightMousePressed) {
+            int deltaX = e.getX() - lastMouseX;
+            int deltaY = e.getY() - lastMouseY;
+
+            updateRotatables(new Vector3D(deltaY * 0.01, deltaX * 0.01, 0));
+
+            // Update the last mouse position
+            lastMouseX = e.getX();
+            lastMouseY = e.getY();
+        }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
     }
 }

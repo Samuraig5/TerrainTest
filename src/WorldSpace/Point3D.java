@@ -26,10 +26,10 @@ public class Point3D extends Vector3D {
     }
 
     public double projectX(double distance) {
-        return x / (z / distance + 1);
+        return x * distance / z;
     }
 
     public double projectY(double distance) {
-        return y / (z / distance + 1);
+        return y * distance / z;
     }
 }

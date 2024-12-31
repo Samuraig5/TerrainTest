@@ -30,9 +30,12 @@ public class Object3D implements Translatable
             Point3D p1 = points[edge[0]];
             Point3D p2 = points[edge[1]];
             p1 = (Point3D) camera.worldToRenderSpace(p1);
+            if (p1 == null) {continue;}
             p2 = (Point3D)  camera.worldToRenderSpace(p2);
-            g2d.drawLine((int) p1.projectX(500), (int) p1.projectY(500),
-                            (int) p2.projectX(500), (int) p2.projectY(500));
+            if (p2 == null) {continue;}
+
+            g2d.drawLine((int) p1.projectX(camera.getFocalDistance()), (int) p1.projectY(camera.getFocalDistance()),
+                            (int) p2.projectX(camera.getFocalDistance()), (int) p2.projectY(camera.getFocalDistance()));
         }
     }
 }

@@ -26,4 +26,11 @@ public class Vector3D implements Translatable
         this.y += deltaY;
         this.z += deltaZ;
     }
+
+    public void set(double newX, double newY, double newZ)
+    {
+        this.x = newX;
+        this.y = newY;
+        this.z = newZ;
+    }
 }

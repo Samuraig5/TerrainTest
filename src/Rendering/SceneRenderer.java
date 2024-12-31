@@ -9,7 +9,11 @@ public class SceneRenderer extends JPanel
 
     public SceneRenderer(Scene initialScene)
     {
+        setFocusable(true);
+        requestFocusInWindow();
+
         activeScene = initialScene;
+
         repaint();
         revalidate();
     }

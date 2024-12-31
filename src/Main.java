@@ -1,4 +1,5 @@
 import Controls.Controller;
+import Rendering.Camera;
 import Rendering.Scene;
 import Rendering.SceneRenderer;
 import WorldSpace.Object3D;
@@ -16,10 +17,12 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 800);
 
-        Scene testScene = new Scene();
+        Camera camera = new Camera(frame, new Vector3D(0,0,0), new Vector3D(0,0,0), 1000);
+        Scene testScene = new Scene(camera);
+
         int size = 100;
         Point3D[] points = {
-                new Point3D(-size, -size-50, -size),
+                new Point3D(-size, -size, -size),
                 new Point3D(size, -size, -size),
                 new Point3D(size, size, -size),
                 new Point3D(-size, size, -size),
@@ -35,21 +38,18 @@ public class Main {
                 {0, 4}, {1, 5}, {2, 6}, {3, 7}  // Connectors
         };
         Object3D cube = new Object3D(points, edges);
-        //cube.translate(new Vector3D(300, 300, 0));
+        cube.translate(new Vector3D(0, 0, 1000));
         testScene.addObject(cube);
 
         SceneRenderer renderer = new SceneRenderer(testScene);
-        renderer.setFocusable(true);
 
         double cameraX = -300;
         double cameraY = -300;
         testScene.getCamera().translate(new Vector3D(cameraX, cameraY, 0));
 
-        Controller controller = new Controller();
-        renderer.addKeyListener(controller);
-        renderer.requestFocusInWindow();
-
+        Controller controller = new Controller(renderer);
         controller.attachTranslatable(testScene.getCamera());
+        controller.setAttachedRotatables(testScene.getCamera());
 
         frame.add(renderer);
         frame.setVisible(true);
