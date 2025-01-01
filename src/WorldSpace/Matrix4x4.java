@@ -40,4 +40,13 @@ public class Matrix4x4
 
         return new Vector3D(x, y, z);
     }
+
+    public Triangle multiplyWithTriangle(Triangle triangle)
+    {
+        Vector3D[] points = triangle.getPoints();
+        Vector3D p1 = multiplyWithVect3D(points[0]);
+        Vector3D p2 = multiplyWithVect3D(points[1]);
+        Vector3D p3 = multiplyWithVect3D(points[2]);
+        return new Triangle(p1, p2, p3);
+    }
 }

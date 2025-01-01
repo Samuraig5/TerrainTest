@@ -24,9 +24,13 @@ public class Vector3D implements Translatable
     public void translate(Vector3D delta){
         translate(delta.x, delta.y, delta.z);
     }
-    public void translate(double uniformTranslation)
-    {
+    public void translate(double uniformTranslation) {
         translate(uniformTranslation, uniformTranslation, uniformTranslation);
+    }
+    public Vector3D translation(Vector3D delta){
+        Vector3D out = new Vector3D(this);
+        out.translate(delta);
+        return out;
     }
 
     public void scale(Vector3D scalars)

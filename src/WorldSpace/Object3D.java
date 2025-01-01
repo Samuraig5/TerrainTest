@@ -38,27 +38,18 @@ public class Object3D implements Translatable, Rotatable
         {
             Vector3D[] triPoints = tri.getPoints();
             //= Apply rotation in Z =
-            Vector3D p1rotZ = rotZ.multiplyWithVect3D(triPoints[0]);
-            Vector3D p2rotZ = rotZ.multiplyWithVect3D(triPoints[1]);
-            Vector3D p3rotZ = rotZ.multiplyWithVect3D(triPoints[2]);
+            Triangle triRotZ = rotZ.multiplyWithTriangle(tri);
 
             //= Apply rotation in X =
-            Vector3D p1rotZX = rotX.multiplyWithVect3D(p1rotZ);
-            Vector3D p2rotZX = rotX.multiplyWithVect3D(p2rotZ);
-            Vector3D p3rotZX = rotX.multiplyWithVect3D(p3rotZ);
+            Triangle triRotZX = rotX.multiplyWithTriangle(triRotZ);
 
             //= Apply translation =
-            Vector3D p1trans = new Vector3D(p1rotZX);
-            p1trans.translate(position);
-            Vector3D p2trans = new Vector3D(p2rotZX);
-            p2trans.translate(position);
-            Vector3D p3trans = new Vector3D(p3rotZX);
-            p3trans.translate(position);
+            Triangle triTrans = triRotZX.translation(position);
 
             //= Check if triangle normal is facing the camera =
-            Vector3D triNormal = new Triangle(p1trans, p2trans, p3trans).getNormal();
+            Vector3D triNormal = triTrans.getNormal();
             //All three points lie on the same plane so we can choose any
-            Vector3D vectorFromCameraToTriangle =  new Vector3D(p1trans);
+            Vector3D vectorFromCameraToTriangle =  new Vector3D(triTrans.getPoints()[0]);
             vectorFromCameraToTriangle.translate(camera.getPosition().inverse());
             //If the camera can't see the triangle, don't draw it
             if (triNormal.dotProduct(vectorFromCameraToTriangle) > 0) { continue; }
@@ -71,28 +62,20 @@ public class Object3D implements Translatable, Rotatable
             tri.setShadedColour(shadedColour);
 
             //= Apply Projection (3D -> 2D) =
-            Vector3D p1proj = camera.projectVector(p1trans);
-            Vector3D p2proj = camera.projectVector(p2trans);
-            Vector3D p3proj = camera.projectVector(p3trans);
+            Triangle triProj = camera.projectTriangle(triTrans);
 
             //= Move projection into view =
-            p1proj.translate(new Vector3D(1f, 1f, 0));
-            p2proj.translate(new Vector3D(1f, 1f, 0));
-            p3proj.translate(new Vector3D(1f, 1f, 0));
+            triProj.translate(new Vector3D(1f, 1f, 0));
 
             //= Scale projection to screen =
             double centreX = 0.5f * camera.getScreenDimensions().x();
             double centreY = 0.5f * camera.getScreenDimensions().y();
-            p1proj.scale(new Vector3D(centreX, centreY, 1));
-            p2proj.scale(new Vector3D(centreX, centreY, 1));
-            p3proj.scale(new Vector3D(centreX, centreY, 1));
-
+            triProj.scale(new Vector3D(centreX, centreY, 1));
 
             //= Add triangle to list=
-            Triangle triProjected = new Triangle(p1proj, p2proj, p3proj);
-            triProjected.setShadedColour(shadedColour);
+            triProj.setShadedColour(shadedColour);
 
-            trianglesToDraw.add(triProjected);
+            trianglesToDraw.add(triProj);
         }
 
         trianglesToDraw.sort(Comparator.comparingDouble(Triangle::getMidPoint).reversed());

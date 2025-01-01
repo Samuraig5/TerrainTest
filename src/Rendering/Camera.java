@@ -39,11 +39,13 @@ public class Camera implements Translatable
      * @param in Vector in world space.
      * @return The projection of 'in' onto the screen space.
      */
-    public Vector3D projectVector(Vector3D in)
-    {
+    public Vector3D projectVector(Vector3D in) {
         return projectionMatrix.multiplyWithVect3D(in);
-
     }
+    public Triangle projectTriangle(Triangle in) {
+        return projectionMatrix.multiplyWithTriangle(in);
+    }
+
     public Vector3D getScreenDimensions()
     {
         return new Vector3D(window.getWidth(), window.getHeight(), 0);

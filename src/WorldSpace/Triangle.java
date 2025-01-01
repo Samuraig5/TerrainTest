@@ -52,6 +52,18 @@ public class Triangle implements Translatable
         points[1].translate(delta);
         points[2].translate(delta);
     }
+    public Triangle translation(Vector3D delta){
+        Vector3D p1 = points[0].translation(delta);
+        Vector3D p2 = points[1].translation(delta);
+        Vector3D p3 = points[2].translation(delta);
+        return new Triangle(p1, p2, p3);
+    }
+
+    public void scale(Vector3D scalar) {
+        points[0].scale(scalar);
+        points[1].scale(scalar);
+        points[2].scale(scalar);
+    }
 
     public void setBaseColour(Color baseColour) {
         this.baseColour = baseColour;
