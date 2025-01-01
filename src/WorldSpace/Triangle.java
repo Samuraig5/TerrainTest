@@ -1,11 +1,16 @@
 package WorldSpace;
 
+import java.awt.*;
+
 public class Triangle implements Translatable
 {
     private final Vector3D[] points = new Vector3D[3];
+    private Color baseColour = Color.MAGENTA;
+    private Color shadedColour;
 
     public Triangle(Vector3D point0, Vector3D point1, Vector3D point2)
     {
+        shadedColour = baseColour;
         points[0] = point0;
         points[1] = point1;
         points[2] = point2;
@@ -41,5 +46,18 @@ public class Triangle implements Translatable
         points[0].translate(delta);
         points[1].translate(delta);
         points[2].translate(delta);
+    }
+
+    public void setBaseColour(Color baseColour) {
+        this.baseColour = baseColour;
+    }
+    public Color getBaseColour() {
+        return baseColour;
+    }
+    public void setShadedColour(Color shadedColour) {
+        this.shadedColour = shadedColour;
+    }
+    public Color getShadedColour() {
+        return shadedColour;
     }
 }

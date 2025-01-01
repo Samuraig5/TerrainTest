@@ -59,6 +59,13 @@ public class Object3D implements Translatable, Rotatable
             //If the camera can't see the triangle, don't draw it
             if (triNormal.dotProduct(vectorFromCameraToTriangle) > 0) { continue; }
 
+            //= Primitive Lighting (Replace later) =
+            Vector3D lightDirection = new Vector3D(0f, 0f, -1f);
+            lightDirection.normalize();
+            double lightDotProduct = triNormal.dotProduct(lightDirection);
+            Color shadedColour = Drawer.getColourShade(tri.getBaseColour(), lightDotProduct);
+            tri.setShadedColour(shadedColour);
+
             //= Apply Projection (3D -> 2D) =
             Vector3D p1proj = camera.projectVector(p1trans);
             Vector3D p2proj = camera.projectVector(p2trans);
@@ -78,7 +85,9 @@ public class Object3D implements Translatable, Rotatable
 
             //= Draw triangle =
             Triangle triProjected = new Triangle(p1proj, p2proj, p3proj);
-            Drawer.drawTriangle(g2d, triProjected);
+            triProjected.setShadedColour(shadedColour);
+
+            Drawer.fillTriangle(g2d, triProjected);
         }
     }
 

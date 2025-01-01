@@ -66,6 +66,8 @@ public class Vector3D implements Translatable
         x /= length; y /= length; z /= length;
     }
     /**
+     * Calculates the dot product of the two vectors.
+     * Vectors should be normalized!
      * @param other the other vector
      * @return the dot product between this vector and the other vector
      */
