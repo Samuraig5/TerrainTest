@@ -1,20 +1,23 @@
 package Rendering;
 
-import WorldSpace.Point3D;
-import WorldSpace.Rotatable;
-import WorldSpace.Translatable;
-import WorldSpace.Vector3D;
+import WorldSpace.*;
 
 import javax.swing.*;
 
-public class Camera implements Translatable, Rotatable
+public class Camera implements Translatable
 {
     JFrame window;
+    Matrix4x4 projectionMatrix;
+    double focalDistance;
+    double aspectRatio;
+    double fov = 90;
+    double fovRad;
+    double zNear = 0.1d;
+    double zFar = 1000;
+    double zNormal = zFar/(zFar-zNear);
+
     Vector3D position;
     Vector3D rotation; // Rendering.Camera orientation (rotation in radians)
-    double focalDistance;
-    double nearPlane = 0;
-    double farPlane = 10000;
 
     public Camera(JFrame window, Vector3D position, Vector3D rotation, double focalDistance)
     {
@@ -22,66 +25,61 @@ public class Camera implements Translatable, Rotatable
         this.position = position;
         this.rotation = rotation;
         this.focalDistance = focalDistance;
+        this.aspectRatio = (double) window.getHeight() / (double) window.getWidth();
+        this.fovRad = 1.0f / Math.tan(fov * 0.5f / 180.0f * Math.PI);
+
+        projectionMatrix = new Matrix4x4();
+        projectionMatrix.mat[0][0] = aspectRatio * fovRad;
+        projectionMatrix.mat[1][1] = fovRad;
+        projectionMatrix.mat[2][2] = zFar / (zFar - zNear);
+        projectionMatrix.mat[3][2] = (-zFar * zNear) / (zFar - zNear);
+        projectionMatrix.mat[2][3] = 1.0f;
+        projectionMatrix.mat[3][3] = 0.0f;
     }
 
-    // Transform a vector from world space to camera space
-    public Vector3D worldToRenderSpace(Vector3D worldPoint) {
-        double screenWidth = window.getWidth();
-        double screenHeight = window.getHeight();
-
-        // Translate by camera position
-        double px = worldPoint.x() - position.x();
-        double py = worldPoint.y() - position.y();
-        double pz = worldPoint.z() - position.z();
-
-        // Rotate around X-axis
-        double cosX = Math.cos(-rotation.x());
-        double sinX = Math.sin(-rotation.x());
-        double ty = cosX * py - sinX * pz;
-        double tz = sinX * py + cosX * pz;
-        py = ty;
-        pz = tz;
-
-        // Rotate around Y-axis
-        double cosY = Math.cos(-rotation.y());
-        double sinY = Math.sin(-rotation.y());
-        double tx = cosY * px + sinY * pz;
-        tz = -sinY * px + cosY * pz;
-        px = tx;
-
-        // Rotate around Z-axis
-        double cosZ = Math.cos(-rotation.z());
-        double sinZ = Math.sin(-rotation.z());
-        double nx = cosZ * px - sinZ * py;
-        double ny = sinZ * px + cosZ * py;
-
-        // Apply frustum clipping of near and far planes
-        if (tz < nearPlane || tz > farPlane) {
-            return null;
+    /**
+     * Multiplies a given input vector with the projection matrix.
+     * The input vector has an implied fourth element set to '1'.
+     * So given a vector in, the implied vector in~ would be in~=(in.x, in.y, in.z, 1.0f).
+     *
+     * @param in The vector that should be projected.
+     * @return The projection of 'in'.
+     */
+    public Vector3D projectVector(Vector3D in)
+    {
+        double x = in.x() * projectionMatrix.mat[0][0]
+                + in.y() * projectionMatrix.mat[1][0]
+                + in.z() * projectionMatrix.mat[2][0]
+                + projectionMatrix.mat[3][0];
+        double y = in.x() * projectionMatrix.mat[0][1]
+                + in.y() * projectionMatrix.mat[1][1]
+                + in.z() * projectionMatrix.mat[2][1]
+                + projectionMatrix.mat[3][1];
+        double z = in.x() * projectionMatrix.mat[0][2]
+                + in.y() * projectionMatrix.mat[1][2]
+                + in.z() * projectionMatrix.mat[2][2]
+                + projectionMatrix.mat[3][2];
+        double w = in.x() * projectionMatrix.mat[0][3]
+                + in.y() * projectionMatrix.mat[1][3]
+                + in.z() * projectionMatrix.mat[2][3]
+                + projectionMatrix.mat[3][3];
+        if (w != 0) //Normalisation of the output vector to 'z'
+        {
+            x /= w;
+            y /= w;
+            z /= w;
         }
 
-        // Perspective projection: Apply the focal length and adjust by the distance to the camera
-        double screenX = (nx / tz) * focalDistance;
-        double screenY = (ny / tz) * focalDistance;
-
-        // Normalize the coordinates to center the screen (assuming screenWidth and screenHeight)
-        double centerX = screenWidth / 2;
-        double centerY = screenHeight / 2;
-
-        // Return the 2D screen position after applying the perspective transformation
-        return new Point3D(screenX + centerX, screenY + centerY, tz);
+        return new Vector3D(x, y, z);
     }
 
     @Override
     public void translate(Vector3D delta) {
         position.translate(delta);
     }
-    @Override
-    public void rotate(Vector3D rotation) {
-        rotation.set(rotation.x(), rotation.y(), 0);
-        this.rotation.translate(rotation);
+
+    public Vector3D getScreenDimensions()
+    {
+        return new Vector3D(window.getWidth(), window.getHeight(), 0);
     }
-    public double getFocalDistance() {return focalDistance;}
-
-
 }

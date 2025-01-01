@@ -12,6 +12,12 @@ public class Vector3D implements Translatable
         this.y = y;
         this.z = z;
     }
+    public Vector3D(){this.x=0; this.y=0; this.z=0;}
+
+    public Vector3D(Vector3D source) {
+        this.x = source.x; this.y = source.y(); this.z = source.z();
+    }
+
     public double x() {return x;}
     public double y() {return y;}
     public double z() {return z;}
@@ -26,11 +32,35 @@ public class Vector3D implements Translatable
         this.y += deltaY;
         this.z += deltaZ;
     }
+    public void translate(double uniformTranslation)
+    {
+        translate(uniformTranslation, uniformTranslation, uniformTranslation);
+    }
+
+    public void scale(Vector3D scalars)
+    {
+        set(x* scalars.x,y* scalars.y,z* scalars.z);
+    }
+    public void scale(double scalar)
+    {
+        scale(new Vector3D(scalar, scalar, scalar));
+    }
 
     public void set(double newX, double newY, double newZ)
     {
         this.x = newX;
         this.y = newY;
         this.z = newZ;
+    }
+    public void set(Vector3D source)
+    {
+        set(source.x, source.y, source.z);
+    }
+
+    public Vector3D getScaledClone(double scalar)
+    {
+        Vector3D clone = new Vector3D(x,y,z);
+        clone.scale(scalar);
+        return clone;
     }
 }
