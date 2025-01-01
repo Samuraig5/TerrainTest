@@ -5,6 +5,7 @@ import Rendering.Drawer;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Object3D implements Translatable, Rotatable
@@ -27,6 +28,8 @@ public class Object3D implements Translatable, Rotatable
     public void drawObject(Graphics g, Camera camera)
     {
         Graphics2D g2d = (Graphics2D) g;
+
+        List<Triangle> trianglesToDraw = new ArrayList<>();
 
         Matrix4x4 rotZ = getRotZ(rotation.z());
         Matrix4x4 rotX = getRotX(rotation.x());
@@ -84,12 +87,19 @@ public class Object3D implements Translatable, Rotatable
             p2proj.scale(new Vector3D(centreX, centreY, 1));
             p3proj.scale(new Vector3D(centreX, centreY, 1));
 
-            //= Draw triangle =
+
+            //= Add triangle to list=
             Triangle triProjected = new Triangle(p1proj, p2proj, p3proj);
             triProjected.setShadedColour(shadedColour);
 
-            Drawer.fillTriangle(g2d, triProjected);
-            if (showWireFrame) { Drawer.drawTriangle(g2d, Color.black, triProjected); }
+            trianglesToDraw.add(triProjected);
+        }
+
+        trianglesToDraw.sort(Comparator.comparingDouble(Triangle::getMidPoint).reversed());
+
+        for (Triangle triangle : trianglesToDraw) {
+            Drawer.fillTriangle(g2d, triangle);
+            if (showWireFrame) { Drawer.drawTriangle(g2d, Color.black, triangle); }
         }
     }
 

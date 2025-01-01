@@ -41,6 +41,11 @@ public class Triangle implements Translatable
         return normal;
     }
 
+    public double getMidPoint()
+    {
+        return (points[0].z() + points[1].z() + points[2].z()) / 3f;
+    }
+
     @Override
     public void translate(Vector3D delta) {
         points[0].translate(delta);
