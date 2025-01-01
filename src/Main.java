@@ -42,6 +42,7 @@ public class Main {
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(renderer);
         cameraController.attachTranslatable(testScene.getCamera());
         cameraController.attachRotatable(testScene.getCamera());
+        testScene.subscribeToTime(cameraController);
 
         frame.add(renderer);
         frame.setVisible(true);

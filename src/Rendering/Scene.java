@@ -3,7 +3,6 @@ package Rendering;
 import Time.GameTimer;
 import Time.Updatable;
 import WorldSpace.Object3D;
-import WorldSpace.Vector3D;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class Scene
         objects.add(object);
         if (object instanceof Updatable)
         {
-            sceneTimer.subscribe((Updatable) object);
+            subscribeToTime((Updatable) object);
         }
     }
 
@@ -39,4 +38,6 @@ public class Scene
     }
 
     public Camera getCamera() {return camera;}
+
+    public void subscribeToTime (Updatable updatable) {sceneTimer.subscribe(updatable);}
 }
