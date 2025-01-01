@@ -42,7 +42,9 @@ public class Object3D implements Translatable, Rotatable
         worldTransform = Matrix4x4.matrixMatrixMultiplication(worldTransform, trans);
 
         Vector3D up = new Vector3D(0,1,0);
-        Vector3D target = camera.getPosition().translation(camera.getLookDirection());
+        Vector3D cameraLookDirection = camera.getLookDirection();
+        Vector3D target = cameraLookDirection.translation(camera.getPosition());
+
         Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(camera.getPosition(), target, up);
         Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
 

@@ -1,4 +1,5 @@
 import Controls.CameraController;
+import Controls.OldSchoolDungeonCameraControls;
 import Rendering.Camera;
 import Rendering.Scene;
 import Rendering.SceneRenderer;
@@ -37,8 +38,9 @@ public class Main {
 
         SceneRenderer renderer = new SceneRenderer(testScene);
 
-        CameraController cameraController = new CameraController(renderer);
+        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(renderer);
         cameraController.attachTranslatable(testScene.getCamera());
+        cameraController.attachRotatable(testScene.getCamera());
 
         frame.add(renderer);
         frame.setVisible(true);

@@ -4,7 +4,7 @@ import WorldSpace.*;
 
 import javax.swing.*;
 
-public class Camera implements Translatable
+public class Camera implements Translatable, Rotatable
 {
     JFrame window;
     public Drawer drawer;
@@ -13,8 +13,9 @@ public class Camera implements Translatable
     double zNear = 0.1d;
     double zFar = 1000;
 
-    Vector3D position = new Vector3D(0,0,0);
-    Vector3D lookDirection = new Vector3D(0,0,1);
+    Vector3D position = new Vector3D();
+    Vector3D rotation = new Vector3D();
+    final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
 
     public Camera(JFrame window)
     {
@@ -43,9 +44,26 @@ public class Camera implements Translatable
 
     @Override
     public void translate(Vector3D delta) {
-        position.translate(delta);
+        Vector3D forwardMovement = getLookDirection().scaled(delta.z());
+        Vector3D verticalMovement = new Vector3D(0,delta.y(),0);
+
+        Vector3D movement = forwardMovement.translation(verticalMovement);
+
+        position.translate(movement);
         System.out.println("Camera Pos: " + position.x() + ", " + position.y() + ", " + position.z());
     }
+
     public Vector3D getPosition(){return new Vector3D(position);}
-    public Vector3D getLookDirection(){return new Vector3D(lookDirection);}
+    public Vector3D getLookDirection()
+    {
+        Matrix4x4 cameraRot = Matrix4x4.getRotationMatrixY(rotation.y());
+        return cameraRot.matrixVectorMultiplication(BASE_LOOK_DIRECTION);
+    }
+
+    @Override
+    public void rotate(Vector3D delta) {
+        rotation.translate(delta);
+        System.out.println("Camera Rot: " + rotation.x() + ", " + rotation.y() + ", " + rotation.z());
+
+    }
 }

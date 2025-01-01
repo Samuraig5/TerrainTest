@@ -15,9 +15,6 @@ public class Controller implements KeyListener, MouseListener, MouseMotionListen
     private final List<Translatable> attachedTranslatables = new ArrayList<>();
     private final List<Rotatable> attachedRotatables = new ArrayList<>();
 
-    private boolean rightMousePressed = false;
-    private int lastMouseX, lastMouseY;
-
     public Controller(SceneRenderer renderer)
     {
         renderer.addKeyListener(this);
@@ -26,14 +23,14 @@ public class Controller implements KeyListener, MouseListener, MouseMotionListen
     }
 
     public void attachTranslatable(Translatable translatable){attachedTranslatables.add(translatable);}
-    public void setAttachedRotatables(Rotatable rotatable) {attachedRotatables.add(rotatable);}
-    private void updateTranslatables(Vector3D delta)
+    public void attachRotatable(Rotatable rotatable) {attachedRotatables.add(rotatable);}
+    void updateTranslatables(Vector3D delta)
     {
         for (Translatable trans : attachedTranslatables) {
             trans.translate(delta);
         }
     }
-    public void updateRotatables(Vector3D rotation)
+    void updateRotatables(Vector3D rotation)
     {
         for (Rotatable rot : attachedRotatables) {
             rot.rotate(rotation);
@@ -42,17 +39,7 @@ public class Controller implements KeyListener, MouseListener, MouseMotionListen
 
     @Override
     public void keyPressed(KeyEvent e) {
-        double step = 10; // Camera movement speed
-        Vector3D delta = new Vector3D(0,0,0);
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_W -> delta.translate(0, 0, step); // Move forward
-            case KeyEvent.VK_S -> delta.translate(0, 0, -step); // Move backward
-            case KeyEvent.VK_A -> delta.translate(-step, 0, 0); // Move left
-            case KeyEvent.VK_D -> delta.translate(step, 0, 0); // Move right
-            case KeyEvent.VK_SPACE -> delta.translate(0, -step, 0); // Move up
-            case KeyEvent.VK_SHIFT -> delta.translate(0, step, 0); // Move down
-        }
-        updateTranslatables(delta);
+
     }
 
     @Override
@@ -72,18 +59,12 @@ public class Controller implements KeyListener, MouseListener, MouseMotionListen
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON3) { // Right mouse button
-            rightMousePressed = true;
-            lastMouseX = e.getX();
-            lastMouseY = e.getY();
-        }
+
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON3) { // Right mouse button
-            rightMousePressed = false;
-        }
+
     }
 
     @Override
@@ -98,17 +79,7 @@ public class Controller implements KeyListener, MouseListener, MouseMotionListen
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        System.out.println("Wa");
-        if (rightMousePressed) {
-            int deltaX = e.getX() - lastMouseX;
-            int deltaY = e.getY() - lastMouseY;
 
-            updateRotatables(new Vector3D(deltaY * 0.01, deltaX * 0.01, 0));
-
-            // Update the last mouse position
-            lastMouseX = e.getX();
-            lastMouseY = e.getY();
-        }
     }
 
     @Override
