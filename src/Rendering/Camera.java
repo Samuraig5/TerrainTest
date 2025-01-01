@@ -8,7 +8,6 @@ public class Camera implements Translatable
 {
     JFrame window;
     Matrix4x4 projectionMatrix;
-    double focalDistance;
     double aspectRatio;
     double fov = 90;
     double fovRad;
@@ -16,15 +15,12 @@ public class Camera implements Translatable
     double zFar = 1000;
     double zNormal = zFar/(zFar-zNear);
 
-    Vector3D position;
-    Vector3D rotation; // Rendering.Camera orientation (rotation in radians)
+    Vector3D position = new Vector3D();
+    Vector3D rotation = new Vector3D(); // Rendering.Camera orientation (rotation in radians)
 
-    public Camera(JFrame window, Vector3D position, Vector3D rotation, double focalDistance)
+    public Camera(JFrame window)
     {
         this.window = window;
-        this.position = position;
-        this.rotation = rotation;
-        this.focalDistance = focalDistance;
         this.aspectRatio = (double) window.getHeight() / (double) window.getWidth();
         this.fovRad = 1.0f / Math.tan(fov * 0.5f / 180.0f * Math.PI);
 
@@ -38,48 +34,24 @@ public class Camera implements Translatable
     }
 
     /**
-     * Multiplies a given input vector with the projection matrix.
-     * The input vector has an implied fourth element set to '1'.
-     * So given a vector in, the implied vector in~ would be in~=(in.x, in.y, in.z, 1.0f).
+     * Projects a given vector in world space into a vector in screen space.
      *
-     * @param in The vector that should be projected.
-     * @return The projection of 'in'.
+     * @param in Vector in world space.
+     * @return The projection of 'in' onto the screen space.
      */
     public Vector3D projectVector(Vector3D in)
     {
-        double x = in.x() * projectionMatrix.mat[0][0]
-                + in.y() * projectionMatrix.mat[1][0]
-                + in.z() * projectionMatrix.mat[2][0]
-                + projectionMatrix.mat[3][0];
-        double y = in.x() * projectionMatrix.mat[0][1]
-                + in.y() * projectionMatrix.mat[1][1]
-                + in.z() * projectionMatrix.mat[2][1]
-                + projectionMatrix.mat[3][1];
-        double z = in.x() * projectionMatrix.mat[0][2]
-                + in.y() * projectionMatrix.mat[1][2]
-                + in.z() * projectionMatrix.mat[2][2]
-                + projectionMatrix.mat[3][2];
-        double w = in.x() * projectionMatrix.mat[0][3]
-                + in.y() * projectionMatrix.mat[1][3]
-                + in.z() * projectionMatrix.mat[2][3]
-                + projectionMatrix.mat[3][3];
-        if (w != 0) //Normalisation of the output vector to 'z'
-        {
-            x /= w;
-            y /= w;
-            z /= w;
-        }
+        return projectionMatrix.multiplyWithVect3D(in);
 
-        return new Vector3D(x, y, z);
+    }
+    public Vector3D getScreenDimensions()
+    {
+        return new Vector3D(window.getWidth(), window.getHeight(), 0);
     }
 
     @Override
     public void translate(Vector3D delta) {
         position.translate(delta);
     }
-
-    public Vector3D getScreenDimensions()
-    {
-        return new Vector3D(window.getWidth(), window.getHeight(), 0);
-    }
+    public Vector3D getPosition(){return new Vector3D(position);}
 }

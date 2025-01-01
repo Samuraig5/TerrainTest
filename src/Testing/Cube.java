@@ -40,6 +40,6 @@ public class Cube extends Object3D
 
         //Bottom Face
         mesh.add(new Triangle(points[3], points[7], points[4]));
-        mesh.add(new Triangle(points[4], points[4], points[0]));
+        mesh.add(new Triangle(points[3], points[4], points[0]));
     }
 }

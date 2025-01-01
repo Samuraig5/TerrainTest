@@ -19,6 +19,23 @@ public class Triangle implements Translatable
 
     public Vector3D[] getPoints() {return points;}
 
+    public Vector3D getNormal()
+    {
+        Vector3D line1 = new Vector3D(points[1]);
+        Vector3D line2 = new Vector3D(points[2]);
+
+        line1.translate(points[0].inverse());
+        line2.translate(points[0].inverse());
+
+        double normalX = line1.y() * line2.z() - line1.z() * line2.y();
+        double normalY = line1.z() * line2.x() - line1.x() * line2.z();
+        double normalZ = line1.x() * line2.y() - line1.y() * line2.x();
+
+        Vector3D normal = new Vector3D(normalX, normalY, normalZ);
+        normal.normalize();
+        return normal;
+    }
+
     @Override
     public void translate(Vector3D delta) {
         points[0].translate(delta);

@@ -4,6 +4,15 @@ public class Matrix4x4
 {
     public double[][] mat = new double[4][4];
 
+    /**
+     * Multiplies a given input vector with the matrix.
+     * Since the input vector is 3D, it has an implied fourth element set to '1'.
+     * So given a vector 'in', the implied vector 'in~' would be 'in~=(in.x, in.y, in.z, 1.0f)'.
+     * The vector is also normalized in the 'z' component.
+     *
+     * @param in The vector that should be multiplied with the matrix.
+     * @return The resulting vector.
+     */
     public Vector3D multiplyWithVect3D(Vector3D in)
     {
         double x = in.x() * mat[0][0]

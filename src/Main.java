@@ -17,12 +17,12 @@ public class Main {
     {
         JFrame frame = new JFrame("Terrain Test");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 800);
+        frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        Camera camera = new Camera(frame, new Vector3D(0,0,0), new Vector3D(0,0,0), 1000);
+        Camera camera = new Camera(frame);
         Scene testScene = new Scene(camera);
 
-        RotatingCube cube = new RotatingCube(1, 0.005f);
+        RotatingCube cube = new RotatingCube(1, 0.001f);
         cube.translate(new Vector3D(0, 0, 3));
         testScene.addObject(cube);
 
