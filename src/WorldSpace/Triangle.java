@@ -5,11 +5,12 @@ import java.awt.*;
 public class Triangle implements Translatable
 {
     private final Vector3D[] points = new Vector3D[3];
-    private Color baseColour = Color.MAGENTA;
+    private Color baseColour;
     private Color shadedColour;
 
     public Triangle(Vector3D point0, Vector3D point1, Vector3D point2)
     {
+        baseColour = Color.magenta;
         shadedColour = baseColour;
         points[0] = point0;
         points[1] = point1;
@@ -76,5 +77,11 @@ public class Triangle implements Translatable
     }
     public Color getShadedColour() {
         return shadedColour;
+    }
+
+    public void copyColour(Triangle source)
+    {
+        this.setBaseColour(source.getBaseColour());
+        this.setShadedColour(source.getShadedColour());
     }
 }

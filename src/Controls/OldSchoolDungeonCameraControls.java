@@ -1,13 +1,9 @@
 package Controls;
 
 import Rendering.SceneRenderer;
-import WorldSpace.Rotatable;
-import WorldSpace.Translatable;
 import WorldSpace.Vector3D;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 public class OldSchoolDungeonCameraControls extends Controller
 {

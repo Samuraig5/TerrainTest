@@ -7,6 +7,7 @@ import java.awt.*;
 
 public class Drawer
 {
+    static double SHADING_HARSHNESS = 0.2d; //The lower this is the darker the shadows will be (0-1)
     Camera camera;
 
     public Drawer(Camera camera)
@@ -54,7 +55,7 @@ public class Drawer
     }
 
     public static Color getColourShade(Color baseColor, double luminance) {
-        luminance = Math.max(0, Math.min(1, luminance)); //Clamp value for safety
+        luminance = Math.max(SHADING_HARSHNESS, Math.min(1, luminance)); //Clamp value for safety
 
         int red = (int) (baseColor.getRed() * luminance);
         int green = (int) (baseColor.getGreen() * luminance);

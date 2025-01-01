@@ -89,6 +89,12 @@ public class Vector3D implements Translatable
         double length = length();
         set(x/length, y/length, z/length);
     }
+    public Vector3D normalized(){
+        Vector3D clone = new Vector3D(this);
+        clone.normalize();
+        return clone;
+    }
+
     /**
      * Calculates the dot product of the two vectors.
      * Vectors should be normalized!

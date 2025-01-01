@@ -33,7 +33,8 @@ public class Main {
 
         Object3D axis = new Object3D();
         ObjLoader.loadFromObjFile("src/Testing/axis.obj", axis);
-        axis.translate(new Vector3D(0,0,20));
+        axis.translate(new Vector3D(0,0,5));
+        axis.showWireFrame(true);
         testScene.addObject(axis);
 
         SceneRenderer renderer = new SceneRenderer(testScene);

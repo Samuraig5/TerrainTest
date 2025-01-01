@@ -42,6 +42,10 @@ public class Camera implements Translatable, Rotatable
         return new Vector3D(window.getWidth(), window.getHeight(), 0);
     }
 
+    public Vector3D getNearPlane() {return new Vector3D(0,0,zNear);}
+    public Vector3D getFarPlane() {return new Vector3D(0,0,zFar);}
+
+
     @Override
     public void translate(Vector3D delta) {
         Vector3D forwardMovement = getLookDirection().scaled(delta.z());
@@ -50,7 +54,7 @@ public class Camera implements Translatable, Rotatable
         Vector3D movement = forwardMovement.translation(verticalMovement);
 
         position.translate(movement);
-        System.out.println("Camera Pos: " + position.x() + ", " + position.y() + ", " + position.z());
+        //System.out.println("Camera Pos: " + position.x() + ", " + position.y() + ", " + position.z());
     }
 
     public Vector3D getPosition(){return new Vector3D(position);}
@@ -63,7 +67,6 @@ public class Camera implements Translatable, Rotatable
     @Override
     public void rotate(Vector3D delta) {
         rotation.translate(delta);
-        System.out.println("Camera Rot: " + rotation.x() + ", " + rotation.y() + ", " + rotation.z());
-
+        //System.out.println("Camera Rot: " + rotation.x() + ", " + rotation.y() + ", " + rotation.z());
     }
 }
