@@ -13,6 +13,7 @@ public class Object3D implements Translatable, Rotatable
     protected List<Triangle> mesh = new ArrayList<>();
     protected Vector3D rotation = new Vector3D();
     protected Vector3D position = new Vector3D();
+    protected boolean showWireFrame = false;
     public Object3D(){}
     @Override
     public void translate(Vector3D delta) {
@@ -88,6 +89,7 @@ public class Object3D implements Translatable, Rotatable
             triProjected.setShadedColour(shadedColour);
 
             Drawer.fillTriangle(g2d, triProjected);
+            if (showWireFrame) { Drawer.drawTriangle(g2d, Color.black, triProjected); }
         }
     }
 
@@ -113,5 +115,9 @@ public class Object3D implements Translatable, Rotatable
         rotX.mat[2][2] = Math.cos(angle * 0.5f);
         rotX.mat[3][3] = 1f;
         return rotX;
+    }
+
+    public void showWireFrame(boolean showWireFrame) {
+        this.showWireFrame = showWireFrame;
     }
 }

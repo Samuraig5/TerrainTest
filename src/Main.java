@@ -4,6 +4,7 @@ import Rendering.Scene;
 import Rendering.SceneRenderer;
 import Testing.Cube;
 import Testing.RotatingCube;
+import WorldSpace.ObjLoader;
 import WorldSpace.Vector3D;
 
 import javax.swing.*;
@@ -23,7 +24,9 @@ public class Main {
         Scene testScene = new Scene(camera);
 
         RotatingCube cube = new RotatingCube(1, 0.001f);
-        cube.translate(new Vector3D(0, 0, 3));
+        cube.translate(new Vector3D(0, 0, 9));
+        ObjLoader.loadFromObjFile("src/Testing/VideoShip.obj", cube);
+        cube.showWireFrame(true);
         testScene.addObject(cube);
 
         SceneRenderer renderer = new SceneRenderer(testScene);
