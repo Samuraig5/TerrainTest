@@ -43,7 +43,7 @@ public class CameraController implements KeyListener, MouseListener, MouseMotion
 
     @Override
     public void keyPressed(KeyEvent e) {
-        double step = 10; // Camera movement speed
+        double step = 1; // Camera movement speed
         Vector3D delta = new Vector3D(0,0,0);
 
         switch (e.getKeyCode()) {
@@ -51,8 +51,8 @@ public class CameraController implements KeyListener, MouseListener, MouseMotion
             case KeyEvent.VK_S -> delta.translate(new Vector3D(0, 0, -step)); // Move backward
             case KeyEvent.VK_A -> delta.translate(new Vector3D(-step, 0, 0)); // Move left
             case KeyEvent.VK_D -> delta.translate(new Vector3D(step, 0, 0)); // Move right
-            case KeyEvent.VK_SPACE -> delta.translate(new Vector3D(0, -step, 0)); // Move up
-            case KeyEvent.VK_SHIFT -> delta.translate(new Vector3D(0, step, 0)); // Move down
+            case KeyEvent.VK_SPACE -> delta.translate(new Vector3D(0, step, 0)); // Move up
+            case KeyEvent.VK_SHIFT -> delta.translate(new Vector3D(0, -step, 0)); // Move down
         }
 
         updateTranslatables(delta);

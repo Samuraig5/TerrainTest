@@ -5,6 +5,7 @@ import Rendering.SceneRenderer;
 import Testing.Cube;
 import Testing.RotatingCube;
 import WorldSpace.ObjLoader;
+import WorldSpace.Object3D;
 import WorldSpace.Vector3D;
 
 import javax.swing.*;
@@ -23,11 +24,16 @@ public class Main {
         Camera camera = new Camera(frame);
         Scene testScene = new Scene(camera);
 
-        RotatingCube cube = new RotatingCube(1, new Vector3D(0.001f, 0.0005f,0.0001f));
-        cube.translate(new Vector3D(0, 0, 9));
-        ObjLoader.loadFromObjFile("src/Testing/teapot.obj", cube);
+        //RotatingCube cube = new RotatingCube(1, new Vector3D(0.001f, 0.0005f,0.0001f));
+        //cube.translate(new Vector3D(0, 0, 9));
+        //ObjLoader.loadFromObjFile("src/Testing/teapot.obj", cube);
         //cube.showWireFrame(true);
-        testScene.addObject(cube);
+        //testScene.addObject(cube);
+
+        Object3D axis = new Object3D();
+        ObjLoader.loadFromObjFile("src/Testing/axis.obj", axis);
+        axis.translate(new Vector3D(0,0,20));
+        testScene.addObject(axis);
 
         SceneRenderer renderer = new SceneRenderer(testScene);
 

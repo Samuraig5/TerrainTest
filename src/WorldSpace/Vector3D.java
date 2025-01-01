@@ -22,6 +22,9 @@ public class Vector3D implements Translatable
     public double y() {return y;}
     public double z() {return z;}
     public double w() {return w;}
+    public double length() {
+       return Math.sqrt(x*x+y*y+z*z);
+    }
     public void set(double newX, double newY, double newZ, double newW) {
         this.x = newX; this.y = newY; this.z = newZ; this.w = newW;
     }
@@ -59,6 +62,11 @@ public class Vector3D implements Translatable
     {
         scale(new Vector3D(scalar, scalar, scalar));
     }
+    public Vector3D scaled(double scalar){
+        Vector3D res = new Vector3D(this);
+        res.scale(scalar);
+        return res;
+    }
 
     /**
      * Inverts the vector.
@@ -78,7 +86,7 @@ public class Vector3D implements Translatable
      * Normalizes the vector to length 1.
      */
     public void normalize(){
-        double length = Math.sqrt(x*x+y*y+z*z);
+        double length = length();
         set(x/length, y/length, z/length);
     }
     /**
@@ -89,5 +97,13 @@ public class Vector3D implements Translatable
      */
     public double dotProduct(Vector3D other) {
         return x * other.x + y * other.y + z * other.z;
+    }
+
+    public Vector3D crossProduct(Vector3D other)
+    {
+        double x = this.y * other.z - this.z * other.y;
+        double y = this.z * other.x - this.x * other.z;
+        double z = this.x * other.y - this.y * other.x;
+        return new Vector3D(x,y,z);
     }
 }

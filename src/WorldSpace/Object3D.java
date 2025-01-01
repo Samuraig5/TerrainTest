@@ -36,10 +36,15 @@ public class Object3D implements Translatable, Rotatable
         Matrix4x4 rotZ = Matrix4x4.getRotationMatrixZ(rotation.z());
         Matrix4x4 trans = Matrix4x4.getTranslationMatrix(position);
 
-        Matrix4x4 worldTransform = Matrix4x4.getIdentityMatrix();
+        Matrix4x4 worldTransform;
         worldTransform = Matrix4x4.matrixMatrixMultiplication(rotZ, rotX);
         worldTransform = Matrix4x4.matrixMatrixMultiplication(worldTransform, rotY);
         worldTransform = Matrix4x4.matrixMatrixMultiplication(worldTransform, trans);
+
+        Vector3D up = new Vector3D(0,1,0);
+        Vector3D target = camera.getPosition().translation(camera.getLookDirection());
+        Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(camera.getPosition(), target, up);
+        Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
 
         for (Triangle tri : mesh)
         {
@@ -49,11 +54,11 @@ public class Object3D implements Translatable, Rotatable
             Vector3D triNormal = triTransformed.getNormal();
 
             //All three points lie on the same plane so we can choose any
-            Vector3D vectorFromCameraToTriangle =  new Vector3D(triTransformed.getPoints()[0]);
-            vectorFromCameraToTriangle.translate(camera.getPosition().inverse());
+            Vector3D cameraRay = new Vector3D(triTransformed.getPoints()[0]);
+            cameraRay.translate(camera.getPosition().inverse());
 
             //If the camera can't see the triangle, don't draw it
-            if (triNormal.dotProduct(vectorFromCameraToTriangle) > 0) { continue; }
+            if (triNormal.dotProduct(cameraRay) >= 0) { continue; }
 
             //= Primitive Lighting (Replace later) =
             Vector3D lightDirection = new Vector3D(0f, 0f, -1f);
@@ -62,8 +67,10 @@ public class Object3D implements Translatable, Rotatable
             Color shadedColour = Drawer.getColourShade(tri.getBaseColour(), lightDotProduct);
             tri.setShadedColour(shadedColour);
 
+            Triangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);
+
             //= Apply Projection (3D -> 2D) =
-            Triangle triProj = camera.projectTriangle(triTransformed);
+            Triangle triProj = camera.projectTriangle(triViewed);
 
             //= Move projection into view =
             triProj.translate(new Vector3D(1f, 1f, 0));
@@ -82,8 +89,8 @@ public class Object3D implements Translatable, Rotatable
         trianglesToDraw.sort(Comparator.comparingDouble(Triangle::getMidPoint).reversed());
 
         for (Triangle triangle : trianglesToDraw) {
-            Drawer.fillTriangle(g2d, triangle);
-            if (showWireFrame) { Drawer.drawTriangle(g2d, Color.black, triangle); }
+            camera.drawer.fillTriangle(g2d, triangle);
+            if (showWireFrame) { camera.drawer.drawTriangle(g2d, Color.black, triangle); }
         }
     }
 

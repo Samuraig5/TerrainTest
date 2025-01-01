@@ -13,7 +13,7 @@ public class Matrix4x4
      * @param in The vector that should be multiplied with the matrix.
      * @return The resulting vector.
      */
-    public Vector3D multiplyWithVect3D(Vector3D in)
+    public Vector3D multiplyAndNormalize(Vector3D in)
     {
         Vector3D res = matrixVectorMultiplication(new Vector3D(in.x(), in.y(), in.z()));
         if (res.w() != 0) { //Normalisation of the output vector to 'z'
@@ -30,9 +30,9 @@ public class Matrix4x4
     public Triangle multiplyWithTriangle(Triangle triangle)
     {
         Vector3D[] points = triangle.getPoints();
-        Vector3D p1 = multiplyWithVect3D(points[0]);
-        Vector3D p2 = multiplyWithVect3D(points[1]);
-        Vector3D p3 = multiplyWithVect3D(points[2]);
+        Vector3D p1 = multiplyAndNormalize(points[0]);
+        Vector3D p2 = multiplyAndNormalize(points[1]);
+        Vector3D p3 = multiplyAndNormalize(points[2]);
         return new Triangle(p1, p2, p3);
     }
 
@@ -70,6 +70,34 @@ public class Matrix4x4
         }
         return res;
     }
+    /**
+     * Only for Rotation and Translation Matrices!!!
+     * @return Inversion of matrix
+     */
+    public Matrix4x4 quickMatrixInverse()
+    {
+        Matrix4x4 inverse = new Matrix4x4();
+        inverse.mat[0][0] = mat[0][0];
+        inverse.mat[0][1] = mat[1][0];
+        inverse.mat[0][2] = mat[2][0];
+        inverse.mat[0][3] = 0.0f;
+
+        inverse.mat[1][0] = mat[0][1];
+        inverse.mat[1][1] = mat[1][1];
+        inverse.mat[1][2] = mat[2][1];
+        inverse.mat[1][3] = 0.0f;
+
+        inverse.mat[2][0] = mat[0][2];
+        inverse.mat[2][1] = mat[1][2];
+        inverse.mat[2][2] = mat[2][2];
+        inverse.mat[2][3] = 0.0f;
+
+        inverse.mat[3][0] = -(mat[3][0] * inverse.mat[0][0] + mat[3][1] * inverse.mat[1][0] + mat[3][2] * inverse.mat[2][0]);
+        inverse.mat[3][1] = -(mat[3][0] * inverse.mat[0][1] + mat[3][1] * inverse.mat[1][1] + mat[3][2] * inverse.mat[2][1]);
+        inverse.mat[3][2] = -(mat[3][0] * inverse.mat[0][2] + mat[3][1] * inverse.mat[1][2] + mat[3][2] * inverse.mat[2][2]);
+        inverse.mat[3][3] = 1.0f;
+        return inverse;
+    }
 
     public static Matrix4x4 getIdentityMatrix()
     {
@@ -94,21 +122,21 @@ public class Matrix4x4
     }
     public static Matrix4x4 getRotationMatrixY(double angle)
     {
-        Matrix4x4 rotZ = new Matrix4x4();
-        rotZ.mat[0][0] = Math.cos(angle);
-        rotZ.mat[2][0] = Math.sin(angle);
-        rotZ.mat[0][2] = Math.sin(-angle);
-        rotZ.mat[1][1] = 1f;
-        rotZ.mat[2][2] = Math.cos(angle);
-        rotZ.mat[3][3] = 1f;
-        return rotZ;
+        Matrix4x4 rotY = new Matrix4x4();
+        rotY.mat[0][0] = Math.cos(angle);
+        rotY.mat[0][2] = Math.sin(angle);
+        rotY.mat[2][0] = -Math.sin(angle);
+        rotY.mat[1][1] = 1f;
+        rotY.mat[2][2] = Math.cos(angle);
+        rotY.mat[3][3] = 1f;
+        return rotY;
     }
     public static Matrix4x4 getRotationMatrixZ(double angle)
     {
         Matrix4x4 rotZ = new Matrix4x4();
         rotZ.mat[0][0] = Math.cos(angle);
-        rotZ.mat[0][1] = Math.sin(angle);
-        rotZ.mat[1][0] = -Math.sin(angle);
+        rotZ.mat[0][1] = -Math.sin(angle);
+        rotZ.mat[1][0] = Math.sin(angle);
         rotZ.mat[1][1] = Math.cos(angle);
         rotZ.mat[2][2] = 1f;
         rotZ.mat[3][3] = 1f;
@@ -126,16 +154,48 @@ public class Matrix4x4
         trans.mat[3][2] = vec.z();
         return trans;
     }
-
     public static Matrix4x4 getProjectionMatrix(double fov, double aspectRatio, double zNear, double zFar) {
-    double fovRad = 1.0f / Math.tan(fov * 0.5f / 180.0f * Math.PI);
-    Matrix4x4 projectionMatrix = new Matrix4x4();
-    projectionMatrix.mat[0][0] = aspectRatio * fovRad;
-    projectionMatrix.mat[1][1] = fovRad;
-    projectionMatrix.mat[2][2] = zFar / (zFar - zNear);
-    projectionMatrix.mat[3][2] = (-zFar * zNear) / (zFar - zNear);
-    projectionMatrix.mat[2][3] = 1.0f;
-    projectionMatrix.mat[3][3] = 0.0f;
-    return projectionMatrix;
+        double fovRad = 1.0f / Math.tan(fov * 0.5f / 180.0f * Math.PI);
+        Matrix4x4 projectionMatrix = new Matrix4x4();
+        projectionMatrix.mat[0][0] = aspectRatio * fovRad;
+        projectionMatrix.mat[1][1] = fovRad;
+        projectionMatrix.mat[2][2] = zFar / (zFar - zNear);
+        projectionMatrix.mat[3][2] = (-zFar * zNear) / (zFar - zNear);
+        projectionMatrix.mat[2][3] = 1.0f;
+        projectionMatrix.mat[3][3] = 0.0f;
+        return projectionMatrix;
+    }
+    public static Matrix4x4 getPointAtMatrix(Vector3D position, Vector3D target, Vector3D up)
+    {
+        Vector3D newForward = target.translation(position.inverse());
+        newForward.normalize();
+
+        Vector3D a = newForward.scaled(up.dotProduct(newForward));
+        Vector3D newUp = up.translation(a.inverse());
+        newUp.normalize();
+
+        Vector3D newRight = newUp.crossProduct(newForward);
+
+        Matrix4x4 lookAt = new Matrix4x4();
+        lookAt.mat[0][0] = newRight.x();
+        lookAt.mat[0][1] = newRight.y();
+        lookAt.mat[0][2] = newRight.z();
+        lookAt.mat[0][3] = 0.0f;
+
+        lookAt.mat[1][0] = newUp.x();
+        lookAt.mat[1][1] = newUp.y();
+        lookAt.mat[1][2] = newUp.z();
+        lookAt.mat[1][3] = 0.0f;
+
+        lookAt.mat[2][0] = newForward.x();
+        lookAt.mat[2][1] = newForward.y();
+        lookAt.mat[2][2] = newForward.z();
+        lookAt.mat[2][3] = 0.0f;
+
+        lookAt.mat[3][0] = position.x();
+        lookAt.mat[3][1] = position.y();
+        lookAt.mat[3][2] = position.z();
+        lookAt.mat[3][3] = 1.0f;
+        return lookAt;
     }
 }
