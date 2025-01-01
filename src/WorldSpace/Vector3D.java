@@ -5,20 +5,28 @@ public class Vector3D implements Translatable
     private double x;
     private double y;
     private double z;
+    private double w = 1;
 
+    public Vector3D(double x, double y, double z, double w) {
+        set(x, y, z, w);
+    }
     public Vector3D(double x, double y, double z) {
         set(x, y, z);
     }
-    public Vector3D(){set(0,0,0);}
+    public Vector3D(){set(0,0,0, 1);}
 
     public Vector3D(Vector3D source) {
-        set(source.x, source.y, source.z);
+        set(source.x, source.y, source.z, source.w);
     }
     public double x() {return x;}
     public double y() {return y;}
     public double z() {return z;}
+    public double w() {return w;}
+    public void set(double newX, double newY, double newZ, double newW) {
+        this.x = newX; this.y = newY; this.z = newZ; this.w = newW;
+    }
     public void set(double newX, double newY, double newZ) {
-        this.x = newX; this.y = newY; this.z = newZ;
+        set(newX, newY, newZ, w);
     }
     public void set(Vector3D source)
     {

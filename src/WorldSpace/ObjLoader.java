@@ -11,6 +11,7 @@ public class ObjLoader
 {
     public static boolean loadFromObjFile(String filePath, Object3D object3D)
     {
+        object3D.mesh.clear();
         List<Vector3D> vertecies = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {

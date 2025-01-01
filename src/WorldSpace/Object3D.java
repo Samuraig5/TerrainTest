@@ -31,26 +31,27 @@ public class Object3D implements Translatable, Rotatable
 
         List<Triangle> trianglesToDraw = new ArrayList<>();
 
-        Matrix4x4 rotZ = getRotZ(rotation.z());
-        Matrix4x4 rotX = getRotX(rotation.x());
+        Matrix4x4 rotX = Matrix4x4.getRotationMatrixX(rotation.x());
+        Matrix4x4 rotY = Matrix4x4.getRotationMatrixY(rotation.y());
+        Matrix4x4 rotZ = Matrix4x4.getRotationMatrixZ(rotation.z());
+        Matrix4x4 trans = Matrix4x4.getTranslationMatrix(position);
+
+        Matrix4x4 worldTransform = Matrix4x4.getIdentityMatrix();
+        worldTransform = Matrix4x4.matrixMatrixMultiplication(rotZ, rotX);
+        worldTransform = Matrix4x4.matrixMatrixMultiplication(worldTransform, rotY);
+        worldTransform = Matrix4x4.matrixMatrixMultiplication(worldTransform, trans);
 
         for (Triangle tri : mesh)
         {
-            Vector3D[] triPoints = tri.getPoints();
-            //= Apply rotation in Z =
-            Triangle triRotZ = rotZ.multiplyWithTriangle(tri);
-
-            //= Apply rotation in X =
-            Triangle triRotZX = rotX.multiplyWithTriangle(triRotZ);
-
-            //= Apply translation =
-            Triangle triTrans = triRotZX.translation(position);
+            Triangle triTransformed = worldTransform.multiplyWithTriangle(tri);
 
             //= Check if triangle normal is facing the camera =
-            Vector3D triNormal = triTrans.getNormal();
+            Vector3D triNormal = triTransformed.getNormal();
+
             //All three points lie on the same plane so we can choose any
-            Vector3D vectorFromCameraToTriangle =  new Vector3D(triTrans.getPoints()[0]);
+            Vector3D vectorFromCameraToTriangle =  new Vector3D(triTransformed.getPoints()[0]);
             vectorFromCameraToTriangle.translate(camera.getPosition().inverse());
+
             //If the camera can't see the triangle, don't draw it
             if (triNormal.dotProduct(vectorFromCameraToTriangle) > 0) { continue; }
 
@@ -62,7 +63,7 @@ public class Object3D implements Translatable, Rotatable
             tri.setShadedColour(shadedColour);
 
             //= Apply Projection (3D -> 2D) =
-            Triangle triProj = camera.projectTriangle(triTrans);
+            Triangle triProj = camera.projectTriangle(triTransformed);
 
             //= Move projection into view =
             triProj.translate(new Vector3D(1f, 1f, 0));
@@ -84,30 +85,6 @@ public class Object3D implements Translatable, Rotatable
             Drawer.fillTriangle(g2d, triangle);
             if (showWireFrame) { Drawer.drawTriangle(g2d, Color.black, triangle); }
         }
-    }
-
-    Matrix4x4 getRotZ(double angle)
-    {
-        Matrix4x4 rotZ = new Matrix4x4();
-        rotZ.mat[0][0] = Math.cos(angle);
-        rotZ.mat[0][1] = Math.sin(angle);
-        rotZ.mat[1][0] = -Math.sin(angle);
-        rotZ.mat[1][1] = Math.cos(angle);
-        rotZ.mat[2][2] = 1f;
-        rotZ.mat[3][3] = 1f;
-        return rotZ;
-    }
-
-    Matrix4x4 getRotX(double angle)
-    {
-        Matrix4x4 rotX = new Matrix4x4();
-        rotX.mat[0][0] = 1f;
-        rotX.mat[1][1] = Math.cos(angle * 0.5f);
-        rotX.mat[1][2] = Math.sin(angle * 0.5f);
-        rotX.mat[2][1] = -Math.sin(angle * 0.5f);
-        rotX.mat[2][2] = Math.cos(angle * 0.5f);
-        rotX.mat[3][3] = 1f;
-        return rotX;
     }
 
     public void showWireFrame(boolean showWireFrame) {

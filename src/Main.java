@@ -23,10 +23,10 @@ public class Main {
         Camera camera = new Camera(frame);
         Scene testScene = new Scene(camera);
 
-        RotatingCube cube = new RotatingCube(1, 0.001f);
+        RotatingCube cube = new RotatingCube(1, new Vector3D(0.001f, 0.0005f,0.0001f));
         cube.translate(new Vector3D(0, 0, 9));
-        ObjLoader.loadFromObjFile("src/Testing/VideoShip.obj", cube);
-        cube.showWireFrame(true);
+        ObjLoader.loadFromObjFile("src/Testing/teapot.obj", cube);
+        //cube.showWireFrame(true);
         testScene.addObject(cube);
 
         SceneRenderer renderer = new SceneRenderer(testScene);
@@ -36,6 +36,5 @@ public class Main {
 
         frame.add(renderer);
         frame.setVisible(true);
-
     }
 }
