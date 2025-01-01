@@ -11,7 +11,8 @@ public class Object3D implements Translatable, Rotatable
 {
     protected Vector3D[] points;
     protected List<Triangle> mesh = new ArrayList<>();
-
+    protected Vector3D rotation = new Vector3D();
+    protected Vector3D position = new Vector3D();
     public Object3D(){}
     @Override
     public void translate(Vector3D delta) {
