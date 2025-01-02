@@ -31,6 +31,7 @@ public class Material
         for (int i = 0; i < 3; i++) {
             textureCoords[i] = new Vector2D(source.getTextureCoords()[i]);
         }
+        setTexturePath(source.getTexturePath());
     }
 
     public Color getShadedColour() {

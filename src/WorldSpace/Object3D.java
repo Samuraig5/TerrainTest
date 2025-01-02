@@ -30,7 +30,7 @@ public class Object3D implements Translatable, Rotatable
     {
         Graphics2D g2d = (Graphics2D) g;
 
-        List<Triangle> trianglesToDraw = new ArrayList<>();
+        List<Triangle> trianglesToRaster = new ArrayList<>();
 
         Matrix4x4 rotX = Matrix4x4.getRotationMatrixX(rotation.x());
         Matrix4x4 rotY = Matrix4x4.getRotationMatrixY(rotation.y());
@@ -51,6 +51,9 @@ public class Object3D implements Translatable, Rotatable
 
         for (Triangle tri : mesh)
         {
+            //TODO: THIS IS JUST FOR TESTING
+            tri.getMaterial().setTexturePath("src/Testing/rock.png");
+
             Triangle triTransformed = worldTransform.multiplyWithTriangle(tri);
             triTransformed.setMaterial(tri);
 
@@ -65,10 +68,11 @@ public class Object3D implements Translatable, Rotatable
             if (triNormal.dotProduct(cameraRay) >= 0) { continue; }
 
             //= Primitive Lighting (Replace later) =
-            Vector3D lightDirection = new Vector3D(0f, 0f, -1f);
+            Vector3D lightDirection = new Vector3D(0f, 1f, -1f);
             lightDirection.normalize();
+
             double lightDotProduct = triNormal.dotProduct(lightDirection);
-            tri.getMaterial().setLuminance(lightDotProduct);
+            triTransformed.getMaterial().setLuminance(lightDotProduct);
 
             // = Convert World Space -> View Space =
             Triangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);
@@ -94,13 +98,13 @@ public class Object3D implements Translatable, Rotatable
                 triProj.scale(new Vector3D(centreX, centreY, 1));
 
                 //= Add triangle to list=
-                trianglesToDraw.add(triProj);
+                trianglesToRaster.add(triProj);
             }
         }
 
-        trianglesToDraw.sort(Comparator.comparingDouble(Triangle::getMidPoint).reversed());
+        trianglesToRaster.sort(Comparator.comparingDouble(Triangle::getMidPoint).reversed());
 
-        for (Triangle triangle : trianglesToDraw) {
+        for (Triangle triangle : trianglesToRaster) {
             List<Triangle> triangleQueue = new ArrayList<>();
             triangleQueue.add(triangle);
             int numNewTriangles = 1;
@@ -136,7 +140,6 @@ public class Object3D implements Translatable, Rotatable
             }
             for (Triangle triToDraw : triangleQueue) {
                 //camera.drawer.fillTriangle(g2d, triToDraw);
-                triangle.getMaterial().setTexturePath("src/Testing/rock.png");
                 camera.drawer.textureTriangle(g2d,triToDraw);
                 if (showWireFrame) { camera.drawer.drawTriangle(g2d, Color.white, triToDraw); }
             }

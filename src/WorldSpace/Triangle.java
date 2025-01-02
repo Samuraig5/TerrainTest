@@ -32,11 +32,7 @@ public class Triangle implements Translatable
         line1.translate(points[0].inverse());
         line2.translate(points[0].inverse());
 
-        double normalX = line1.y() * line2.z() - line1.z() * line2.y();
-        double normalY = line1.z() * line2.x() - line1.x() * line2.z();
-        double normalZ = line1.x() * line2.y() - line1.y() * line2.x();
-
-        Vector3D normal = new Vector3D(normalX, normalY, normalZ);
+        Vector3D normal = line1.crossProduct(line2);
         normal.normalize();
         return normal;
     }
@@ -58,12 +54,12 @@ public class Triangle implements Translatable
         Vector3D p3 = points[2].translation(delta);
         return new Triangle(p1, p2, p3);
     }
-
     public void scale(Vector3D scalar) {
         points[0].scale(scalar);
         points[1].scale(scalar);
         points[2].scale(scalar);
     }
+
     public Material getMaterial() {
         return material;
     }
@@ -72,6 +68,6 @@ public class Triangle implements Translatable
         this.material = material;
     }
     public void setMaterial(Triangle tri){
-        setMaterial(tri.getMaterial());
+        setMaterial(new Material (tri.getMaterial()));
     }
 }

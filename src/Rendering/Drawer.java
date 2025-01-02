@@ -61,7 +61,7 @@ public class Drawer
     public void textureTriangle(Graphics2D g, Triangle tri)
     {
         BufferedImage sprite = spriteManager.getResource(tri.getMaterial().getTexturePath());
-        if (sprite == null) {return;}
+        if (sprite == null) {System.err.println("Drawer: Triangle doesn't have a texture!"); return;}
 
         Vector3D[] points = tri.getPoints();
         Vector2D[] texPoints = tri.getMaterial().getTextureCoords();
@@ -70,9 +70,9 @@ public class Drawer
         int x2 = (int) points[1].x(); int y2 = (int) points[1].y();
         int x3 = (int) points[2].x(); int y3 = (int) points[2].y();
 
-        int u1 = (int) texPoints[0].u(); int v1 = (int) texPoints[0].v(); int w1 = 0;
-        int u2 = (int) texPoints[1].u(); int v2 = (int) texPoints[1].v(); int w2 = 0;
-        int u3 = (int) texPoints[2].u(); int v3 = (int) texPoints[2].v(); int w3 = 0;
+        double u1 = texPoints[0].u(); double v1 = texPoints[0].v(); double w1 = 0;
+        double u2 = texPoints[1].u(); double v2 = texPoints[1].v(); double w2 = 0;
+        double u3 = texPoints[2].u(); double v3 = texPoints[2].v(); double w3 = 0;
 
         Texturizer.textureTriangle(g,(int)camera.getScreenDimensions().y(),x1,y1,u1,v1,w1,x2,y2,u2,v2,w2,x3,y3,u3,v3,w3, sprite);
     }
