@@ -68,8 +68,7 @@ public class Object3D implements Translatable, Rotatable
             Vector3D lightDirection = new Vector3D(0f, 0f, -1f);
             lightDirection.normalize();
             double lightDotProduct = triNormal.dotProduct(lightDirection);
-            Color shadedColour = Drawer.getColourShade(tri.getBaseColour(), lightDotProduct);
-            tri.setShadedColour(shadedColour);
+            tri.getMaterial().setLuminance(lightDotProduct);
 
             // = Convert World Space -> View Space =
             Triangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);
@@ -93,7 +92,7 @@ public class Object3D implements Translatable, Rotatable
                 triProj.scale(new Vector3D(centreX, centreY, 1));
 
                 //= Add triangle to list=
-                triProj.setShadedColour(Drawer.getColourShade(triProj.getBaseColour(), lightDotProduct));
+                triProj.getMaterial().setLuminance(lightDotProduct);
                 trianglesToDraw.add(triProj);
             }
         }
@@ -175,7 +174,7 @@ public class Object3D implements Translatable, Rotatable
             Vector3D p2 = l2.getIntersectToPlane(planePosition, planeNormal);
 
             Triangle newTriangle = new Triangle(p0, p1, p2);
-            newTriangle.copyColour(in);
+            newTriangle.setMaterial(in);
             out.add(newTriangle);
 
             return out;
@@ -192,11 +191,11 @@ public class Object3D implements Translatable, Rotatable
             Vector3D p3 = l3.getIntersectToPlane(planePosition, planeNormal);
 
             Triangle tri1 = new Triangle(p0, p1, p2);
-            tri1.copyColour(in);
+            tri1.setMaterial(in);
             out.add(tri1);
 
             Triangle tri2 = new Triangle(p1, p2, p3);
-            tri2.copyColour(in);
+            tri2.setMaterial(in);
             out.add(tri2);
 
             return out;

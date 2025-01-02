@@ -42,7 +42,7 @@ public class Drawer
     {
         t = adjustTriangle(t);
 
-        g.setColor(t.getShadedColour());
+        g.setColor(t.getMaterial().getShadedColour());
 
         Vector3D points[] = t.getPoints();
 
@@ -79,8 +79,7 @@ public class Drawer
         Vector3D p3 = adjustVector(points[2]);
 
         Triangle res = new Triangle(p1,p2,p3);
-        res.setBaseColour(tri.getBaseColour());
-        res.setShadedColour(tri.getShadedColour());
+        res.setMaterial(new Material(tri.getMaterial()));
         return res;
     }
 }

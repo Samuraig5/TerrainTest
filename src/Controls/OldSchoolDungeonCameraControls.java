@@ -53,7 +53,6 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
     @Override
     public void keyPressed(KeyEvent e) {
-        System.out.println(e.getKeyCode());
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W -> wDown = true;
             case KeyEvent.VK_A -> aDown = true;

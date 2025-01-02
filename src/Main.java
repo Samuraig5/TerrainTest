@@ -26,7 +26,7 @@ public class Main {
         Scene testScene = new Scene(camera);
 
         //RotatingCube cube = new RotatingCube(1, new Vector3D(0.001f, 0.0005f,0.0001f));
-        //cube.translate(new Vector3D(0, 0, 9));
+        //cube.translate(new Vector3D(2, 2, 9));
         //ObjLoader.loadFromObjFile("src/Testing/teapot.obj", cube);
         //cube.showWireFrame(true);
         //testScene.addObject(cube);
@@ -34,7 +34,7 @@ public class Main {
         Object3D axis = new Object3D();
         ObjLoader.loadFromObjFile("src/Testing/axis.obj", axis);
         axis.translate(new Vector3D(0,0,5));
-        axis.showWireFrame(true);
+        axis.showWireFrame(false);
         testScene.addObject(axis);
 
         SceneRenderer renderer = new SceneRenderer(testScene);

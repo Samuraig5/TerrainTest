@@ -1,23 +1,23 @@
 package WorldSpace;
 
+import Rendering.Material;
+
 import java.awt.*;
 
 public class Triangle implements Translatable
 {
     private final Vector3D[] points = new Vector3D[3];
-    private Color baseColour;
-    private Color shadedColour;
-
+    private Material material;
     public Triangle(Vector3D point0, Vector3D point1, Vector3D point2)
     {
-        baseColour = Color.magenta;
-        shadedColour = baseColour;
+        material = new Material();
         points[0] = point0;
         points[1] = point1;
         points[2] = point2;
     }
     public Triangle(Triangle tri)
     {
+        material = new Material(tri.getMaterial());
         points[0] = new Vector3D(tri.points[0].x(), tri.points[0].y(), tri.points[0].z());
         points[1] = new Vector3D(tri.points[1].x(), tri.points[1].y(), tri.points[1].z());
         points[2] = new Vector3D(tri.points[2].x(), tri.points[2].y(), tri.points[2].z());
@@ -65,23 +65,14 @@ public class Triangle implements Translatable
         points[1].scale(scalar);
         points[2].scale(scalar);
     }
-
-    public void setBaseColour(Color baseColour) {
-        this.baseColour = baseColour;
-    }
-    public Color getBaseColour() {
-        return baseColour;
-    }
-    public void setShadedColour(Color shadedColour) {
-        this.shadedColour = shadedColour;
-    }
-    public Color getShadedColour() {
-        return shadedColour;
+    public Material getMaterial() {
+        return material;
     }
 
-    public void copyColour(Triangle source)
-    {
-        this.setBaseColour(source.getBaseColour());
-        this.setShadedColour(source.getShadedColour());
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+    public void setMaterial(Triangle tri){
+        setMaterial(tri.getMaterial());
     }
 }
