@@ -1,7 +1,9 @@
 package Testing;
 
+import Rendering.Material;
 import WorldSpace.Object3D;
 import WorldSpace.Triangle;
+import WorldSpace.Vector2D;
 import WorldSpace.Vector3D;
 
 public class Cube extends Object3D
@@ -18,28 +20,56 @@ public class Cube extends Object3D
                 new Vector3D(size, size, size),
                 new Vector3D(size, 0, size),
         };
+
+        Triangle tri;
+
         //Front Face
-        mesh.add(new Triangle(points[0], points[1], points[2]));
-        mesh.add(new Triangle(points[0], points[2], points[3]));
+        tri = new Triangle(points[0], points[1], points[2]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(0,0),new Vector2D(1,0)));
+        mesh.add(tri);
+
+        tri = new Triangle(points[0], points[2], points[3]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(1,0),new Vector2D(1,1)));
+        mesh.add(tri);
 
         //Back Face
-        mesh.add(new Triangle(points[6], points[5], points[4]));
-        mesh.add(new Triangle(points[6], points[4], points[7]));
+        tri = new Triangle(points[6], points[5], points[4]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(0,0),new Vector2D(1,0)));
+        mesh.add(tri);
+        tri = new Triangle(points[6], points[4], points[7]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(1,0),new Vector2D(1,1)));
+        mesh.add(tri);
 
         //Right Face
-        mesh.add(new Triangle(points[3], points[2], points[6]));
-        mesh.add(new Triangle(points[3], points[6], points[7]));
+        tri = new Triangle(points[3], points[2], points[6]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(0,0),new Vector2D(1,0)));
+        mesh.add(tri);
+        tri = new Triangle(points[3], points[6], points[7]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(1,0),new Vector2D(1,1)));
+        mesh.add(tri);
 
         //Left Face
-        mesh.add(new Triangle(points[4], points[5], points[1]));
-        mesh.add(new Triangle(points[4], points[1], points[0]));
+        tri = new Triangle(points[4], points[5], points[1]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(0,0),new Vector2D(1,0)));
+        mesh.add(tri);
+        tri = new Triangle(points[4], points[1], points[0]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(1,0),new Vector2D(1,1)));
+        mesh.add(tri);
 
         //Top Face
-        mesh.add(new Triangle(points[1], points[5], points[6]));
-        mesh.add(new Triangle(points[1], points[6], points[2]));
+        tri = new Triangle(points[1], points[5], points[6]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(0,0),new Vector2D(1,0)));
+        mesh.add(tri);
+        tri = new Triangle(points[1], points[6], points[2]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(1,0),new Vector2D(1,1)));
+        mesh.add(tri);
 
         //Bottom Face
-        mesh.add(new Triangle(points[3], points[7], points[4]));
-        mesh.add(new Triangle(points[3], points[4], points[0]));
+        tri = new Triangle(points[3], points[7], points[4]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(0,0),new Vector2D(1,0)));
+        mesh.add(tri);
+        tri = new Triangle(points[3], points[4], points[0]);
+        tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(1,0),new Vector2D(1,1)));
+        mesh.add(tri);
     }
 }

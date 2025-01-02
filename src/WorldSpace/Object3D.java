@@ -1,13 +1,12 @@
 package WorldSpace;
 
 import Rendering.Camera;
-import Rendering.Drawer;
+import Rendering.Material;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.Function;
 
 public class Object3D implements Translatable, Rotatable
@@ -53,11 +52,12 @@ public class Object3D implements Translatable, Rotatable
         for (Triangle tri : mesh)
         {
             Triangle triTransformed = worldTransform.multiplyWithTriangle(tri);
+            triTransformed.setMaterial(tri);
 
             //= Check if triangle normal is facing the camera =
             Vector3D triNormal = triTransformed.getNormal();
 
-            //All three points lie on the same plane so we can choose any
+            //All three points lie on the same plane, so we can choose any
             Vector3D cameraRay = new Vector3D(triTransformed.getPoints()[0]);
             cameraRay.translate(camera.getPosition().inverse());
 
@@ -72,6 +72,7 @@ public class Object3D implements Translatable, Rotatable
 
             // = Convert World Space -> View Space =
             Triangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);
+            triViewed.setMaterial(triTransformed);
 
             // = Clip Viewed Triangle =
             Vector3D planePosition = camera.getNearPlane();
@@ -82,6 +83,7 @@ public class Object3D implements Translatable, Rotatable
             {
                 //= Apply Projection (3D -> 2D) =
                 Triangle triProj = camera.projectTriangle(triClipped);
+                triProj.setMaterial(triClipped);
 
                 //= Move projection into view =
                 triProj.translate(new Vector3D(1f, 1f, 0));
@@ -92,7 +94,6 @@ public class Object3D implements Translatable, Rotatable
                 triProj.scale(new Vector3D(centreX, centreY, 1));
 
                 //= Add triangle to list=
-                triProj.getMaterial().setLuminance(lightDotProduct);
                 trianglesToDraw.add(triProj);
             }
         }
@@ -134,8 +135,10 @@ public class Object3D implements Translatable, Rotatable
                 numNewTriangles = triangleQueue.size();
             }
             for (Triangle triToDraw : triangleQueue) {
-                camera.drawer.fillTriangle(g2d, triToDraw);
-                if (showWireFrame) { camera.drawer.drawTriangle(g2d, Color.black, triToDraw); }
+                //camera.drawer.fillTriangle(g2d, triToDraw);
+                triangle.getMaterial().setTexturePath("src/Testing/rock.png");
+                camera.drawer.textureTriangle(g2d,triToDraw);
+                if (showWireFrame) { camera.drawer.drawTriangle(g2d, Color.white, triToDraw); }
             }
         }
     }
@@ -145,20 +148,32 @@ public class Object3D implements Translatable, Rotatable
         planeNormal.normalize();
 
         Function<Vector3D, Double> dist = (Vector3D p) -> {
-            Vector3D n = p.normalized();
+            //Vector3D n = p.normalized();
             return (planeNormal.x() * p.x() + planeNormal.y() * p.y() + planeNormal.z() * p.z()
                     - planeNormal.dotProduct(planePosition));
         };
 
         Vector3D[] inPoints = new Vector3D[3]; int numInPoints = 0;
         Vector3D[] outPoints = new Vector3D[3]; int numOutPoints = 0;
+        Vector2D[] texInPoints = new Vector2D[3]; int numTexInPoints = 0;
+        Vector2D[] texOutPoints = new Vector2D[3]; int numTexOutPoints = 0;
+
 
         Vector3D[] points = in.getPoints();
+        Vector2D[] texPoints = in.getMaterial().getTextureCoords();
 
         for (int i = 0; i < 3; i++) {
             double distance = dist.apply(points[i]);
-            if (distance >= 0) { inPoints[numInPoints++] = points[i]; }
-            else {outPoints[numOutPoints++] = points[i];}
+            if (distance >= 0)
+            {
+                inPoints[numInPoints++] = points[i];
+                texInPoints[numTexInPoints++] = texPoints[i];
+            }
+            else
+            {
+                outPoints[numOutPoints++] = points[i];
+                texOutPoints[numTexOutPoints++] = texPoints[i];
+            }
         }
 
         List<Triangle> out = new ArrayList<>();
@@ -167,14 +182,27 @@ public class Object3D implements Translatable, Rotatable
         if (numInPoints == 1) // Only one point of the triangle was inside the clipping area
         {
             Vector3D p0 = inPoints[0];
+            Vector2D t0 = texInPoints[0];
 
             Line l1 = new Line(inPoints[0], outPoints[0]);
             Vector3D p1 = l1.getIntersectToPlane(planePosition, planeNormal);
+
+            double u1 = l1.getDistanceToLastIntersect() * (texOutPoints[0].u() - texInPoints[0].u()) + texInPoints[0].u();
+            double v1 = l1.getDistanceToLastIntersect() * (texOutPoints[0].v() - texInPoints[0].v()) + texInPoints[0].v();
+            Vector2D t1 = new Vector2D(u1, v1);
+
             Line l2 = new Line(inPoints[0], outPoints[1]);
             Vector3D p2 = l2.getIntersectToPlane(planePosition, planeNormal);
 
+            double u2 = l2.getDistanceToLastIntersect() * (texOutPoints[1].u() - texInPoints[0].u()) + texInPoints[0].u();
+            double v2 = l2.getDistanceToLastIntersect() * (texOutPoints[1].v() - texInPoints[0].v()) + texInPoints[0].v();
+            Vector2D t2 = new Vector2D(u2, v2);
+
+            Material newMaterial = new Material(in.getMaterial());
+            newMaterial.setTextureCoords(t0, t1, t2);
+
             Triangle newTriangle = new Triangle(p0, p1, p2);
-            newTriangle.setMaterial(in);
+            newTriangle.setMaterial(newMaterial);
             out.add(newTriangle);
 
             return out;
@@ -182,20 +210,36 @@ public class Object3D implements Translatable, Rotatable
         if (numInPoints == 2) // Two point of the triangle was inside the clipping area
         {
             Vector3D p0 = inPoints[0];
+            Vector2D t0 = texInPoints[0];
             Vector3D p1 = inPoints[1];
+            Vector2D t1 = texInPoints[1];
 
             Line l2 = new Line(inPoints[0], outPoints[0]);
             Vector3D p2 = l2.getIntersectToPlane(planePosition, planeNormal);
 
+            double u2 = l2.getDistanceToLastIntersect() * (texOutPoints[0].u() - texInPoints[0].u()) + texInPoints[0].u();
+            double v2 = l2.getDistanceToLastIntersect() * (texOutPoints[0].v() - texInPoints[0].v()) + texInPoints[0].v();
+            Vector2D t2 = new Vector2D(u2, v2);
+
             Line l3 = new Line(inPoints[1], outPoints[0]);
             Vector3D p3 = l3.getIntersectToPlane(planePosition, planeNormal);
 
+            double u3 = l3.getDistanceToLastIntersect() * (texOutPoints[0].u() - texInPoints[1].u()) + texInPoints[1].u();
+            double v3 = l3.getDistanceToLastIntersect() * (texOutPoints[0].v() - texInPoints[1].v()) + texInPoints[1].v();
+            Vector2D t3 = new Vector2D(u3, v3);
+
+            Material mat1 = new Material(in.getMaterial());
+            mat1.setTextureCoords(t0, t1, t2);
+
             Triangle tri1 = new Triangle(p0, p1, p2);
-            tri1.setMaterial(in);
+            tri1.setMaterial(mat1);
             out.add(tri1);
 
+            Material mat2 = new Material(in.getMaterial());
+            mat2.setTextureCoords(t1, t2, t3);
+
             Triangle tri2 = new Triangle(p1, p2, p3);
-            tri2.setMaterial(in);
+            tri2.setMaterial(mat2);
             out.add(tri2);
 
             return out;

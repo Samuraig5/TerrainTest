@@ -7,10 +7,9 @@ import java.awt.*;
 public class Triangle implements Translatable
 {
     private final Vector3D[] points = new Vector3D[3];
-    private Material material;
+    private Material material = new Material();
     public Triangle(Vector3D point0, Vector3D point1, Vector3D point2)
     {
-        material = new Material();
         points[0] = point0;
         points[1] = point1;
         points[2] = point2;
