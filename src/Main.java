@@ -26,7 +26,7 @@ public class Main {
 
         Cube cube = new Cube(1);
         cube.translate(new Vector3D(0,0,5));
-        cube.showWireFrame(true);
+        cube.showWireFrame(false);
         testScene.addObject(cube);
 
         //RotatingCube cube = new RotatingCube(1, new Vector3D(0.001f, 0.0005f,0.0001f));

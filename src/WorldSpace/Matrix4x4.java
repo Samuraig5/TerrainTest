@@ -4,35 +4,12 @@ public class Matrix4x4
 {
     public double[][] mat = new double[4][4];
 
-    /**
-     * Multiplies a given input vector with the matrix.
-     * Since the input vector is 3D, it has an implied fourth element set to '1'.
-     * So given a vector 'in', the implied vector 'in~' would be 'in~=(in.x, in.y, in.z, 1.0f)'.
-     * The vector is also normalized in the 'z' component.
-     *
-     * @param in The vector that should be multiplied with the matrix.
-     * @return The resulting vector.
-     */
-    public Vector3D multiplyAndNormalize(Vector3D in)
-    {
-        Vector3D res = matrixVectorMultiplication(new Vector3D(in.x(), in.y(), in.z()));
-        if (res.w() != 0) { //Normalisation of the output vector to 'z'
-            double x = res.x()/ res.w();
-            double y = res.y()/ res.w();
-            double z = res.z()/ res.w();
-            return new Vector3D(x, y, z);
-        } else {
-            System.err.println("Matrix4x4: w component of resulting vector is = 0");
-            return new Vector3D(0,0,0);
-        }
-    }
-
     public Triangle multiplyWithTriangle(Triangle triangle)
     {
         Vector3D[] points = triangle.getPoints();
-        Vector3D p1 = multiplyAndNormalize(points[0]);
-        Vector3D p2 = multiplyAndNormalize(points[1]);
-        Vector3D p3 = multiplyAndNormalize(points[2]);
+        Vector3D p1 = matrixVectorMultiplication(points[0]);
+        Vector3D p2 = matrixVectorMultiplication(points[1]);
+        Vector3D p3 = matrixVectorMultiplication(points[2]);
         return new Triangle(p1, p2, p3);
     }
 

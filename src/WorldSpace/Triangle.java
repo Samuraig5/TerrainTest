@@ -2,8 +2,6 @@ package WorldSpace;
 
 import Rendering.Material;
 
-import java.awt.*;
-
 public class Triangle implements Translatable
 {
     private final Vector3D[] points = new Vector3D[3];
@@ -58,6 +56,13 @@ public class Triangle implements Translatable
         points[0].scale(scalar);
         points[1].scale(scalar);
         points[2].scale(scalar);
+    }
+
+    public void dividePointsByW()
+    {
+        points[0].scale(1/points[0].w());
+        points[1].scale(1/points[1].w());
+        points[2].scale(1/points[2].w());
     }
 
     public Material getMaterial() {

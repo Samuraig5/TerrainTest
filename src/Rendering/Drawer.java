@@ -70,9 +70,9 @@ public class Drawer
         int x2 = (int) points[1].x(); int y2 = (int) points[1].y();
         int x3 = (int) points[2].x(); int y3 = (int) points[2].y();
 
-        double u1 = texPoints[0].u(); double v1 = texPoints[0].v(); double w1 = 0;
-        double u2 = texPoints[1].u(); double v2 = texPoints[1].v(); double w2 = 0;
-        double u3 = texPoints[2].u(); double v3 = texPoints[2].v(); double w3 = 0;
+        double u1 = texPoints[0].u(); double v1 = texPoints[0].v(); double w1 = texPoints[0].w();
+        double u2 = texPoints[1].u(); double v2 = texPoints[1].v(); double w2 = texPoints[1].w();;
+        double u3 = texPoints[2].u(); double v3 = texPoints[2].v(); double w3 = texPoints[2].w();
 
         Texturizer.textureTriangle(g,(int)camera.getScreenDimensions().y(),x1,y1,u1,v1,w1,x2,y2,u2,v2,w2,x3,y3,u3,v3,w3, sprite);
     }

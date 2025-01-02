@@ -10,7 +10,7 @@ public class Camera implements Translatable, Rotatable
     public Drawer drawer;
     Matrix4x4 projectionMatrix;
     double fov = 90;
-    double zNear = 0.1d;
+    double zNear = 0.25d;
     double zFar = 1000;
 
     Vector3D position = new Vector3D();
@@ -25,15 +25,6 @@ public class Camera implements Translatable, Rotatable
         this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, aspectRatio, zNear, zFar);
     }
 
-    /**
-     * Projects a given vector in world space into a vector in screen space.
-     *
-     * @param in Vector in world space.
-     * @return The projection of 'in' onto the screen space.
-     */
-    public Vector3D projectVector(Vector3D in) {
-        return projectionMatrix.multiplyAndNormalize(in);
-    }
     public Triangle projectTriangle(Triangle in) {
         return projectionMatrix.multiplyWithTriangle(in);
     }

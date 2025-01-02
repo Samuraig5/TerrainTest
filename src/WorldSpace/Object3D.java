@@ -87,7 +87,27 @@ public class Object3D implements Translatable, Rotatable
             {
                 //= Apply Projection (3D -> 2D) =
                 Triangle triProj = camera.projectTriangle(triClipped);
-                triProj.setMaterial(triClipped);
+
+                Vector3D[] points = triProj.getPoints();
+                Vector2D[] texPoints = triClipped.getMaterial().getTextureCoords();
+                double u1 = texPoints[0].u() / points[0].w();
+                double u2 = texPoints[1].u() / points[1].w();
+                double u3 = texPoints[2].u() / points[2].w();
+                double v1 = texPoints[0].v() / points[0].w();
+                double v2 = texPoints[1].v() / points[1].w();
+                double v3 = texPoints[2].v() / points[2].w();
+                double w1 = 1f / points[0].w();
+                double w2 = 1f / points[1].w();
+                double w3 = 1f / points[2].w();
+                Vector2D tex1 = new Vector2D(u1, v1, w1);
+                Vector2D tex2 = new Vector2D(u2, v2, w2);
+                Vector2D tex3 = new Vector2D(u3, v3, w3);
+
+                Material newMat = new Material(triClipped.getMaterial());
+                newMat.setTextureCoords(tex1, tex2, tex3);
+                triProj.setMaterial(newMat);
+
+                triProj.dividePointsByW();
 
                 //= Move projection into view =
                 triProj.translate(new Vector3D(1f, 1f, 0));
@@ -192,14 +212,16 @@ public class Object3D implements Translatable, Rotatable
 
             double u1 = l1.getDistanceToLastIntersect() * (texOutPoints[0].u() - texInPoints[0].u()) + texInPoints[0].u();
             double v1 = l1.getDistanceToLastIntersect() * (texOutPoints[0].v() - texInPoints[0].v()) + texInPoints[0].v();
-            Vector2D t1 = new Vector2D(u1, v1);
+            double w1 = l1.getDistanceToLastIntersect() * (texOutPoints[0].w() - texInPoints[0].w()) + texInPoints[0].w();
+            Vector2D t1 = new Vector2D(u1, v1, w1);
 
             Line l2 = new Line(inPoints[0], outPoints[1]);
             Vector3D p2 = l2.getIntersectToPlane(planePosition, planeNormal);
 
             double u2 = l2.getDistanceToLastIntersect() * (texOutPoints[1].u() - texInPoints[0].u()) + texInPoints[0].u();
             double v2 = l2.getDistanceToLastIntersect() * (texOutPoints[1].v() - texInPoints[0].v()) + texInPoints[0].v();
-            Vector2D t2 = new Vector2D(u2, v2);
+            double w2 = l2.getDistanceToLastIntersect() * (texOutPoints[1].w() - texInPoints[0].w()) + texInPoints[0].w();
+            Vector2D t2 = new Vector2D(u2, v2, w2);
 
             Material newMaterial = new Material(in.getMaterial());
             newMaterial.setTextureCoords(t0, t1, t2);
@@ -222,14 +244,16 @@ public class Object3D implements Translatable, Rotatable
 
             double u2 = l2.getDistanceToLastIntersect() * (texOutPoints[0].u() - texInPoints[0].u()) + texInPoints[0].u();
             double v2 = l2.getDistanceToLastIntersect() * (texOutPoints[0].v() - texInPoints[0].v()) + texInPoints[0].v();
-            Vector2D t2 = new Vector2D(u2, v2);
+            double w2 = l2.getDistanceToLastIntersect() * (texOutPoints[0].w() - texInPoints[0].w()) + texInPoints[0].w();
+            Vector2D t2 = new Vector2D(u2, v2, w2);
 
             Line l3 = new Line(inPoints[1], outPoints[0]);
             Vector3D p3 = l3.getIntersectToPlane(planePosition, planeNormal);
 
             double u3 = l3.getDistanceToLastIntersect() * (texOutPoints[0].u() - texInPoints[1].u()) + texInPoints[1].u();
             double v3 = l3.getDistanceToLastIntersect() * (texOutPoints[0].v() - texInPoints[1].v()) + texInPoints[1].v();
-            Vector2D t3 = new Vector2D(u3, v3);
+            double w3 = l2.getDistanceToLastIntersect() * (texOutPoints[0].w() - texInPoints[1].w()) + texInPoints[1].w();
+            Vector2D t3 = new Vector2D(u3, v3, w3);
 
             Material mat1 = new Material(in.getMaterial());
             mat1.setTextureCoords(t0, t1, t2);

@@ -107,16 +107,15 @@ public class Texturizer
                 {
                     tex_u = (1.0f - t) * tex_su + t * tex_eu;
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
-                    /*tex_w = (1.0f - t) * tex_sw + t * tex_ew;
-                    if (tex_w > pDepthBuffer[i*ScreenWidth() + j])
+                    tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+                    /*if (tex_w > pDepthBuffer[i*ScreenWidth() + j])
                     {
-                        Draw(j, i, tex->SampleGlyph(tex_u / tex_w, tex_v / tex_w), tex->SampleColour(tex_u / tex_w, tex_v / tex_w));
+                        Color c = sampleSprite(sprite, tex_u / tex_w, tex_v / tex_w);
+                        drawPixel(g, screenHeight, c, j, i);
                         pDepthBuffer[i*ScreenWidth() + j] = tex_w;
                     }*/
-
-                    Color c = sampleSprite(sprite, tex_u, tex_v);
+                    Color c = sampleSprite(sprite, tex_u / tex_w, tex_v / tex_w);
                     drawPixel(g, screenHeight, c, j, i);
-
                     t += tstep;
                 }
             }
@@ -179,7 +178,7 @@ public class Texturizer
                     }
                      */
 
-                    Color c = sampleSprite(sprite, tex_u, tex_v);
+                    Color c = sampleSprite(sprite, tex_u / tex_w, tex_v / tex_w);
                     drawPixel(g, screenHeight, c, j, i);
 
                     t += tstep;
@@ -197,6 +196,9 @@ public class Texturizer
 
     private static Color sampleSprite(BufferedImage sprite, double u, double v)
     {
+        u = Math.max(0, Math.min(1, u));
+        v = Math.max(0, Math.min(1, v));
+
         u *= sprite.getWidth()-1;
         v *= sprite.getHeight()-1;
 
@@ -204,7 +206,7 @@ public class Texturizer
             int rgb = sprite.getRGB((int)u, (int)v);
             return new Color(rgb);
         } else {
-            System.err.println("Drawer: u (" + u + ") or v (" + v + ") are out of bounds of the sprite!");
+            System.err.println("Texturizer: u (" + u + ") or v (" + v + ") are out of bounds of the sprite!");
             return Color.magenta;
         }
     }

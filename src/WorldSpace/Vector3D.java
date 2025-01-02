@@ -56,11 +56,11 @@ public class Vector3D implements Translatable
         return out;
     }
     public void scale(Vector3D scalars) {
-        set(x*scalars.x,y*scalars.y,z*scalars.z);
+        set(x*scalars.x,y*scalars.y,z*scalars.z, w*scalars.w);
     }
     public void scale(double scalar)
     {
-        scale(new Vector3D(scalar, scalar, scalar));
+        scale(new Vector3D(scalar, scalar, scalar, scalar));
     }
     public Vector3D scaled(double scalar){
         Vector3D res = new Vector3D(this);
