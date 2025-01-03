@@ -10,7 +10,7 @@ import static java.lang.Math.abs;
 
 public class Texturizer
 {
-    public static void textureTriangle(Graphics2D g, int screenHeight, double resolution,
+    public static void textureTriangle(Graphics2D g, int screenHeight, double resolution, double[][] depthBuffer,
                                        int x1, int y1, double u1, double v1, double w1,
                                        int x2, int y2, double u2, double v2, double w2,
                                        int x3, int y3, double u3, double v3, double w3,
@@ -111,14 +111,10 @@ public class Texturizer
                     tex_u = (1.0f - t) * tex_su + t * tex_eu;
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
-                    /*if (tex_w > pDepthBuffer[i*ScreenWidth() + j])
-                    {
-                        Color c = sampleSprite(sprite, tex_u / tex_w, tex_v / tex_w);
-                        drawPixel(g, screenHeight, c, j, i);
-                        pDepthBuffer[i*ScreenWidth() + j] = tex_w;
-                    }*/
-                    Color c = sampleSprite(sprite, luminance, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
-                    drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
+
+                    drawTextureToPixel(g,screenHeight,resolution,depthBuffer,
+                            sprite,luminance,spriteWidth,spriteHeigth,
+                            tex_u,tex_v,tex_w,j,i);
                     t += tstep;
                 }
             }
@@ -174,19 +170,26 @@ public class Texturizer
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-                    /*if (tex_w > pDepthBuffer[i*ScreenWidth() + j])
-                    {
-                        Draw(j, i, tex->SampleGlyph(tex_u / tex_w, tex_v / tex_w), tex->SampleColour(tex_u / tex_w, tex_v / tex_w));
-                        pDepthBuffer[i*ScreenWidth() + j] = tex_w;
-                    }
-                     */
-
-                    Color c = sampleSprite(sprite, luminance, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
-                    drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
+                    drawTextureToPixel(g,screenHeight,resolution,depthBuffer,
+                            sprite,luminance,spriteWidth,spriteHeigth,
+                            tex_u,tex_v,tex_w,j,i);
 
                     t += tstep;
                 }
             }
+        }
+    }
+
+    private static void drawTextureToPixel(Graphics2D g, int screenHeight, double resolution, double[][] depthBuffer,
+                                           BufferedImage sprite, double luminance, int spriteWidth, int spriteHeigth,
+                                           double tex_u, double tex_v, double tex_w,
+                                           int j, int i)
+    {
+        if (tex_w > depthBuffer[j][i])
+        {
+            Color c = sampleSprite(sprite, luminance, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
+            drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
+            depthBuffer[j][i] = tex_w;
         }
     }
 

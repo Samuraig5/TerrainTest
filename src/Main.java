@@ -38,7 +38,11 @@ public class Main {
         //cube.showWireFrame(false);
         //testScene.addObject(cube);
 
-        //RotatingCube cubeRot = new RotatingCube(2, new Vector3D(0.001f, 0.0005f,0.0001f));
+        RotatingCube cubeRot = new RotatingCube(10, new Vector3D(0.001f, 0.0005f,0.0001f));
+        cubeRot.translate(new Vector3D(0,0,20));
+        cubeRot.showWireFrame(false);
+        testScene.addObject(cubeRot);
+
         Object3D rockGolem = new Object3D();
         rockGolem.translate(new Vector3D(0, 0, 10));
         rockGolem.rotate(new Vector3D(0,Math.toRadians(180),0));

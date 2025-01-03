@@ -10,9 +10,11 @@ import java.awt.image.BufferedImage;
 public class PixelDrawer
 {
     Camera camera;
+    double[][] depthBuffer;
     public PixelDrawer(Camera camera)
     {
         this.camera = camera;
+        recomputeDepthBuffer();
     }
 
     public void drawLine(Graphics2D g, Color c, Vector3D v1, Vector3D v2)
@@ -84,6 +86,14 @@ public class PixelDrawer
         double u2 = texPoints[1].u(); double v2 = texPoints[1].v(); double w2 = texPoints[1].w();;
         double u3 = texPoints[2].u(); double v3 = texPoints[2].v(); double w3 = texPoints[2].w();
 
-        Texturizer.textureTriangle(g,(int)camera.getResolution().y(), camera.resolution,x1,y1,u1,v1,w1,x2,y2,u2,v2,w2,x3,y3,u3,v3,w3,tri.getMaterial().getLuminance(),sprite);
+        Texturizer.textureTriangle(g,(int)camera.getResolution().y(),camera.resolution,depthBuffer,
+                x1,y1,u1,v1,w1,x2,y2,u2,v2,w2,x3,y3,u3,v3,w3,
+                tri.getMaterial().getLuminance(),sprite);
+    }
+
+    public void recomputeDepthBuffer()
+    {
+        Vector3D res = camera.getResolution();
+        depthBuffer = new double[(int) res.x()][(int) res.y()];
     }
 }

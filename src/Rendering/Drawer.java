@@ -23,6 +23,12 @@ public class Drawer
         p = new PixelDrawer(camera);
     }
 
+    public void clearScreen(Graphics2D g, Color backgroundColour)
+    {
+        p.recomputeDepthBuffer();
+        fillBackground(g, backgroundColour);
+    }
+
     public void drawLine(Graphics2D g, Color c, Vector3D v1, Vector3D v2) {
         p.drawLine(g, c, v1, v2);
     }
@@ -49,7 +55,7 @@ public class Drawer
         p.textureTriangle(g,tri,sprite);
     }
 
-    public void fillBackground(Graphics2D g, Color c)
+    private void fillBackground(Graphics2D g, Color c)
     {
         p.fillRectangle(g,c,camera.getResolution());
     }
@@ -62,5 +68,9 @@ public class Drawer
         int blue = (int) (baseColor.getBlue() * luminance);
 
         return new Color(red, green, blue);
+    }
+    public void recomputeDepthBuffer()
+    {
+        p.recomputeDepthBuffer();
     }
 }

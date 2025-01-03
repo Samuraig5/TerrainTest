@@ -34,7 +34,7 @@ public class Scene
 
     public void drawScene(Graphics g)
     {
-        camera.drawer.fillBackground((Graphics2D) g,backgroundColour);
+        camera.drawer.clearScreen((Graphics2D) g,backgroundColour);
         for (Object3D o:objects)
         {
             o.drawObject(g, camera, timeMeasurer);

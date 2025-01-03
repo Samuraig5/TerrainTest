@@ -135,7 +135,8 @@ public class Object3D implements Translatable, Rotatable
             tm.stopMeasurement("ObjWorldToScreen");
         }
 
-        trianglesToRaster.sort(Comparator.comparingDouble(Triangle::getMidPoint).reversed());
+        //Sorting no longer needed due to depth buffer
+        //trianglesToRaster.sort(Comparator.comparingDouble(Triangle::getMidPoint).reversed());
 
         for (Triangle triangle : trianglesToRaster) {
             List<Triangle> triangleQueue = new ArrayList<>();

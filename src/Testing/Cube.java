@@ -71,5 +71,10 @@ public class Cube extends Object3D
         tri = new Triangle(points[3], points[4], points[0]);
         tri.setMaterial(new Material(new Vector2D(0,1),new Vector2D(1,0),new Vector2D(1,1)));
         mesh.add(tri);
+
+        for (Triangle trig:mesh)
+        {
+            trig.getMaterial().setTexturePath("src/Testing/Rock.png");
+        }
     }
 }

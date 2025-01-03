@@ -68,5 +68,6 @@ public class Camera implements Translatable, Rotatable
     public void onFrameSizeChange()
     {
         this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
+        drawer.recomputeDepthBuffer();
     }
 }
