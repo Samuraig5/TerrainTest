@@ -1,12 +1,10 @@
-import Controls.CameraController;
-import Controls.OldSchoolDungeonCameraControls;
-import Rendering.Camera;
-import Rendering.Material;
-import Rendering.Scene;
-import Rendering.SceneRenderer;
-import Testing.Cube;
-import Testing.RotatingCube;
-import WorldSpace.*;
+import Engine3d.Controls.OldSchoolDungeonCameraControls;
+import Engine3d.Math.Vector3D;
+import Engine3d.Rendering.Camera;
+import Engine3d.Rendering.Scene;
+import Engine3d.Rendering.SceneRenderer;
+import Engine3d.Testing.RotatingCube;
+import Engine3d.Model.*;
 
 import javax.swing.*;
 import java.awt.event.ComponentAdapter;
@@ -46,12 +44,12 @@ public class Main {
         Object3D rockGolem = new Object3D();
         rockGolem.translate(new Vector3D(0, 0, 10));
         rockGolem.rotate(new Vector3D(0,Math.toRadians(180),0));
-        ObjLoader.loadFromObjFile("src/Testing/StoneGolem.obj", "src/Testing/StoneGolemRock.tif", rockGolem);
+        ObjLoader.loadFromObjFile("src/Engine3d/Testing/StoneGolem.obj", "src/Engine3d/Testing/StoneGolemRock.tif", rockGolem);
         rockGolem.showWireFrame(false);
         testScene.addObject(rockGolem);
 
         //Object3D axis = new Object3D();
-        //ObjLoader.loadFromObjFile("src/Testing/axis.obj", axis);
+        //ObjLoader.loadFromObjFile("src/Engine3d.Testing/axis.obj", axis);
         //axis.translate(new Vector3D(0,0,5));
         //axis.showWireFrame(false);
         //testScene.addObject(axis);
