@@ -16,6 +16,9 @@ public class Texturizer
                                        int x3, int y3, double u3, double v3, double w3,
                                        BufferedImage sprite)
     {
+        int spriteWidth = sprite.getWidth()-1;
+        int spriteHeigth = sprite.getHeight()-1;
+
         int tempi;
         double tempd;
         if (y2 < y1)
@@ -114,7 +117,7 @@ public class Texturizer
                         drawPixel(g, screenHeight, c, j, i);
                         pDepthBuffer[i*ScreenWidth() + j] = tex_w;
                     }*/
-                    Color c = sampleSprite(sprite, tex_u / tex_w, tex_v / tex_w);
+                    Color c = sampleSprite(sprite, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
                     drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
                     t += tstep;
                 }
@@ -178,7 +181,7 @@ public class Texturizer
                     }
                      */
 
-                    Color c = sampleSprite(sprite, tex_u / tex_w, tex_v / tex_w);
+                    Color c = sampleSprite(sprite, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
                     drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
 
                     t += tstep;
@@ -194,20 +197,23 @@ public class Texturizer
         g.fillRect(x*pixelSize, y*pixelSize, pixelSize, pixelSize);
     }
 
-    private static Color sampleSprite(BufferedImage sprite, double u, double v)
+    private static Color sampleSprite(BufferedImage sprite, int spriteWidth, int spriteHeigth, double u, double v)
     {
         u = Math.max(0, Math.min(1, u));
         v = Math.max(0, Math.min(1, v));
 
-        u *= sprite.getWidth()-1;
-        v *= sprite.getHeight()-1;
+        u *= spriteWidth;
+        v *= spriteHeigth;
 
-        if (u >= 0 && u < sprite.getWidth() && v >= 0 && v < sprite.getHeight()) {
+        int rgb = sprite.getRGB((int)u, (int)v);
+        return new Color(rgb);
+
+        /*if (u >= 0 && u < sprite.getWidth() && v >= 0 && v < sprite.getHeight()) {
             int rgb = sprite.getRGB((int)u, (int)v);
             return new Color(rgb);
         } else {
             System.err.println("Texturizer: u (" + u + ") or v (" + v + ") are out of bounds of the sprite!");
             return Color.magenta;
-        }
+        }*/
     }
 }
