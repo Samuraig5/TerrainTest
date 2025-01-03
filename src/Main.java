@@ -25,7 +25,7 @@ public class Main {
         Scene testScene = new Scene(camera);
 
         Cube cube = new Cube(1);
-        cube.translate(new Vector3D(0,0,5));
+        cube.translate(new Vector3D(0,0,1));
         cube.showWireFrame(false);
         testScene.addObject(cube);
 
