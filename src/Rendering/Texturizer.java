@@ -14,7 +14,7 @@ public class Texturizer
                                        int x1, int y1, double u1, double v1, double w1,
                                        int x2, int y2, double u2, double v2, double w2,
                                        int x3, int y3, double u3, double v3, double w3,
-                                       BufferedImage sprite)
+                                       double luminance, BufferedImage sprite)
     {
         int spriteWidth = sprite.getWidth()-1;
         int spriteHeigth = sprite.getHeight()-1;
@@ -117,7 +117,7 @@ public class Texturizer
                         drawPixel(g, screenHeight, c, j, i);
                         pDepthBuffer[i*ScreenWidth() + j] = tex_w;
                     }*/
-                    Color c = sampleSprite(sprite, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
+                    Color c = sampleSprite(sprite, luminance, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
                     drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
                     t += tstep;
                 }
@@ -181,7 +181,7 @@ public class Texturizer
                     }
                      */
 
-                    Color c = sampleSprite(sprite, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
+                    Color c = sampleSprite(sprite, luminance, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
                     drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
 
                     t += tstep;
@@ -197,7 +197,7 @@ public class Texturizer
         g.fillRect(x*pixelSize, y*pixelSize, pixelSize, pixelSize);
     }
 
-    private static Color sampleSprite(BufferedImage sprite, int spriteWidth, int spriteHeigth, double u, double v)
+    private static Color sampleSprite(BufferedImage sprite, double luminance, int spriteWidth, int spriteHeigth, double u, double v)
     {
         u = Math.max(0, Math.min(1, u));
         v = Math.max(0, Math.min(1, v));
@@ -206,7 +206,8 @@ public class Texturizer
         v *= spriteHeigth;
 
         int rgb = sprite.getRGB((int)u, (int)v);
-        return new Color(rgb);
+        Color result =  Drawer.getColourShade(new Color(rgb), luminance);
+        return result;
 
         /*if (u >= 0 && u < sprite.getWidth() && v >= 0 && v < sprite.getHeight()) {
             int rgb = sprite.getRGB((int)u, (int)v);

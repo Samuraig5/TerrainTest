@@ -33,16 +33,18 @@ public class Main {
 
         Scene testScene = new Scene(camera);
 
-        Cube cube = new Cube(1);
-        cube.translate(new Vector3D(-0.5,-0.5,0.5));
-        cube.showWireFrame(false);
-        testScene.addObject(cube);
+        //Cube cube = new Cube(1);
+        //cube.translate(new Vector3D(-0.5,-0.5,0.5));
+        //cube.showWireFrame(false);
+        //testScene.addObject(cube);
 
         //RotatingCube cubeRot = new RotatingCube(2, new Vector3D(0.001f, 0.0005f,0.0001f));
-        //cubeRot.translate(new Vector3D(0, 0, 10));
-        //ObjLoader.loadFromObjFile("src/Testing/teapot.obj", cube);
-        //cubeRot.showWireFrame(false);
-        //testScene.addObject(cubeRot);
+        Object3D rockGolem = new Object3D();
+        rockGolem.translate(new Vector3D(0, 0, 10));
+        rockGolem.rotate(new Vector3D(0,Math.toRadians(180),0));
+        ObjLoader.loadFromObjFile("src/Testing/StoneGolem.obj", "src/Testing/StoneGolemRock.tif", rockGolem);
+        rockGolem.showWireFrame(false);
+        testScene.addObject(rockGolem);
 
         //Object3D axis = new Object3D();
         //ObjLoader.loadFromObjFile("src/Testing/axis.obj", axis);

@@ -55,7 +55,7 @@ public class Object3D implements Translatable, Rotatable
         for (Triangle tri : mesh)
         {
             //TODO: THIS IS JUST FOR TESTING
-            tri.getMaterial().setTexturePath("src/Testing/rock.png");
+            //tri.getMaterial().setTexturePath("src/Testing/rock.png");
 
             tm.startMeasurement("ObjWorldToScreen");
             Triangle triTransformed = worldTransform.multiplyWithTriangle(tri);
@@ -175,11 +175,16 @@ public class Object3D implements Translatable, Rotatable
             tm.stopMeasurement("TriangleClipping");
 
             for (Triangle triToDraw : triangleQueue) {
-                //camera.drawer.fillTriangle(g2d, triToDraw);
-                tm.startMeasurement("Texturizer");
-                camera.drawer.textureTriangle(g2d,triToDraw);
-                tm.stopMeasurement("Texturizer");
-
+                if (!(triToDraw.getMaterial().getTexturePath() == null))
+                {
+                    tm.startMeasurement("Texturizer");
+                    camera.drawer.textureTriangle(g2d,triToDraw);
+                    tm.stopMeasurement("Texturizer");
+                }
+                else
+                {
+                    camera.drawer.fillTriangle(g2d, triToDraw);
+                }
                 if (showWireFrame) { camera.drawer.drawTriangle(g2d, Color.white, triToDraw); }
             }
         }
