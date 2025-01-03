@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TerrainTest:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/TerrainTest_jar</output-path>
+    <root id="archive" name="TerrainTest.jar">
+      <element id="module-output" name="TerrainTest" />
+    </root>
+  </artifact>
+</component>

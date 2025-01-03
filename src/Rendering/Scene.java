@@ -1,6 +1,7 @@
 package Rendering;
 
 import Time.GameTimer;
+import Time.TimeMeasurer;
 import Time.Updatable;
 import WorldSpace.Object3D;
 
@@ -14,6 +15,7 @@ public class Scene
     Camera camera;
     GameTimer sceneTimer;
     Color backgroundColour = Color.BLACK;
+    private TimeMeasurer timeMeasurer;
 
     public Scene(Camera camera)
     {
@@ -35,11 +37,15 @@ public class Scene
         camera.drawer.fillBackground((Graphics2D) g,backgroundColour);
         for (Object3D o:objects)
         {
-            o.drawObject(g, camera);
+            o.drawObject(g, camera, timeMeasurer);
         }
     }
 
     public Camera getCamera() {return camera;}
 
     public void subscribeToTime (Updatable updatable) {sceneTimer.subscribe(updatable);}
+
+    public void addTimeMeasurer(TimeMeasurer tm) {
+        this.timeMeasurer = tm;
+    }
 }

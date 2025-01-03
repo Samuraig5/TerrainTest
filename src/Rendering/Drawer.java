@@ -36,6 +36,11 @@ public class Drawer
         drawLine(g,c,points[2],points[0]);
     }
 
+    public void fillTriangle(Graphics2D g, Triangle t)
+    {
+        p.fillTriangle(g, t);
+    }
+
     public void textureTriangle(Graphics2D g, Triangle tri)
     {
         BufferedImage sprite = spriteManager.getResource(tri.getMaterial().getTexturePath());

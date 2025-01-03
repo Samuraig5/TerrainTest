@@ -2,6 +2,7 @@ package WorldSpace;
 
 import Rendering.Camera;
 import Rendering.Material;
+import Time.TimeMeasurer;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -26,10 +27,11 @@ public class Object3D implements Translatable, Rotatable
         rotation.translate(delta);
     }
 
-    public void drawObject(Graphics g, Camera camera)
+    public void drawObject(Graphics g, Camera camera, TimeMeasurer tm)
     {
         Graphics2D g2d = (Graphics2D) g;
 
+        tm.startMeasurement("Get Matrices");
         List<Triangle> trianglesToRaster = new ArrayList<>();
 
         Matrix4x4 rotX = Matrix4x4.getRotationMatrixX(rotation.x());
@@ -48,12 +50,14 @@ public class Object3D implements Translatable, Rotatable
 
         Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(camera.getPosition(), target, up);
         Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
+        tm.stopMeasurement("Get Matrices");
 
         for (Triangle tri : mesh)
         {
             //TODO: THIS IS JUST FOR TESTING
             tri.getMaterial().setTexturePath("src/Testing/rock.png");
 
+            tm.startMeasurement("ObjWorldToScreen");
             Triangle triTransformed = worldTransform.multiplyWithTriangle(tri);
             triTransformed.setMaterial(tri);
 
@@ -65,7 +69,11 @@ public class Object3D implements Translatable, Rotatable
             cameraRay.translate(camera.getPosition().inverse());
 
             //If the camera can't see the triangle, don't draw it
-            if (triNormal.dotProduct(cameraRay) >= 0) { continue; }
+            if (triNormal.dotProduct(cameraRay) >= 0)
+            {
+                tm.stopMeasurement("ObjWorldToScreen");
+                continue;
+            }
 
             //= Primitive Lighting (Replace later) =
             Vector3D lightDirection = new Vector3D(0f, 1f, -1f);
@@ -77,12 +85,16 @@ public class Object3D implements Translatable, Rotatable
             // = Convert World Space -> View Space =
             Triangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);
             triViewed.setMaterial(triTransformed);
+            tm.stopMeasurement("ObjWorldToScreen");
 
+            tm.startMeasurement("TriangleClipping");
             // = Clip Viewed Triangle =
             Vector3D planePosition = camera.getNearPlane();
             Vector3D planeNormal = new Vector3D(0,0,1);
             List<Triangle> clippedTriangles = clipTriangleAgainstPlane(planePosition, planeNormal, triViewed);
+            tm.stopMeasurement("TriangleClipping");
 
+            tm.startMeasurement("ObjWorldToScreen");
             for (Triangle triClipped : clippedTriangles)
             {
                 //= Apply Projection (3D -> 2D) =
@@ -120,6 +132,7 @@ public class Object3D implements Translatable, Rotatable
                 //= Add triangle to list=
                 trianglesToRaster.add(triProj);
             }
+            tm.stopMeasurement("ObjWorldToScreen");
         }
 
         trianglesToRaster.sort(Comparator.comparingDouble(Triangle::getMidPoint).reversed());
@@ -129,6 +142,7 @@ public class Object3D implements Translatable, Rotatable
             triangleQueue.add(triangle);
             int numNewTriangles = 1;
 
+            tm.startMeasurement("TriangleClipping");
             for (int p = 0; p < 4; p++) {
                 List<Triangle> triToAdd = new ArrayList<>();
                 while (numNewTriangles > 0)
@@ -158,9 +172,14 @@ public class Object3D implements Translatable, Rotatable
                 }
                 numNewTriangles = triangleQueue.size();
             }
+            tm.stopMeasurement("TriangleClipping");
+
             for (Triangle triToDraw : triangleQueue) {
                 //camera.drawer.fillTriangle(g2d, triToDraw);
+                tm.startMeasurement("Texturizer");
                 camera.drawer.textureTriangle(g2d,triToDraw);
+                tm.stopMeasurement("Texturizer");
+
                 if (showWireFrame) { camera.drawer.drawTriangle(g2d, Color.white, triToDraw); }
             }
         }

@@ -14,9 +14,10 @@ public class SceneRenderer extends JPanel
     {
         setFocusable(true);
         requestFocusInWindow();
+        timeMeasurer = new TimeMeasurer();
 
         activeScene = initialScene;
-        timeMeasurer = new TimeMeasurer();
+        activeScene.addTimeMeasurer(timeMeasurer);
 
         repaint();
         revalidate();
@@ -39,10 +40,20 @@ public class SceneRenderer extends JPanel
 
     private void paintActiveScene(Graphics g)
     {
-        //RenderVector offset = activeScene.getCameraOffset();
-        //g.translate((int) (offset.x()*activeScene.getZoomLevel()), (int) (offset.y()*activeScene.getZoomLevel()));
+        timeMeasurer.clearMeasurements();
+        timeMeasurer.startMeasurement("DrawScene");
+
         activeScene.drawScene(g);
+
+        long sceneDrawTime = timeMeasurer.getMeasurement("DrawScene");
+
+
         g.setColor(Color.white);
         g.drawString("FPS: " + timeMeasurer.getFPS(), 20, 20);
+        g.drawString(timeMeasurer.getMsPrintOut("DrawScene"), 25, 60);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", sceneDrawTime), 25, 80);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", sceneDrawTime), 25, 100);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", sceneDrawTime),25, 120);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", sceneDrawTime),25, 140);
     }
 }
