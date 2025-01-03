@@ -113,8 +113,8 @@ public class Object3D implements Translatable, Rotatable
                 triProj.translate(new Vector3D(1f, 1f, 0));
 
                 //= Scale projection to screen =
-                double centreX = 0.5f * camera.getScreenDimensions().x();
-                double centreY = 0.5f * camera.getScreenDimensions().y();
+                double centreX = 0.5f * camera.getResolution().x();
+                double centreY = 0.5f * camera.getResolution().y();
                 triProj.scale(new Vector3D(centreX, centreY, 1));
 
                 //= Add triangle to list=
@@ -142,7 +142,7 @@ public class Object3D implements Translatable, Rotatable
                                 new Vector3D(0, 1, 0),
                                 curr);
                         case 1 -> triToAdd = clipTriangleAgainstPlane(
-                                new Vector3D(0, camera.getScreenDimensions().y() - 1, 0),
+                                new Vector3D(0, camera.getResolution().y() - 1, 0),
                                 new Vector3D(0, -1, 0),
                                 curr);
                         case 2 -> triToAdd = clipTriangleAgainstPlane(
@@ -150,7 +150,7 @@ public class Object3D implements Translatable, Rotatable
                                 new Vector3D(1, 0, 0),
                                 curr);
                         case 3 -> triToAdd = clipTriangleAgainstPlane(
-                                new Vector3D(camera.getScreenDimensions().x() - 1, 0, 0),
+                                new Vector3D(camera.getResolution().x() - 1, 0, 0),
                                 new Vector3D(-1, 0, 0),
                                 curr);
                     }

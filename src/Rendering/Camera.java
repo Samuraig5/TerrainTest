@@ -9,6 +9,7 @@ public class Camera implements Translatable, Rotatable
     JFrame window;
     public Drawer drawer;
     Matrix4x4 projectionMatrix;
+    double resolution = 0.25f;
     double fov = 90;
     double zNear = 0.25d;
     double zFar = 1000;
@@ -32,7 +33,7 @@ public class Camera implements Translatable, Rotatable
     public Vector3D getScreenDimensions() {
         return new Vector3D(window.getWidth(), window.getHeight(), 0);
     }
-
+    public Vector3D getResolution() { return getScreenDimensions().scaled(resolution); }
     public Vector3D getNearPlane() {return new Vector3D(0,0,zNear);}
     public Vector3D getFarPlane() {return new Vector3D(0,0,zFar);}
 

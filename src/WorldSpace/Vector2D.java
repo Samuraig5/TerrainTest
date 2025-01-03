@@ -30,4 +30,10 @@ public class Vector2D
     public double u() {return u;}
     public double v() {return v;}
     public double w() {return w;}
+
+    public Vector2D scaled(double scalar) {
+        Vector2D res = new Vector2D();
+        res.set(u*scalar,v*scalar,w*scalar);
+        return res;
+    }
 }

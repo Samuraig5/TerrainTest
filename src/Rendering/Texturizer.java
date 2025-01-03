@@ -10,7 +10,7 @@ import static java.lang.Math.abs;
 
 public class Texturizer
 {
-    public static void textureTriangle(Graphics2D g, int screenHeight,
+    public static void textureTriangle(Graphics2D g, int screenHeight, double resolution,
                                        int x1, int y1, double u1, double v1, double w1,
                                        int x2, int y2, double u2, double v2, double w2,
                                        int x3, int y3, double u3, double v3, double w3,
@@ -115,7 +115,7 @@ public class Texturizer
                         pDepthBuffer[i*ScreenWidth() + j] = tex_w;
                     }*/
                     Color c = sampleSprite(sprite, tex_u / tex_w, tex_v / tex_w);
-                    drawPixel(g, screenHeight, c, j, i);
+                    drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
                     t += tstep;
                 }
             }
@@ -179,7 +179,7 @@ public class Texturizer
                      */
 
                     Color c = sampleSprite(sprite, tex_u / tex_w, tex_v / tex_w);
-                    drawPixel(g, screenHeight, c, j, i);
+                    drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
 
                     t += tstep;
                 }
@@ -187,11 +187,11 @@ public class Texturizer
         }
     }
 
-    private static void drawPixel(Graphics2D g, int screenHeight, Color c, int x, int y)
+    private static void drawPixel(Graphics2D g, int screenHeight, int pixelSize, Color c, int x, int y)
     {
         y = screenHeight - y;
         g.setColor(c);
-        g.fillRect(x, y, 1, 1);
+        g.fillRect(x*pixelSize, y*pixelSize, pixelSize, pixelSize);
     }
 
     private static Color sampleSprite(BufferedImage sprite, double u, double v)
