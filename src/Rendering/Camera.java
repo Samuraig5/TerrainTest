@@ -22,8 +22,7 @@ public class Camera implements Translatable, Rotatable
     {
         this.window = window;
         this.drawer = new Drawer(this);
-        double aspectRatio = getScreenDimensions().y() / getScreenDimensions().x();
-        this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, aspectRatio, zNear, zFar);
+        this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
     }
 
     public Triangle projectTriangle(Triangle in) {
@@ -60,5 +59,14 @@ public class Camera implements Translatable, Rotatable
     public void rotate(Vector3D delta) {
         rotation.translate(delta);
         //System.out.println("Camera Rot: " + rotation.x() + ", " + rotation.y() + ", " + rotation.z());
+    }
+
+    private double getAspectRatio()
+    {
+        return getScreenDimensions().y() / getScreenDimensions().x();
+    }
+    public void onFrameSizeChange()
+    {
+        this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
     }
 }

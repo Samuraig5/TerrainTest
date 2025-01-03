@@ -9,6 +9,8 @@ import Testing.RotatingCube;
 import WorldSpace.*;
 
 import javax.swing.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class Main {
 
@@ -22,6 +24,13 @@ public class Main {
         frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         Camera camera = new Camera(frame);
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                camera.onFrameSizeChange();
+            }
+        });
+
         Scene testScene = new Scene(camera);
 
         Cube cube = new Cube(1);
