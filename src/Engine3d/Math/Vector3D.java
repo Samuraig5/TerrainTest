@@ -97,6 +97,15 @@ public class Vector3D implements Translatable
         return clone;
     }
 
+    public double distanceTo(Vector3D other)
+    {
+        double dx = this.x - other.x;
+        double dy = this.y - other.y;
+        double dz = this.z - other.z;
+        double dw = this.w - other.w;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz + dw * dw);
+    }
+
     /**
      * Calculates the dot product of the two vectors.
      * Vectors should be normalized!

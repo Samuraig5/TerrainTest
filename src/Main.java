@@ -3,6 +3,7 @@ import Engine3d.Math.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Scene;
 import Engine3d.Rendering.SceneRenderer;
+import Engine3d.Testing.Cube;
 import Engine3d.Testing.RotatingCube;
 import Engine3d.Model.*;
 

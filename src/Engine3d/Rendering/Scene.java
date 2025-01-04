@@ -8,6 +8,7 @@ import Engine3d.Model.Object3D;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Scene
@@ -36,6 +37,16 @@ public class Scene
     public void drawScene()
     {
         camera.getScreenBuffer().clear(backgroundColour);
+        objects.sort(new Comparator<Object3D>() {
+            @Override
+            public int compare(Object3D o1, Object3D o2) {
+                // Calculate distances to the camera
+                double distance1 = o1.getPosition().distanceTo(camera.getPosition());
+                double distance2 = o2.getPosition().distanceTo(camera.getPosition());
+                // Sort objects by distance (closer first)
+                return Double.compare(distance1, distance2);
+            }
+        });
         for (Object3D o:objects)
         {
             o.drawObject(camera, timeMeasurer);

@@ -47,6 +47,7 @@ public class MeshTriangle implements Translatable
         points[1].translate(delta);
         points[2].translate(delta);
     }
+
     public MeshTriangle translation(Vector3D delta){
         Vector3D p1 = points[0].translation(delta);
         Vector3D p2 = points[1].translation(delta);

@@ -28,6 +28,7 @@ public class Object3D implements Translatable, Rotatable
     public void rotate(Vector3D delta) {
         rotation.translate(delta);
     }
+    public Vector3D getPosition() {return new Vector3D(position);}
 
     public void drawObject(Camera camera, TimeMeasurer tm)
     {
