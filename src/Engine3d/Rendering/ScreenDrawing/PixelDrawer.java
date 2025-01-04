@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
+import static java.lang.Math.abs;
 
 public class PixelDrawer
 {
@@ -29,28 +30,49 @@ public class PixelDrawer
         raster.setPixels(x, y, 1, 1, ScreenBuffer.colorToIntArray(c));
     }
 
-    public void drawLine(ScreenBuffer screenBuffer, Color c, Vector3D v1, Vector3D v2)
+    public static void checkAndDrawPixel(ScreenBuffer screenBuffer, Color c, int x, int y, double depth)
     {
+        if (screenBuffer.pixelOnTop(x,y,depth))
+        {
+            PixelDrawer.drawPixel(screenBuffer, c, x, y);
+            screenBuffer.updateDepth(x,y,depth);
+        }
+    }
+
+    public void drawLine(ScreenBuffer screenBuffer, Color c, Vector3D v1, Vector3D v2) {
+        // Extract coordinates and depths from the input vectors
         int x1 = (int) v1.x();
         int y1 = (int) v1.y();
+        double w1 = v1.w();
+
         int x2 = (int) v2.x();
         int y2 = (int) v2.y();
+        double w2 = v2.w();
 
+        // Calculate the differences and the direction of the line
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
-        int sx = (x1 < x2) ? 1 : -1;
-        int sy = (y1 < y2) ? 1 : -1;
+
+        int sx = x1 < x2 ? 1 : -1; // Step direction in x
+        int sy = y1 < y2 ? 1 : -1; // Step direction in y
+
+        // Bresenham's algorithm variables
         int err = dx - dy;
 
         while (true) {
-            // Draw the pixel at the current position
-            drawPixel(screenBuffer, c, x1, y1);
+            // Interpolate the depth based on the line's progress
+            double t = (dx + dy == 0) ? 0 : Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+                    / (float) Math.sqrt((dx * dx) + (dy * dy));
+            double depth = w1 * (1 - t) + w2 * t;
 
-            // If we have reached the endpoint, break the loop
+            // Draw the current pixel
+            checkAndDrawPixel(screenBuffer, c, x1, y1, depth);
+
+            // Break when the line is complete
             if (x1 == x2 && y1 == y2) break;
 
-            // Calculate error and adjust the x or y coordinate
-            int e2 = err * 2;
+            // Calculate the error and adjust coordinates
+            int e2 = 2 * err;
             if (e2 > -dy) {
                 err -= dy;
                 x1 += sx;

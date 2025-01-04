@@ -174,17 +174,15 @@ public class Object3D implements Translatable, Rotatable
             tm.stopMeasurement("TriangleClipping");
 
             for (MeshTriangle triToDraw : triangleQueue) {
-                if (!(triToDraw.getMaterial().getTexturePath() == null))
-                {
+                if (showWireFrame) { camera.drawer.drawDebugTriangle(Color.white, triToDraw); }
+                if (!(triToDraw.getMaterial().getTexturePath() == null)) {
                     tm.startMeasurement("Texturizer");
                     camera.drawer.textureTriangle(triToDraw);
                     tm.stopMeasurement("Texturizer");
                 }
-                else
-                {
+                else {
                     camera.drawer.fillTriangle(triToDraw);
                 }
-                if (showWireFrame) { camera.drawer.drawTriangle(Color.white, triToDraw); }
             }
         }
     }

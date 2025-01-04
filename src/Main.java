@@ -41,10 +41,10 @@ public class Main {
         //cubeRot.showWireFrame(false);
         //testScene.addObject(cubeRot);
 
-        Object3D map = ObjParser.loadFromObjFile("Resources/Models/PeachesCastle", "Peaches Castle.obj");
-        map.translate(new Vector3D(0, 0, 0));
-        map.showWireFrame(false);
-        testScene.addObject(map);
+        //Object3D map = ObjParser.loadFromObjFile("Resources/Models/PeachesCastle", "Peaches Castle.obj");
+        //map.translate(new Vector3D(0, 0, 0));
+        //map.showWireFrame(false);
+        //testScene.addObject(map);
 
 
         Object3D rockGolem = ObjParser.loadFromObjFile("Resources/Models/RockGolem", "Stone.obj");

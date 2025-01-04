@@ -1,5 +1,6 @@
 package Engine3d.Rendering.ScreenDrawing;
 
+import Engine3d.Math.Vector2D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.ResourceManager.SpriteManager;
 import Engine3d.Math.MeshTriangle;
@@ -32,8 +33,6 @@ public class Drawer
         g.drawImage(buffer, 0, 0, screenWidth, screenHeight,
                                 0, 0, buffer.getWidth(), buffer.getHeight(),
                                 null);
-
-
     }
 
     public void drawLine(Color c, Vector3D v1, Vector3D v2) {
@@ -42,10 +41,19 @@ public class Drawer
 
     public void drawTriangle(Color c, MeshTriangle t)
     {
-        Vector3D points[] = t.getPoints();
-        drawLine(c,points[0],points[1]);
-        drawLine(c,points[1],points[2]);
-        drawLine(c,points[2],points[0]);
+        Vector3D[] points = t.getPoints();
+        Vector2D[] texPoints = t.getMaterial().getTextureCoords();
+        Vector3D[] depthPoints = new Vector3D[3];
+        for (int i = 0; i < 3; i++) {
+            double x = points[i].x();
+            double y = points[i].y();
+            double w = texPoints[i].w();
+            depthPoints[i] = new Vector3D(x,y,0,w);
+        }
+
+        drawLine(c,depthPoints[0],depthPoints[1]);
+        drawLine(c,depthPoints[1],depthPoints[2]);
+        drawLine(c,depthPoints[2],depthPoints[0]);
     }
 
     public void fillTriangle(MeshTriangle t)
@@ -93,5 +101,22 @@ public class Drawer
 
         // Create and return the resulting color
         return new Color(red, green, blue);
+    }
+
+    public void drawDebugTriangle(Color c, MeshTriangle t)
+    {
+        Vector3D[] points = t.getPoints();
+        Vector2D[] texPoints = t.getMaterial().getTextureCoords();
+        Vector3D[] depthPoints = new Vector3D[3];
+        for (int i = 0; i < 3; i++) {
+            double x = points[i].x();
+            double y = points[i].y();
+            double w = texPoints[i].w() * 1.2f; //Make these pixels be drawn with a slight preference
+            depthPoints[i] = new Vector3D(x,y,0,w);
+        }
+
+        drawLine(c,depthPoints[0],depthPoints[1]);
+        drawLine(c,depthPoints[1],depthPoints[2]);
+        drawLine(c,depthPoints[2],depthPoints[0]);
     }
 }
