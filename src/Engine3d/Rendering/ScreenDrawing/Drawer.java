@@ -106,6 +106,23 @@ public class Drawer
         // Create and return the resulting color
         return new Color(red, green, blue, alpha);
     }
+    public static Color alphaBlend(Color color1, Color color2) {
+        float alpha1 = color1.getAlpha() / 255.0f;
+        float alpha2 = color2.getAlpha() / 255.0f;
+
+        float red = (color1.getRed() * alpha1 + color2.getRed() * alpha2 * (1 - alpha1));
+        float green = (color1.getGreen() * alpha1 + color2.getGreen() * alpha2 * (1 - alpha1));
+        float blue = (color1.getBlue() * alpha1 + color2.getBlue() * alpha2 * (1 - alpha1));
+        float alphaResult = alpha1 + alpha2 * (1 - alpha1);
+
+        // Normalize to [0, 255]
+        int redResult = Math.round(red / alphaResult);
+        int greenResult = Math.round(green / alphaResult);
+        int blueResult = Math.round(blue / alphaResult);
+        int alphaResultInt = Math.round(alphaResult * 255);
+
+        return new Color(redResult, greenResult, blueResult, alphaResultInt);
+    }
 
     public void drawDebugTriangle(Color c, MeshTriangle t)
     {
@@ -122,5 +139,11 @@ public class Drawer
         drawLine(c,depthPoints[0],depthPoints[1]);
         drawLine(c,depthPoints[1],depthPoints[2]);
         drawLine(c,depthPoints[2],depthPoints[0]);
+    }
+
+    public static boolean colourEmpty(Color c, float tolerance)
+    {
+        int tol = (int) (tolerance*255);
+        return c.getRed() <= tol && c.getGreen() <= tol && c.getBlue() <= tol && c.getAlpha() == 0;
     }
 }

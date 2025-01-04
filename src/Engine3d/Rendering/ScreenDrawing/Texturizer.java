@@ -179,11 +179,10 @@ public class Texturizer
         if (screenBuffer.pixelOnTop(j,i,tex_w))
         {
             Color texture = sampleSprite(sprite, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w);
-            if (texture.getAlpha() == 0) {return;}
+            if (Drawer.colourEmpty(texture, 0.1f)) {return;}
             Color diffuse = mtl.getDiffuseColour();
             Color base = Drawer.multiplyColors(texture, diffuse);
             Color shaded =  Drawer.getColourShade(base, luminance);
-
             PixelDrawer.drawPixel(screenBuffer, shaded, j, i);
             screenBuffer.updateDepth(j,i,tex_w);
         }

@@ -26,8 +26,7 @@ public class PixelDrawer
         BufferedImage bufferedImage = screenBuffer.getBufferedImage();
         y = bufferedImage.getHeight() - y;
         if (!screenBuffer.inBounds(x,y)) {return;}
-        WritableRaster raster = bufferedImage.getRaster();
-        raster.setPixels(x, y, 1, 1, ScreenBuffer.colorToIntArray(c));
+        bufferedImage.setRGB(x, y, ScreenBuffer.colorToARGB(c));
     }
 
     public static void checkAndDrawPixel(ScreenBuffer screenBuffer, Color c, int x, int y, double depth)

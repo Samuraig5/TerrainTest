@@ -69,6 +69,13 @@ public class ScreenBuffer
         return sample;
     }
 
+    public static int colorToARGB(Color color){
+        int alpha = color.getAlpha(); // Half transparent
+        int red = color.getRed();
+        int green = color.getGreen();
+        int blue = color.getBlue();
+        return (alpha << 24) | (red << 16) | (green << 8) | blue;
+    }
     public static int[] colorToIntArray(Color color) {
         return new int[] {
                 color.getRed(),    // Extract red component (0-255)
