@@ -190,8 +190,8 @@ public class Texturizer
 
     private static Color sampleSprite(BufferedImage sprite, int spriteWidth, int spriteHeigth, double u, double v)
     {
-        u = Math.max(0, Math.min(1, u));
-        v = Math.max(0, Math.min(1, v));
+        u = (u % 1 + 1) % 1; // Ensures u is between 0 and 1
+        v = (v % 1 + 1) % 1; // Ensures v is between 0 and 1
 
         u *= spriteWidth;
         v *= spriteHeigth;
