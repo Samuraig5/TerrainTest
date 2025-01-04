@@ -3,8 +3,6 @@ import Engine3d.Math.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Scene;
 import Engine3d.Rendering.SceneRenderer;
-import Engine3d.Testing.Cube;
-import Engine3d.Testing.RotatingCube;
 import Engine3d.Model.*;
 
 import javax.swing.*;
@@ -43,17 +41,17 @@ public class Main {
         //cubeRot.showWireFrame(false);
         //testScene.addObject(cubeRot);
 
-        Object3D bloodGulch = new Object3D();
+        /*Object3D bloodGulch = new Object3D();
         bloodGulch.translate(new Vector3D(0, -90, 5));
         //bloodGulch.rotate(new Vector3D(0,Math.toRadians(180),0));
         ObjLoader.loadFromObjFile("src/Engine3d/Testing/BloodGulch.obj", "src/Engine3d/Testing/blood ground.png", bloodGulch, false);
         bloodGulch.showWireFrame(false);
         testScene.addObject(bloodGulch);
+         */
 
-        Object3D rockGolem = new Object3D();
+        Object3D rockGolem = ObjParser.loadFromObjFile("Resources/Models/RockGolem", "Stone.obj");
         rockGolem.translate(new Vector3D(0, 0, 7));
         rockGolem.rotate(new Vector3D(0,Math.toRadians(180),0));
-        ObjLoader.loadFromObjFile("src/Engine3d/Testing/StoneGolem.obj", "src/Engine3d/Testing/StoneGolemRock.tif", rockGolem, true);
         rockGolem.showWireFrame(false);
         testScene.addObject(rockGolem);
 

@@ -275,7 +275,7 @@ public class Object3D implements Translatable, Rotatable
 
             double u3 = l3.getDistanceToLastIntersect() * (texOutPoints[0].u() - texInPoints[1].u()) + texInPoints[1].u();
             double v3 = l3.getDistanceToLastIntersect() * (texOutPoints[0].v() - texInPoints[1].v()) + texInPoints[1].v();
-            double w3 = l2.getDistanceToLastIntersect() * (texOutPoints[0].w() - texInPoints[1].w()) + texInPoints[1].w();
+            double w3 = l3.getDistanceToLastIntersect() * (texOutPoints[0].w() - texInPoints[1].w()) + texInPoints[1].w();
             Vector2D t3 = new Vector2D(u3, v3, w3);
 
             Material mat1 = new Material(in.getMaterial());
