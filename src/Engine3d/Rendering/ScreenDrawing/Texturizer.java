@@ -179,6 +179,7 @@ public class Texturizer
         if (screenBuffer.pixelOnTop(j,i,tex_w))
         {
             Color texture = sampleSprite(sprite, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w);
+            if (texture.getAlpha() == 0) {return;}
             Color diffuse = mtl.getDiffuseColour();
             Color base = Drawer.multiplyColors(texture, diffuse);
             Color shaded =  Drawer.getColourShade(base, luminance);
@@ -197,6 +198,11 @@ public class Texturizer
         v *= spriteHeigth;
 
         int rgb = sprite.getRGB((int)u, (int)v);
-        return new Color(rgb);
+        int alpha = (rgb >> 24) & 0xFF; // Extract the alpha channel (8 highest bits)
+        int red = (rgb >> 16) & 0xff;
+        int green = (rgb >> 8) & 0xff;
+        int blue = (rgb >> 0) & 0xff;
+
+        return new Color(red, green, blue, alpha);
     }
 }

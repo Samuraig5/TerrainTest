@@ -84,23 +84,27 @@ public class Drawer
         float red1 = color1.getRed() / 255.0f;
         float green1 = color1.getGreen() / 255.0f;
         float blue1 = color1.getBlue() / 255.0f;
+        float alpha1 = color1.getAlpha() / 255.0f;
 
         float red2 = color2.getRed() / 255.0f;
         float green2 = color2.getGreen() / 255.0f;
         float blue2 = color2.getBlue() / 255.0f;
+        float alpha2 = color2.getAlpha() / 255.0f;
 
         // Multiply corresponding components
         float redResult = red1 * red2;
         float greenResult = green1 * green2;
         float blueResult = blue1 * blue2;
+        float alphaResult = alpha1 * alpha2;
 
         // Convert back to the range [0, 255] and clamp
         int red = Math.min(255, Math.max(0, Math.round(redResult * 255)));
         int green = Math.min(255, Math.max(0, Math.round(greenResult * 255)));
         int blue = Math.min(255, Math.max(0, Math.round(blueResult * 255)));
+        int alpha = Math.min(255, Math.max(0, Math.round(alphaResult * 255)));
 
         // Create and return the resulting color
-        return new Color(red, green, blue);
+        return new Color(red, green, blue, alpha);
     }
 
     public void drawDebugTriangle(Color c, MeshTriangle t)

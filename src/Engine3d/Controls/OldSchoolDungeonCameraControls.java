@@ -17,6 +17,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
     private boolean dDown = false;
     private boolean spaceDown = false;
     private boolean shiftDown = false;
+    private boolean ctrlDown = false;
 
     public OldSchoolDungeonCameraControls(SceneRenderer renderer) {
         super(renderer);
@@ -27,10 +28,13 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         Vector3D transDelta = new Vector3D();
         Vector3D rotDelta = new Vector3D();
 
-        if (wDown) {transDelta.translate(new Vector3D(0, 0, stepSize));}
-        if (sDown) {transDelta.translate(new Vector3D(0, 0, -stepSize));}
-        if (spaceDown) {transDelta.translate(new Vector3D(0, stepSize, 0));}
-        if (shiftDown) {transDelta.translate(new Vector3D(0, -stepSize, 0));}
+        double currStepSize = stepSize;
+        if (ctrlDown) {currStepSize *= 5;}
+
+        if (wDown) {transDelta.translate(new Vector3D(0, 0, currStepSize));}
+        if (sDown) {transDelta.translate(new Vector3D(0, 0, -currStepSize));}
+        if (spaceDown) {transDelta.translate(new Vector3D(0, currStepSize, 0));}
+        if (shiftDown) {transDelta.translate(new Vector3D(0, -currStepSize, 0));}
         if (aDown) {rotDelta.translate(new Vector3D(0, turnStep, 0));}
         if (dDown) {rotDelta.translate(new Vector3D(0, -turnStep, 0));}
 
@@ -48,6 +52,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
             case KeyEvent.VK_D -> dDown = false;
             case KeyEvent.VK_SPACE -> spaceDown = false;
             case KeyEvent.VK_SHIFT -> shiftDown = false;
+            case KeyEvent.VK_CONTROL -> ctrlDown = false;
         }
     }
 
@@ -60,6 +65,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
             case KeyEvent.VK_D -> dDown = true;
             case KeyEvent.VK_SPACE -> spaceDown = true;
             case KeyEvent.VK_SHIFT -> shiftDown = true;
+            case KeyEvent.VK_CONTROL -> ctrlDown = true;
         }
     }
 }
