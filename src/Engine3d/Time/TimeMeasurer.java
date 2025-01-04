@@ -1,15 +1,17 @@
 package Engine3d.Time;
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class TimeMeasurer {
+    public boolean measureTime = false;
     private long timeOfLastFrame = System.nanoTime();
     private int frameCount = 0;
     private volatile int fps;
 
-    private final ConcurrentHashMap<String, AtomicLong> measurementMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, AtomicLong> startTime = new ConcurrentHashMap<>();
+    private final HashMap<String, Long> measurementMap = new HashMap<>();
+    private final HashMap<String, Long> startTime = new HashMap<>();
 
     public double getFPS() {
         long currentTime = System.nanoTime();
@@ -28,36 +30,66 @@ public class TimeMeasurer {
         measurementMap.clear();
     }
 
+    private void startSelfMeasurement()
+    {
+        measurementMap.putIfAbsent("SelfMeasurement", 0L);
+        startTime.put("SelfMeasurement",  System.nanoTime());
+    }
+    private void stopSelfMeasurement()
+    {
+        Long start = startTime.get("SelfMeasurement");
+        Long total = measurementMap.get("SelfMeasurement");
+        if (start == null || total == null) {return;}
+        long currentTime = System.nanoTime();
+        long elapsed = currentTime - start;
+        measurementMap.put("SelfMeasurement", total + elapsed);
+        startTime.remove("SelfMeasurement"); // Stop tracking the start time
+    }
+    public String getSelfMeasurement() {
+        return getMsPrintOut("SelfMeasurement");
+    }
+
     public void startMeasurement(String measurementName) {
-        measurementMap.putIfAbsent(measurementName, new AtomicLong(0));
-        startTime.put(measurementName, new AtomicLong(System.nanoTime()));
+        if (!measureTime) {return;}
+        startSelfMeasurement();
+        measurementMap.putIfAbsent(measurementName, 0L);
+        startTime.put(measurementName, System.nanoTime());
+        stopSelfMeasurement();
     }
 
     public void stopMeasurement(String measurementName) {
+        if (!measureTime) {return;}
+        startSelfMeasurement();
         updateMeasurement(measurementName);
         startTime.remove(measurementName); // Stop tracking the start time
+        stopSelfMeasurement();
     }
 
     public long getMeasurement(String measurementName) {
-        measurementMap.putIfAbsent(measurementName, new AtomicLong(0));
+        if (!measureTime) {measureTime = true;}
+        startSelfMeasurement();
+        measurementMap.putIfAbsent(measurementName, 0L);
         updateMeasurement(measurementName);
-        return measurementMap.get(measurementName).get();
+        stopSelfMeasurement();
+        return measurementMap.get(measurementName);
     }
 
     private void updateMeasurement(String measurementName) {
-        AtomicLong start = startTime.get(measurementName);
-        AtomicLong total = measurementMap.get(measurementName);
+        if (!measureTime) {return;}
+        startSelfMeasurement();
+        Long start = startTime.get(measurementName);
+        Long total = measurementMap.get(measurementName);
 
         if (start == null || total == null) {
             return; // Measurement not started or doesn't exist
         }
 
         long currentTime = System.nanoTime();
-        long elapsed = currentTime - start.get();
-        total.addAndGet(elapsed);
+        long elapsed = currentTime - start;
+        measurementMap.put(measurementName, total + elapsed);
+        startTime.put(measurementName, currentTime);
 
-        // Reset the start time for continuous measurement
-        start.set(currentTime);
+        stopSelfMeasurement();
     }
 
     public double getRelativeMeasurement(long measurement, long comparison)

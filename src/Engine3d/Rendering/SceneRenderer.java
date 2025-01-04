@@ -47,13 +47,13 @@ public class SceneRenderer extends JPanel
 
         long sceneDrawTime = timeMeasurer.getMeasurement("DrawScene");
 
-
         g.setColor(Color.white);
         g.drawString("FPS: " + timeMeasurer.getFPS(), 20, 20);
-        g.drawString(timeMeasurer.getMsPrintOut("DrawScene"), 25, 60);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", sceneDrawTime), 25, 80);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", sceneDrawTime), 25, 100);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", sceneDrawTime),25, 120);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", sceneDrawTime),25, 140);
+        g.drawString(timeMeasurer.getSelfMeasurement(), 20, 40);
+        g.drawString(timeMeasurer.getMsPrintOut("DrawScene"), 20, 60);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", sceneDrawTime), 30, 80);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", sceneDrawTime), 30, 100);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", sceneDrawTime),30, 120);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", sceneDrawTime),30, 140);
     }
 }
