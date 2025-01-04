@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 
 public class Camera implements Translatable, Rotatable
 {
+    public static final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
     JFrame window;
     public Drawer drawer;
     Matrix4x4 projectionMatrix;
@@ -26,7 +27,6 @@ public class Camera implements Translatable, Rotatable
 
     Vector3D position = new Vector3D();
     Vector3D rotation = new Vector3D();
-    final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
 
     public Camera(JFrame window)
     {
@@ -74,6 +74,9 @@ public class Camera implements Translatable, Rotatable
     {
         Matrix4x4 cameraRot = Matrix4x4.getRotationMatrixY(rotation.y());
         return cameraRot.matrixVectorMultiplication(BASE_LOOK_DIRECTION);
+    }
+    public Vector3D getRotation() {
+        return new Vector3D(rotation);
     }
     @Override
     public void rotate(Vector3D delta) {

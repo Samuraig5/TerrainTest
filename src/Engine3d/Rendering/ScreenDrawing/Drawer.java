@@ -13,7 +13,7 @@ import static java.lang.Math.abs;
 
 public class Drawer
 {
-    static double SHADING_HARSHNESS = 0.2d; //The lower this is the darker the shadows will be (0-1)
+    static double SHADING_HARSHNESS = 0; //The lower this is the darker the shadows will be (0-1)
     Camera camera;
     PixelDrawer p;
     SpriteManager spriteManager = new SpriteManager();

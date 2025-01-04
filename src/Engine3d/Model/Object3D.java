@@ -1,5 +1,6 @@
 package Engine3d.Model;
 
+import Engine3d.Lighting.LightSource;
 import Engine3d.Math.*;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Material;
@@ -30,7 +31,7 @@ public class Object3D implements Translatable, Rotatable
     }
     public Vector3D getPosition() {return new Vector3D(position);}
 
-    public void drawObject(Camera camera, TimeMeasurer tm)
+    public void drawObject(Camera camera, List<LightSource> lightSources, TimeMeasurer tm)
     {
         tm.startMeasurement("Get Matrices");
         List<MeshTriangle> trianglesToRaster = new ArrayList<>();
@@ -73,12 +74,14 @@ public class Object3D implements Translatable, Rotatable
                 continue;
             }
 
-            //= Primitive Lighting (Replace later) =
-            Vector3D lightDirection = new Vector3D(0f, 1f, -0.25f);
-            lightDirection.normalize();
+            for (LightSource ls : lightSources) {
+                Vector3D lightDirection = ls.getRotation().normalized().inverse();
 
-            double lightDotProduct = triNormal.dotProduct(lightDirection);
-            triTransformed.getMaterial().setLuminance(lightDotProduct);
+                double lightDotProduct = (triNormal.dotProduct(lightDirection)*ls.getLightIntensity());
+                if (triTransformed.getMaterial().getLuminance() < lightDotProduct) {
+                    triTransformed.getMaterial().setLuminance(lightDotProduct);
+                }
+            }
 
             // = Convert World Space -> View Space =
             MeshTriangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);

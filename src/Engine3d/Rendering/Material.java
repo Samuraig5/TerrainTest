@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class Material
 {
-    private double luminance;
+    private double luminance = 0;
     private Vector2D[] textureCoords = new Vector2D[3];
     private MTL mtl;
 

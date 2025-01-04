@@ -1,12 +1,12 @@
 package Engine3d.Rendering;
 
+import Engine3d.Lighting.LightSource;
 import Engine3d.Time.GameTimer;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Object3D;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -14,6 +14,7 @@ import java.util.List;
 public class Scene
 {
     List<Object3D> objects = new ArrayList<>();
+    List<LightSource> lightSources = new ArrayList<>();
     Camera camera;
     GameTimer sceneTimer;
     Color backgroundColour = Color.BLACK;
@@ -49,7 +50,7 @@ public class Scene
         });
         for (Object3D o:objects)
         {
-            o.drawObject(camera, timeMeasurer);
+            o.drawObject(camera, lightSources, timeMeasurer);
         }
     }
 
@@ -59,5 +60,8 @@ public class Scene
 
     public void addTimeMeasurer(TimeMeasurer tm) {
         this.timeMeasurer = tm;
+    }
+    public void addLight(LightSource lightSource) {
+        lightSources.add(lightSource);
     }
 }

@@ -1,4 +1,6 @@
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
+import Engine3d.Lighting.CameraLight;
+import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Scene;
@@ -30,6 +32,11 @@ public class Main {
         });
 
         Scene testScene = new Scene(camera);
+        new CameraLight(camera, testScene, new Vector3D());
+        new CameraLight(camera, testScene, new Vector3D(Math.toRadians(-45),0,0)).setLightIntensity(0.5);
+        new CameraLight(camera, testScene, new Vector3D(Math.toRadians(45),0,0)).setLightIntensity(0.5);
+        new CameraLight(camera, testScene, new Vector3D(0,Math.toRadians(-45),0)).setLightIntensity(0.5);
+        new CameraLight(camera, testScene, new Vector3D(0,Math.toRadians(45),0)).setLightIntensity(0.5);
 
         //Cube cube = new Cube(1);
         //cube.translate(new Vector3D(-0.5,-0.5,0.5));
