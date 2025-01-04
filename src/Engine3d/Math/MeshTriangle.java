@@ -36,10 +36,15 @@ public class MeshTriangle implements Translatable
         return normal;
     }
 
-    public double getMidPoint()
+    public Vector3D getMidPoint()
     {
-        return (points[0].z() + points[1].z() + points[2].z()) / 3f;
-    }
+        // Calculate the midpoint
+        double midX = (points[0].x() + points[1].x() + points[2].x()) / 3.0;
+        double midY = (points[0].y() + points[1].y() + points[2].y()) / 3.0;
+        double midZ = (points[0].z() + points[1].z() + points[2].z()) / 3.0;
+
+        // Return the result as a new Vector3D
+        return new Vector3D(midX, midY, midZ);    }
 
     @Override
     public void translate(Vector3D delta) {

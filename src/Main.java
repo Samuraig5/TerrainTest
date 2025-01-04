@@ -32,11 +32,21 @@ public class Main {
         });
 
         Scene testScene = new Scene(camera);
-        new CameraLight(camera, testScene, new Vector3D());
-        new CameraLight(camera, testScene, new Vector3D(Math.toRadians(-45),0,0)).setLightIntensity(0.5);
-        new CameraLight(camera, testScene, new Vector3D(Math.toRadians(45),0,0)).setLightIntensity(0.5);
-        new CameraLight(camera, testScene, new Vector3D(0,Math.toRadians(-45),0)).setLightIntensity(0.5);
-        new CameraLight(camera, testScene, new Vector3D(0,Math.toRadians(45),0)).setLightIntensity(0.5);
+        CameraLight cl = new CameraLight(camera, testScene, new Vector3D());
+        cl.setLightRange(100);
+        CameraLight cl1 = new CameraLight(camera, testScene, new Vector3D(Math.toRadians(-45),0,0));
+        cl1.setLightIntensity(0.5);
+        cl1.setLightRange(100);
+        CameraLight cl2 = new CameraLight(camera, testScene, new Vector3D(Math.toRadians(45),0,0));
+        cl2.setLightIntensity(0.5);
+        cl2.setLightRange(100);
+        CameraLight cl3 = new CameraLight(camera, testScene, new Vector3D(0,Math.toRadians(-45),0));
+        cl3.setLightIntensity(0.5);
+        cl3.setLightRange(100);
+        CameraLight cl4 = new CameraLight(camera, testScene, new Vector3D(0,Math.toRadians(45),0));
+        cl4.setLightIntensity(0.5);
+        cl4.setLightRange(100);
+
 
         //Cube cube = new Cube(1);
         //cube.translate(new Vector3D(-0.5,-0.5,0.5));

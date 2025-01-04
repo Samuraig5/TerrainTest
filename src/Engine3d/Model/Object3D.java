@@ -75,9 +75,12 @@ public class Object3D implements Translatable, Rotatable
             }
 
             for (LightSource ls : lightSources) {
+                double lightIntensity = ls.getLightIntensity(triTransformed.getMidPoint().distanceTo(ls.getPosition()));
+                if (lightIntensity == 0) {continue;}
+
                 Vector3D lightDirection = ls.getRotation().normalized().inverse();
 
-                double lightDotProduct = (triNormal.dotProduct(lightDirection)*ls.getLightIntensity());
+                double lightDotProduct = (triNormal.dotProduct(lightDirection)*lightIntensity);
                 if (triTransformed.getMaterial().getLuminance() < lightDotProduct) {
                     triTransformed.getMaterial().setLuminance(lightDotProduct);
                 }

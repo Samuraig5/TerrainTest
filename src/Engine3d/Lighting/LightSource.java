@@ -24,6 +24,13 @@ public class LightSource implements Translatable, Rotatable
     public double getLightIntensity() {
         return Math.min(1, Math.max(0, lightIntensity));
     }
+    public double getLightIntensity(double distance){
+        distance = Math.min(lightRange, Math.max(0, distance));
+        return lightIntensity * (1 - (distance / lightRange));
+    }
+    public void setLightRange(double lightRange) {
+        this.lightRange = lightRange;
+    }
     public double getLightRange() {
         return lightRange;
     }
