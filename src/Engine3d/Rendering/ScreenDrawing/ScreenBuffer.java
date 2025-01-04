@@ -38,6 +38,7 @@ public class ScreenBuffer
     }
 
     public boolean pixelOnTop(int x, int y, double depth) {
+        if (!inBounds(x,y)) {return false;}
         return (depth > depthBuffer[x][y]);
     }
     public void updateDepth(int x, int y, double depth) {

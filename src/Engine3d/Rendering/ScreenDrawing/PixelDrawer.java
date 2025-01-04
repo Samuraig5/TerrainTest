@@ -14,6 +14,7 @@ import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 public class PixelDrawer
 {
     Camera camera;
+    double[][] depthBuffer;
     public PixelDrawer(Camera camera)
     {
         this.camera = camera;
@@ -24,7 +25,6 @@ public class PixelDrawer
         BufferedImage bufferedImage = screenBuffer.getBufferedImage();
         y = bufferedImage.getHeight() - y;
         if (!screenBuffer.inBounds(x,y)) {return;}
-
         WritableRaster raster = bufferedImage.getRaster();
         raster.setPixels(x, y, 1, 1, ScreenBuffer.colorToIntArray(c));
     }
