@@ -14,8 +14,8 @@ import java.util.Objects;
 
 public class ObjLoader
 {
-    public static boolean loadFromObjFile(String objPath, Object3D object3D) {return loadFromObjFile(objPath, null, object3D);}
-    public static boolean loadFromObjFile(String objPath, String texturePath, Object3D object3D)
+    public static boolean loadFromObjFile(String objPath, Object3D object3D) {return loadFromObjFile(objPath, null, object3D, true);}
+    public static boolean loadFromObjFile(String objPath, String texturePath, Object3D object3D, boolean windingClockwise)
     {
         boolean hasTexture = true;
 
@@ -26,7 +26,6 @@ public class ObjLoader
         List<Vector2D> texturePoints = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(objPath))) {
-            boolean readingVertecies = true;
             String line;
 
             while ((line = reader.readLine()) != null)
@@ -51,11 +50,23 @@ public class ObjLoader
                     //Once all vertecies have been read, add them to the mesh.
                     if (!hasTexture)
                     {
-                        //Obj starts counting from 0, so we need to subtract 1 from the listed indexes
-                        MeshTriangle face = new MeshTriangle(vertecies.get(Integer.parseInt(data[3]) - 1), //Because we invert x we have to invert the way the faces are loaded
-                                                        vertecies.get(Integer.parseInt(data[2]) - 1),
-                                                        vertecies.get(Integer.parseInt(data[1]) - 1));
-                        object3D.mesh.add(face);
+                        if (windingClockwise)
+                        {
+                            //Obj starts counting from 0, so we need to subtract 1 from the listed indexes
+                            MeshTriangle face = new MeshTriangle(vertecies.get(Integer.parseInt(data[3]) - 1), //Because we invert x we have to invert the way the faces are loaded
+                                    vertecies.get(Integer.parseInt(data[2]) - 1),
+                                    vertecies.get(Integer.parseInt(data[1]) - 1));
+                            object3D.mesh.add(face);
+                        }
+                        else
+                        {
+                            //Obj starts counting from 0, so we need to subtract 1 from the listed indexes
+                            MeshTriangle face = new MeshTriangle(vertecies.get(Integer.parseInt(data[1]) - 1), //Because we invert x we have to invert the way the faces are loaded
+                                    vertecies.get(Integer.parseInt(data[2]) - 1),
+                                    vertecies.get(Integer.parseInt(data[3]) - 1));
+                            object3D.mesh.add(face);
+                        }
+
                     }
                     else
                     {
@@ -63,19 +74,34 @@ public class ObjLoader
                         String[] token1 = data[2].split("/+");
                         String[] token2 = data[1].split("/+");
 
-                        MeshTriangle face = new MeshTriangle(vertecies.get(Integer.parseInt(token0[0]) - 1), //Because we invert x we have to invert the way the faces are loaded
-                                                        vertecies.get(Integer.parseInt(token1[0]) - 1),
-                                                        vertecies.get(Integer.parseInt(token2[0]) - 1));
-                        Material mat = new Material(texturePoints.get(Integer.parseInt(token0[1]) - 1),
-                                                    texturePoints.get(Integer.parseInt(token1[1]) - 1),
-                                                    texturePoints.get(Integer.parseInt(token2[1]) - 1));
-                        mat.setTexturePath(texturePath);
-                        face.setMaterial(mat);
-                        object3D.mesh.add(face);
+                        if (windingClockwise)
+                        {
+                            MeshTriangle face = new MeshTriangle(vertecies.get(Integer.parseInt(token0[0]) - 1), //Because we invert x we have to invert the way the faces are loaded
+                                    vertecies.get(Integer.parseInt(token1[0]) - 1),
+                                    vertecies.get(Integer.parseInt(token2[0]) - 1));
+                            Material mat = new Material(texturePoints.get(Integer.parseInt(token0[1]) - 1),
+                                    texturePoints.get(Integer.parseInt(token1[1]) - 1),
+                                    texturePoints.get(Integer.parseInt(token2[1]) - 1));
+                            mat.setTexturePath(texturePath);
+                            face.setMaterial(mat);
+                            object3D.mesh.add(face);
+                        }
+                        else
+                        {
+                            MeshTriangle face = new MeshTriangle(vertecies.get(Integer.parseInt(token2[0]) - 1), //Because we invert x we have to invert the way the faces are loaded
+                                    vertecies.get(Integer.parseInt(token1[0]) - 1),
+                                    vertecies.get(Integer.parseInt(token0[0]) - 1));
+                            Material mat = new Material(texturePoints.get(Integer.parseInt(token2[1]) - 1),
+                                    texturePoints.get(Integer.parseInt(token1[1]) - 1),
+                                    texturePoints.get(Integer.parseInt(token0[1]) - 1));
+                            mat.setTexturePath(texturePath);
+                            face.setMaterial(mat);
+                            object3D.mesh.add(face);
+                        }
                     }
                 }
             }
-            object3D.points = vertecies.toArray(new Vector3D[0]); readingVertecies = false;
+            object3D.points = vertecies.toArray(new Vector3D[0]);
         }
         catch (IOException e)
         {

@@ -74,7 +74,7 @@ public class Object3D implements Translatable, Rotatable
             }
 
             //= Primitive Lighting (Replace later) =
-            Vector3D lightDirection = new Vector3D(0f, 1f, -1f);
+            Vector3D lightDirection = new Vector3D(0f, 1f, -0.25f);
             lightDirection.normalize();
 
             double lightDotProduct = triNormal.dotProduct(lightDirection);
