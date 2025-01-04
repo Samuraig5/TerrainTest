@@ -23,41 +23,42 @@ public class Drawer
         p = new PixelDrawer(camera);
     }
 
-    public void clearScreen(Graphics2D g, Color backgroundColour)
+    public void drawBuffer(Graphics g)
     {
-        p.recomputeDepthBuffer();
-        fillBackground(g, backgroundColour);
+        BufferedImage buffer = camera.getScreenBuffer().getBufferedImage();
+        int screenWidth = (int) (buffer.getWidth() / camera.getResolutionFactor());
+        int screenHeight = (int) (buffer.getHeight() / camera.getResolutionFactor());
+
+        g.drawImage(buffer, 0, 0, screenWidth, screenHeight,
+                                0, 0, buffer.getWidth(), buffer.getHeight(),
+                                null);
+
+
     }
 
-    public void drawLine(Graphics2D g, Color c, Vector3D v1, Vector3D v2) {
-        p.drawLine(g, c, v1, v2);
+    public void drawLine(Color c, Vector3D v1, Vector3D v2) {
+        p.drawLine(camera.getScreenBuffer(), c, v1, v2);
     }
 
-    public void drawTriangle(Graphics2D g, Color c, MeshTriangle t)
+    public void drawTriangle(Color c, MeshTriangle t)
     {
-        g.setColor(c);
         Vector3D points[] = t.getPoints();
-        drawLine(g,c,points[0],points[1]);
-        drawLine(g,c,points[1],points[2]);
-        drawLine(g,c,points[2],points[0]);
+        drawLine(c,points[0],points[1]);
+        drawLine(c,points[1],points[2]);
+        drawLine(c,points[2],points[0]);
     }
 
-    public void fillTriangle(Graphics2D g, MeshTriangle t)
+    public void fillTriangle(MeshTriangle t)
     {
-        p.fillTriangle(g, t);
+        p.fillTriangle(camera.getScreenBuffer(), t);
     }
 
-    public void textureTriangle(Graphics2D g, MeshTriangle tri)
+    public void textureTriangle(MeshTriangle tri)
     {
         BufferedImage sprite = spriteManager.getResource(tri.getMaterial().getTexturePath());
         if (sprite == null) {System.err.println("Drawer: Triangle doesn't have a texture!"); return;}
 
-        p.textureTriangle(g,tri,sprite);
-    }
-
-    private void fillBackground(Graphics2D g, Color c)
-    {
-        p.fillRectangle(g,c,camera.getResolution());
+        p.textureTriangle(camera.getScreenBuffer(),tri,sprite);
     }
 
     public static Color getColourShade(Color baseColor, double luminance) {
@@ -68,9 +69,5 @@ public class Drawer
         int blue = (int) (baseColor.getBlue() * luminance);
 
         return new Color(red, green, blue);
-    }
-    public void recomputeDepthBuffer()
-    {
-        p.recomputeDepthBuffer();
     }
 }

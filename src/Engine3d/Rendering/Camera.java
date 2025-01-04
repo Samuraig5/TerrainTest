@@ -4,10 +4,13 @@ import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.MeshTriangle;
 import Engine3d.Math.Vector3D;
 import Engine3d.Rendering.ScreenDrawing.Drawer;
+import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
 import Engine3d.Rotatable;
 import Engine3d.Translatable;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Camera implements Translatable, Rotatable
 {
@@ -19,6 +22,8 @@ public class Camera implements Translatable, Rotatable
     double zNear = 0.25d;
     double zFar = 1000;
 
+    private ScreenBuffer screenBuffer;
+
     Vector3D position = new Vector3D();
     Vector3D rotation = new Vector3D();
     final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
@@ -27,13 +32,13 @@ public class Camera implements Translatable, Rotatable
     {
         this.window = window;
         this.drawer = new Drawer(this);
+        this.screenBuffer = new ScreenBuffer(getResolution());
         this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
     }
 
     public MeshTriangle projectTriangle(MeshTriangle in) {
         return projectionMatrix.multiplyWithTriangle(in);
     }
-
     public Vector3D getScreenDimensions() {
         return new Vector3D(window.getWidth(), window.getHeight(), 0);
     }
@@ -41,7 +46,18 @@ public class Camera implements Translatable, Rotatable
     public double getResolutionFactor() {return resolution;}
     public Vector3D getNearPlane() {return new Vector3D(0,0,zNear);}
     public Vector3D getFarPlane() {return new Vector3D(0,0,zFar);}
-
+    private double getAspectRatio()
+    {
+        return getScreenDimensions().y() / getScreenDimensions().x();
+    }
+    public ScreenBuffer getScreenBuffer(){ return screenBuffer; }
+    public void onFrameSizeChange() {
+        this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
+        this.screenBuffer.recompute(getResolution());
+    }
+    public void drawScreenBuffer(Graphics g){
+        drawer.drawBuffer(g);
+    }
 
     @Override
     public void translate(Vector3D delta) {
@@ -53,27 +69,15 @@ public class Camera implements Translatable, Rotatable
         position.translate(movement);
         //System.out.println("Camera Pos: " + position.x() + ", " + position.y() + ", " + position.z());
     }
-
     public Vector3D getPosition(){return new Vector3D(position);}
     public Vector3D getLookDirection()
     {
         Matrix4x4 cameraRot = Matrix4x4.getRotationMatrixY(rotation.y());
         return cameraRot.matrixVectorMultiplication(BASE_LOOK_DIRECTION);
     }
-
     @Override
     public void rotate(Vector3D delta) {
         rotation.translate(delta);
         //System.out.println("Camera Rot: " + rotation.x() + ", " + rotation.y() + ", " + rotation.z());
-    }
-
-    private double getAspectRatio()
-    {
-        return getScreenDimensions().y() / getScreenDimensions().x();
-    }
-    public void onFrameSizeChange()
-    {
-        this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
-        drawer.recomputeDepthBuffer();
     }
 }

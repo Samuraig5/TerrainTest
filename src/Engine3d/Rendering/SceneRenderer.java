@@ -1,15 +1,18 @@
 package Engine3d.Rendering;
 
+import Engine3d.Math.Vector3D;
 import Engine3d.Time.TimeMeasurer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+
+import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
 public class SceneRenderer extends JPanel
 {
     private Scene activeScene;
     private TimeMeasurer timeMeasurer;
-
     public SceneRenderer(Scene initialScene)
     {
         setFocusable(true);
@@ -43,7 +46,11 @@ public class SceneRenderer extends JPanel
         timeMeasurer.clearMeasurements();
         timeMeasurer.startMeasurement("DrawScene");
 
-        activeScene.drawScene(g);
+        activeScene.drawScene();
+
+        timeMeasurer.startMeasurement("DrawBuffer");
+        activeScene.getCamera().drawScreenBuffer(g);
+        timeMeasurer.stopMeasurement("DrawBuffer");
 
         long sceneDrawTime = timeMeasurer.getMeasurement("DrawScene");
 
@@ -55,5 +62,6 @@ public class SceneRenderer extends JPanel
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", sceneDrawTime), 30, 100);
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", sceneDrawTime),30, 120);
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", sceneDrawTime),30, 140);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("DrawBuffer", sceneDrawTime),30, 160);
     }
 }

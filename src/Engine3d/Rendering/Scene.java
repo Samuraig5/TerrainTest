@@ -6,6 +6,7 @@ import Engine3d.Time.Updatable;
 import Engine3d.Model.Object3D;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,12 +33,12 @@ public class Scene
         }
     }
 
-    public void drawScene(Graphics g)
+    public void drawScene()
     {
-        camera.drawer.clearScreen((Graphics2D) g,backgroundColour);
+        camera.getScreenBuffer().clear(backgroundColour);
         for (Object3D o:objects)
         {
-            o.drawObject(g, camera, timeMeasurer);
+            o.drawObject(camera, timeMeasurer);
         }
     }
 

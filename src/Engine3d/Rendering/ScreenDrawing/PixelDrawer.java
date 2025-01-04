@@ -1,81 +1,75 @@
 package Engine3d.Rendering.ScreenDrawing;
 
 import Engine3d.Rendering.Camera;
-import Engine3d.Rendering.Material;
 import Engine3d.Math.MeshTriangle;
 import Engine3d.Math.Vector2D;
 import Engine3d.Math.Vector3D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
+
+import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
 public class PixelDrawer
 {
     Camera camera;
-    double[][] depthBuffer;
     public PixelDrawer(Camera camera)
     {
         this.camera = camera;
-        recomputeDepthBuffer();
     }
 
-    public void drawLine(Graphics2D g, Color c, Vector3D v1, Vector3D v2)
+    public static void drawPixel(ScreenBuffer screenBuffer, Color c, int x, int y)
     {
-        g.setColor(c);
-        v1 = adjustVector(v1);
-        v2 = adjustVector(v2);
-        g.drawLine((int) v1.x(), (int) v1.y(), (int) v2.x(), (int) v2.y());
+        BufferedImage bufferedImage = screenBuffer.getBufferedImage();
+        y = bufferedImage.getHeight() - y;
+        if (!screenBuffer.inBounds(x,y)) {return;}
+
+        WritableRaster raster = bufferedImage.getRaster();
+        raster.setPixels(x, y, 1, 1, ScreenBuffer.colorToIntArray(c));
     }
 
-    public void fillTriangle(Graphics2D g, MeshTriangle t)
+    public void drawLine(ScreenBuffer screenBuffer, Color c, Vector3D v1, Vector3D v2)
     {
-        t = adjustTriangle(t);
+        int x1 = (int) v1.x();
+        int y1 = (int) v1.y();
+        int x2 = (int) v2.x();
+        int y2 = (int) v2.y();
 
-        g.setColor(t.getMaterial().getShadedColour());
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        int sx = (x1 < x2) ? 1 : -1;
+        int sy = (y1 < y2) ? 1 : -1;
+        int err = dx - dy;
 
-        Vector3D points[] = t.getPoints();
+        while (true) {
+            // Draw the pixel at the current position
+            drawPixel(screenBuffer, c, x1, y1);
 
-        Polygon triangle = new Polygon();
-        triangle.addPoint((int) points[0].x(), (int) points[0].y());
-        triangle.addPoint((int) points[1].x(), (int) points[1].y());
-        triangle.addPoint((int) points[2].x(), (int) points[2].y());
+            // If we have reached the endpoint, break the loop
+            if (x1 == x2 && y1 == y2) break;
 
-        g.fillPolygon(triangle);
+            // Calculate error and adjust the x or y coordinate
+            int e2 = err * 2;
+            if (e2 > -dy) {
+                err -= dy;
+                x1 += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y1 += sy;
+            }
+        }
     }
 
-    public void fillRectangle(Graphics2D g, Color c, Vector3D rect)
+    public void fillTriangle(ScreenBuffer screenBuffer, MeshTriangle t)
     {
-        g.setColor(c);
-        g.fillRect(0, 0, (int) (rect.x() / camera.getResolutionFactor()), (int) (rect.y() / camera.getResolutionFactor()));
+        BufferedImage colour = new BufferedImage(1, 1, TYPE_INT_ARGB);
+        colour.setRGB(1,1,t.getMaterial().getShadedColour().getRGB());
+        textureTriangle(screenBuffer, t, colour);
     }
 
-    private Vector3D adjustVector(Vector3D vec)
-    {
-        double x = (vec.x() * (1/camera.getResolutionFactor()));
-        double y = camera.getScreenDimensions().y() - (vec.y() * (1/camera.getResolutionFactor()));
-        return new Vector3D(x,y,0);
-    }
-
-    private MeshTriangle adjustTriangle(MeshTriangle tri)
-    {
-        Vector3D[] points = tri.getPoints();
-        Vector2D[] texPoints = tri.getMaterial().getTextureCoords();
-
-        Vector3D p1 = adjustVector(points[0]);
-        Vector3D p2 = adjustVector(points[1]);
-        Vector3D p3 = adjustVector(points[2]);
-        Vector2D t1 = texPoints[0].scaled((1/camera.getResolutionFactor()));
-        Vector2D t2 = texPoints[1].scaled((1/camera.getResolutionFactor()));
-        Vector2D t3 = texPoints[2].scaled((1/camera.getResolutionFactor()));
-
-        MeshTriangle res = new MeshTriangle(p1,p2,p3);
-        Material mat = new Material(tri.getMaterial());
-        mat.setTextureCoords(t1,t2,t3);
-        res.setMaterial(mat);
-        return res;
-    }
-
-    public void textureTriangle(Graphics2D g, MeshTriangle tri, BufferedImage sprite)
+    public void textureTriangle(ScreenBuffer screenBuffer, MeshTriangle tri, BufferedImage sprite)
     {
         Vector3D[] points = tri.getPoints();
         Vector2D[] texPoints = tri.getMaterial().getTextureCoords();
@@ -88,14 +82,8 @@ public class PixelDrawer
         double u2 = texPoints[1].u(); double v2 = texPoints[1].v(); double w2 = texPoints[1].w();;
         double u3 = texPoints[2].u(); double v3 = texPoints[2].v(); double w3 = texPoints[2].w();
 
-        Texturizer.textureTriangle(g,(int)camera.getResolution().y(),camera.getResolutionFactor(),depthBuffer,
+        Texturizer.textureTriangle(screenBuffer,
                 x1,y1,u1,v1,w1,x2,y2,u2,v2,w2,x3,y3,u3,v3,w3,
                 tri.getMaterial().getLuminance(),sprite);
-    }
-
-    public void recomputeDepthBuffer()
-    {
-        Vector3D res = camera.getResolution();
-        depthBuffer = new double[(int) res.x()][(int) res.y()];
     }
 }

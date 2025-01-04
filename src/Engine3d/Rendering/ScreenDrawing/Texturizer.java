@@ -9,7 +9,7 @@ import static java.lang.Math.abs;
 
 public class Texturizer
 {
-    public static void textureTriangle(Graphics2D g, int screenHeight, double resolution, double[][] depthBuffer,
+    public static void textureTriangle(ScreenBuffer screenBuffer,
                                        int x1, int y1, double u1, double v1, double w1,
                                        int x2, int y2, double u2, double v2, double w2,
                                        int x3, int y3, double u3, double v3, double w3,
@@ -98,10 +98,6 @@ public class Texturizer
                     tempd = tex_sw; tex_sw = tex_ew; tex_ew = tempd;
                 }
 
-                tex_u = tex_su;
-                tex_v = tex_sv;
-                tex_w = tex_sw;
-
                 double tstep = 1.0f / ((double)(bx - ax));
                 double t = 0.0f;
 
@@ -111,8 +107,7 @@ public class Texturizer
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-                    drawTextureToPixel(g,screenHeight,resolution,depthBuffer,
-                            sprite,luminance,spriteWidth,spriteHeigth,
+                    drawTextureToPixel(screenBuffer,luminance,sprite,spriteWidth,spriteHeigth,
                             tex_u,tex_v,tex_w,j,i);
                     t += tstep;
                 }
@@ -156,10 +151,6 @@ public class Texturizer
                     tempd = tex_sw; tex_sw = tex_ew; tex_ew = tempd;
                 }
 
-                tex_u = tex_su;
-                tex_v = tex_sv;
-                tex_w = tex_sw;
-
                 double tstep = 1.0f / ((double)(bx - ax));
                 double t = 0.0f;
 
@@ -169,8 +160,7 @@ public class Texturizer
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-                    drawTextureToPixel(g,screenHeight,resolution,depthBuffer,
-                            sprite,luminance,spriteWidth,spriteHeigth,
+                    drawTextureToPixel(screenBuffer,luminance,sprite,spriteWidth,spriteHeigth,
                             tex_u,tex_v,tex_w,j,i);
 
                     t += tstep;
@@ -179,24 +169,18 @@ public class Texturizer
         }
     }
 
-    private static void drawTextureToPixel(Graphics2D g, int screenHeight, double resolution, double[][] depthBuffer,
-                                           BufferedImage sprite, double luminance, int spriteWidth, int spriteHeigth,
+    private static void drawTextureToPixel(ScreenBuffer screenBuffer, double luminance,
+                                           BufferedImage sprite, int spriteWidth, int spriteHeight,
                                            double tex_u, double tex_v, double tex_w,
                                            int j, int i)
     {
-        if (tex_w > depthBuffer[j][i])
-        {
-            Color c = sampleSprite(sprite, luminance, spriteWidth, spriteHeigth,tex_u / tex_w, tex_v / tex_w);
-            drawPixel(g, screenHeight, (int)(1/resolution), c, j, i);
-            depthBuffer[j][i] = tex_w;
-        }
-    }
 
-    private static void drawPixel(Graphics2D g, int screenHeight, int pixelSize, Color c, int x, int y)
-    {
-        y = screenHeight - y;
-        g.setColor(c);
-        g.fillRect(x*pixelSize, y*pixelSize, pixelSize, pixelSize);
+        if (screenBuffer.pixelOnTop(j,i,tex_w))
+        {
+            Color c = sampleSprite(sprite, luminance, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w);
+            PixelDrawer.drawPixel(screenBuffer, c, j, i);
+            screenBuffer.updateDepth(j,i,tex_w);
+        }
     }
 
     private static Color sampleSprite(BufferedImage sprite, double luminance, int spriteWidth, int spriteHeigth, double u, double v)
@@ -210,13 +194,5 @@ public class Texturizer
         int rgb = sprite.getRGB((int)u, (int)v);
         Color result =  Drawer.getColourShade(new Color(rgb), luminance);
         return result;
-
-        /*if (u >= 0 && u < sprite.getWidth() && v >= 0 && v < sprite.getHeight()) {
-            int rgb = sprite.getRGB((int)u, (int)v);
-            return new Color(rgb);
-        } else {
-            System.err.println("Texturizer: u (" + u + ") or v (" + v + ") are out of bounds of the sprite!");
-            return Color.magenta;
-        }*/
     }
 }

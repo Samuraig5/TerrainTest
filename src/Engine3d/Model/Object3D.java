@@ -29,10 +29,8 @@ public class Object3D implements Translatable, Rotatable
         rotation.translate(delta);
     }
 
-    public void drawObject(Graphics g, Camera camera, TimeMeasurer tm)
+    public void drawObject(Camera camera, TimeMeasurer tm)
     {
-        Graphics2D g2d = (Graphics2D) g;
-
         tm.startMeasurement("Get Matrices");
         List<MeshTriangle> trianglesToRaster = new ArrayList<>();
 
@@ -56,9 +54,6 @@ public class Object3D implements Translatable, Rotatable
 
         for (MeshTriangle tri : mesh)
         {
-            //TODO: THIS IS JUST FOR TESTING
-            //tri.getMaterial().setTexturePath("src/Engine3d.Testing/rock.png");
-
             tm.startMeasurement("ObjWorldToScreen");
             MeshTriangle triTransformed = worldTransform.multiplyWithTriangle(tri);
             triTransformed.setMaterial(tri);
@@ -181,14 +176,14 @@ public class Object3D implements Translatable, Rotatable
                 if (!(triToDraw.getMaterial().getTexturePath() == null))
                 {
                     tm.startMeasurement("Texturizer");
-                    camera.drawer.textureTriangle(g2d,triToDraw);
+                    camera.drawer.textureTriangle(triToDraw);
                     tm.stopMeasurement("Texturizer");
                 }
                 else
                 {
-                    camera.drawer.fillTriangle(g2d, triToDraw);
+                    camera.drawer.fillTriangle(triToDraw);
                 }
-                if (showWireFrame) { camera.drawer.drawTriangle(g2d, Color.white, triToDraw); }
+                if (showWireFrame) { camera.drawer.drawTriangle(Color.white, triToDraw); }
             }
         }
     }
