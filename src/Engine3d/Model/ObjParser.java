@@ -55,7 +55,7 @@ public class ObjParser
                     mtl = mtlLib.get(data[1]);
                 }
                 else if (Objects.equals(data[0],"mtllib")) {
-                    mtlLib = readMTLlib(folderPath, data[1]);
+                    mtlLib = readMTLlib(folderPath, recombineString(data));
                 }
             }
             object3D.points = vertices.toArray(new Vector3D[0]);
@@ -72,6 +72,7 @@ public class ObjParser
         return new Vector3D(-Double.parseDouble(data[1]), //For some reason if we don't invert this, loaded objects are mirrored across x
                 Double.parseDouble(data[2]),
                 Double.parseDouble(data[3]));
+
     }
     private static Vector2D generateTextureVertex(String[] data) {
         return new Vector2D(Double.parseDouble(data[1]),
@@ -104,7 +105,7 @@ public class ObjParser
                 String[] data = line.split(" +");
                 switch (data[0]) {
                     case "newmtl" -> {
-                        mtl = new MTL(data[1]);
+                        mtl = new MTL(recombineString(data));
                         mtlLib.put(data[1], mtl);
                     }
                     case "Kd" -> {
@@ -115,7 +116,7 @@ public class ObjParser
                     }
                     case "map_Kd" -> {
                         assert mtl != null;
-                        mtl.setColourTexture(folderPath + "/" + data[1]);
+                        mtl.setColourTexture(folderPath + "/" + recombineString(data));
                     }
                 }
             }
@@ -147,5 +148,15 @@ public class ObjParser
             triangles.add(new String[]{"f", v0, v1, v2});
         }
         return triangles;
+    }
+
+    private static String recombineString(String[] strings) {
+        if (strings == null || strings.length <= 1) {
+            // Return an empty string if array is null or has 1 or fewer elements
+            return "";
+        }
+
+        // Use String.join() to combine strings starting from the second element
+        return String.join(" ", java.util.Arrays.copyOfRange(strings, 1, strings.length));
     }
 }

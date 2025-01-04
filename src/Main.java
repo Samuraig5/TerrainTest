@@ -41,13 +41,11 @@ public class Main {
         //cubeRot.showWireFrame(false);
         //testScene.addObject(cubeRot);
 
-        /*Object3D bloodGulch = new Object3D();
-        bloodGulch.translate(new Vector3D(0, -90, 5));
-        //bloodGulch.rotate(new Vector3D(0,Math.toRadians(180),0));
-        ObjLoader.loadFromObjFile("src/Engine3d/Testing/BloodGulch.obj", "src/Engine3d/Testing/blood ground.png", bloodGulch, false);
-        bloodGulch.showWireFrame(false);
-        testScene.addObject(bloodGulch);
-         */
+        Object3D map = ObjParser.loadFromObjFile("Resources/Models/PeachesCastle", "Peaches Castle.obj");
+        map.translate(new Vector3D(0, 0, 0));
+        map.showWireFrame(false);
+        testScene.addObject(map);
+
 
         Object3D rockGolem = ObjParser.loadFromObjFile("Resources/Models/RockGolem", "Stone.obj");
         rockGolem.translate(new Vector3D(0, 0, 7));

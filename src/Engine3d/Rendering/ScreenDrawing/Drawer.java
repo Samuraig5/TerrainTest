@@ -71,6 +71,7 @@ public class Drawer
         return new Color(red, green, blue);
     }
     public static Color multiplyColors(Color color1, Color color2) {
+        if (color1 == null || color2 == null) {return Color.magenta;}
         // Normalize RGB components to the range [0, 1]
         float red1 = color1.getRed() / 255.0f;
         float green1 = color1.getGreen() / 255.0f;

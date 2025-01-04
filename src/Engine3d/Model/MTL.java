@@ -9,6 +9,7 @@ public class MTL
     Color diffuseColour;
     public MTL(String name) {
         this.name = name;
+        this.setDiffuseColour(Color.white);
     }
     public MTL(MTL source) {
         this.name = source.name;
