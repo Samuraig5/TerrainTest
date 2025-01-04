@@ -1,5 +1,6 @@
 package Engine3d.Rendering.ScreenDrawing;
 
+import Engine3d.Model.MTL;
 import Engine3d.Rendering.ScreenDrawing.Drawer;
 
 import java.awt.*;
@@ -9,7 +10,7 @@ import static java.lang.Math.abs;
 
 public class Texturizer
 {
-    public static void textureTriangle(ScreenBuffer screenBuffer,
+    public static void textureTriangle(ScreenBuffer screenBuffer, MTL mtl,
                                        int x1, int y1, double u1, double v1, double w1,
                                        int x2, int y2, double u2, double v2, double w2,
                                        int x3, int y3, double u3, double v3, double w3,
@@ -107,7 +108,7 @@ public class Texturizer
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-                    drawTextureToPixel(screenBuffer,luminance,sprite,spriteWidth,spriteHeigth,
+                    drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
                             tex_u,tex_v,tex_w,j,i);
                     t += tstep;
                 }
@@ -160,7 +161,7 @@ public class Texturizer
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-                    drawTextureToPixel(screenBuffer,luminance,sprite,spriteWidth,spriteHeigth,
+                    drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
                             tex_u,tex_v,tex_w,j,i);
 
                     t += tstep;
@@ -169,7 +170,7 @@ public class Texturizer
         }
     }
 
-    private static void drawTextureToPixel(ScreenBuffer screenBuffer, double luminance,
+    private static void drawTextureToPixel(ScreenBuffer screenBuffer, MTL mtl, double luminance,
                                            BufferedImage sprite, int spriteWidth, int spriteHeight,
                                            double tex_u, double tex_v, double tex_w,
                                            int j, int i)
@@ -177,13 +178,17 @@ public class Texturizer
 
         if (screenBuffer.pixelOnTop(j,i,tex_w))
         {
-            Color c = sampleSprite(sprite, luminance, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w);
-            PixelDrawer.drawPixel(screenBuffer, c, j, i);
+            Color texture = sampleSprite(sprite, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w);
+            Color diffuse = mtl.getDiffuseColour();
+            Color base = Drawer.multiplyColors(texture, diffuse);
+            Color shaded =  Drawer.getColourShade(base, luminance);
+
+            PixelDrawer.drawPixel(screenBuffer, shaded, j, i);
             screenBuffer.updateDepth(j,i,tex_w);
         }
     }
 
-    private static Color sampleSprite(BufferedImage sprite, double luminance, int spriteWidth, int spriteHeigth, double u, double v)
+    private static Color sampleSprite(BufferedImage sprite, int spriteWidth, int spriteHeigth, double u, double v)
     {
         u = Math.max(0, Math.min(1, u));
         v = Math.max(0, Math.min(1, v));
@@ -192,7 +197,6 @@ public class Texturizer
         v *= spriteHeigth;
 
         int rgb = sprite.getRGB((int)u, (int)v);
-        Color result =  Drawer.getColourShade(new Color(rgb), luminance);
-        return result;
+        return new Color(rgb);
     }
 }

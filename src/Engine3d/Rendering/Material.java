@@ -1,5 +1,6 @@
 package Engine3d.Rendering;
 
+import Engine3d.Model.MTL;
 import Engine3d.Rendering.ScreenDrawing.Drawer;
 import Engine3d.Math.Vector2D;
 
@@ -7,10 +8,9 @@ import java.awt.*;
 
 public class Material
 {
-    private Color baseColour = Color.magenta;
     private double luminance;
     private Vector2D[] textureCoords = new Vector2D[3];
-    private String texturePath;
+    private MTL mtl;
 
     public Material()
     {
@@ -26,12 +26,11 @@ public class Material
     }
     public Material(Material source)
     {
-        this.baseColour = source.baseColour;
         this.luminance = source.luminance;
         for (int i = 0; i < 3; i++) {
             textureCoords[i] = new Vector2D(source.getTextureCoords()[i]);
         }
-        setTexturePath(source.getTexturePath());
+        this.mtl = source.getMTL();
     }
 
     public Color getShadedColour() {
@@ -39,10 +38,10 @@ public class Material
     }
 
     public void setBaseColour(Color baseColour) {
-        this.baseColour = baseColour;
+        mtl.setDiffuseColour(baseColour);
     }
     public Color getBaseColour() {
-        return baseColour;
+        return mtl.getDiffuseColour();
     }
     public void setLuminance(double luminance) {
         this.luminance = luminance;
@@ -60,10 +59,17 @@ public class Material
         textureCoords[1] = t1;
         textureCoords[2] = t2;
     }
+
+    public MTL getMTL() {
+        return mtl;
+    }
+    public void setMTL(MTL mtl) {
+        this.mtl = mtl;
+    }
     public String getTexturePath() {
-        return texturePath;
+        return mtl.getColourTexture();
     }
     public void setTexturePath(String texturePath) {
-        this.texturePath = texturePath;
+        mtl.setColourTexture(texturePath);
     }
 }
