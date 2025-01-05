@@ -9,11 +9,13 @@ import java.util.List;
 public class GameTimer implements ActionListener
 {
     private final Timer timer;
+    private long lastTime;
     private final List<Updatable> updatables = new ArrayList<>();
 
     public GameTimer()
     {
         timer = new Timer(16, this);
+        lastTime = System.nanoTime();
         timer.start();
     }
 
@@ -26,7 +28,20 @@ public class GameTimer implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
         for (Updatable updatable : updatables) {
-            updatable.update(timer.getDelay());
+            updatable.update(deltaTime());
         }
+    }
+
+    private double deltaTime()
+    {
+        long currentTime = System.nanoTime();
+        long deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+        return nanoToSec(deltaTime);
+    }
+
+    private double nanoToSec(long ns)
+    {
+        return (double) ns / 1_000_000_000;
     }
 }

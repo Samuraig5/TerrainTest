@@ -8,8 +8,8 @@ import java.awt.event.KeyEvent;
 
 public class OldSchoolDungeonCameraControls extends Controller implements Updatable
 {
-    private float stepSize = 0.25f;
-    private float turnStep = 0.05f;
+    private float stepSize = 5f;
+    private float turnStep = 2f;
 
     private boolean wDown = false;
     private boolean aDown = false;
@@ -28,15 +28,17 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         Vector3D transDelta = new Vector3D();
         Vector3D rotDelta = new Vector3D();
 
-        double currStepSize = stepSize;
-        if (ctrlDown) {currStepSize *= 5;}
+        double adjStepSize = stepSize * deltaTime;
+        double adjTurnStep = turnStep * deltaTime;
 
-        if (wDown) {transDelta.translate(new Vector3D(0, 0, currStepSize));}
-        if (sDown) {transDelta.translate(new Vector3D(0, 0, -currStepSize));}
-        if (spaceDown) {transDelta.translate(new Vector3D(0, currStepSize, 0));}
-        if (shiftDown) {transDelta.translate(new Vector3D(0, -currStepSize, 0));}
-        if (aDown) {rotDelta.translate(new Vector3D(0, turnStep, 0));}
-        if (dDown) {rotDelta.translate(new Vector3D(0, -turnStep, 0));}
+        if (ctrlDown) {adjStepSize *= 5;}
+
+        if (wDown) {transDelta.translate(new Vector3D(0, 0, adjStepSize));}
+        if (sDown) {transDelta.translate(new Vector3D(0, 0, -adjStepSize));}
+        if (spaceDown) {transDelta.translate(new Vector3D(0, adjStepSize, 0));}
+        if (shiftDown) {transDelta.translate(new Vector3D(0, -adjStepSize, 0));}
+        if (aDown) {rotDelta.translate(new Vector3D(0, adjTurnStep, 0));}
+        if (dDown) {rotDelta.translate(new Vector3D(0, -adjTurnStep, 0));}
 
         updateTranslatables(transDelta);
         updateRotatables(rotDelta);
