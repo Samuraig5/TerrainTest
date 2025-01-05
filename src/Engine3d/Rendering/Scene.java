@@ -1,6 +1,7 @@
 package Engine3d.Rendering;
 
 import Engine3d.Lighting.LightSource;
+import Engine3d.Model.ObjParser;
 import Engine3d.Time.GameTimer;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
@@ -14,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Scene
 {
+    private ObjParser objParser;
     List<Object3D> objects = new CopyOnWriteArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
     Camera camera;
@@ -25,6 +27,8 @@ public class Scene
     public Scene(Camera camera) {
         this.camera = camera;
         this.sceneTimer = new GameTimer();
+
+        objParser = new ObjParser();
 
         camera.getFrame().add(sceneRenderer);
         sceneRenderer.setActiveScene(this);
@@ -70,5 +74,16 @@ public class Scene
     }
     public void addLight(LightSource lightSource) {
         lightSources.add(lightSource);
+    }
+    public Object3D loadFromFile(String folderPath, String filePath) {
+        Object3D loaded = objParser.loadFromObjFile(folderPath, filePath);
+        if (loaded == null) {
+            getSceneRenderer().logError("ObjParser coulding find file: " + folderPath + "/" + filePath);
+            return new Object3D();
+        }
+        else
+        {
+            return loaded;
+        }
     }
 }

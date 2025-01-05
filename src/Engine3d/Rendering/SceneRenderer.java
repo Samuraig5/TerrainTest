@@ -1,15 +1,23 @@
 package Engine3d.Rendering;
 
+import Engine3d.Math.Vector.Vector;
+import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Time.TimeMeasurer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SceneRenderer extends JPanel
 {
     private Thread buildThread;
     private Scene activeScene;
     private TimeMeasurer timeMeasurer;
+    Vector3D errorMessagePos;
+    Vector3D errorPosDelta = new Vector3D(0, 20, 0);
+    List<String> errors = new ArrayList<>();
+
     public SceneRenderer()
     {
         setFocusable(true);
@@ -22,6 +30,8 @@ public class SceneRenderer extends JPanel
         this.activeScene = activeScene;
         activeScene.addTimeMeasurer(timeMeasurer);
         startBuildThread();
+
+        errorMessagePos = new Vector3D(20, activeScene.camera.getScreenDimensions().y()/2,0);
 
         repaint();
         revalidate();
@@ -54,7 +64,6 @@ public class SceneRenderer extends JPanel
         timeMeasurer.stopMeasurement("DrawBuffer");
         long sceneDrawTime = timeMeasurer.getMeasurement("DrawScene");
 
-        g.setColor(Color.white);
 
         int screenWidth = (int) activeScene.camera.getScreenDimensions().x() - 20;
 
@@ -74,6 +83,18 @@ public class SceneRenderer extends JPanel
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", sceneDrawTime),30, 120);
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", sceneDrawTime),30, 140);
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("DrawBuffer", sceneDrawTime),30, 160);
+
+        g.setColor(Color.red);
+
+        Vector3D cursorPos = new Vector3D(errorMessagePos);
+        for (String err : errors) {
+            g.drawString(err, (int) cursorPos.x(), (int) cursorPos.y());
+            cursorPos.translate(errorPosDelta);
+        }
+    }
+
+    public void logError(String message) {
+        errors.add(message);
     }
 
     private void startBuildThread() {

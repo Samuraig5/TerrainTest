@@ -16,8 +16,9 @@ public class BloodGulch extends Scene
     public BloodGulch(Camera camera) {
         super(camera);
 
-        LightSource sun = new LightSource(this);
-        sun.setRotation(new Vector3D(0,Math.toRadians(-90),0));
+        //LightSource sun = new LightSource(this);
+        //sun.setRotation(new Vector3D(0,Math.toRadians(-90),0));
+        //sun.setLightIntensity(0.5);
 
         CameraLight cl = new CameraLight(camera, this, new Vector3D());
         cl.setLightRange(100);
@@ -34,8 +35,6 @@ public class BloodGulch extends Scene
         cl4.setLightIntensity(0.5);
         cl4.setLightRange(100);
 
-        ObjParser objParser = new ObjParser();
-
         //Cube cube = new Cube(1);
         //cube.translate(new Vector3D(-0.5,-0.5,0.5));
         //cube.showWireFrame(false);
@@ -46,18 +45,18 @@ public class BloodGulch extends Scene
         //cubeRot.showWireFrame(false);
         //testScene.addObject(cubeRot);
 
-        Object3D map = objParser.loadFromObjFile("Resources/Models/BloodGulch", "bloodgulch.obj");
+        Object3D map = loadFromFile("Resources/Models/BloodGulch", "bloodgulch.obj");
         map.translate(new Vector3D(0, -90, 5));
         map.showWireFrame(false);
         addObject(map);
 
-        Object3D rockGolem = objParser.loadFromObjFile("Resources/Models/RockGolem", "Stone.obj");
+        Object3D rockGolem = loadFromFile("Resources/Models/RockGolem", "Stone.obj");
         rockGolem.translate(new Vector3D(0, 0, 7));
         rockGolem.rotate(new Vector3D(0,Math.toRadians(180),0));
         rockGolem.showWireFrame(false);
         addObject(rockGolem);
 
-        Object3D rockGolem2 = objParser.loadFromObjFile("Resources/Models/RockGolem", "Stone.obj");
+        Object3D rockGolem2 = loadFromFile( "Resources/Models/RockGolem", "Stone.obj");
         rockGolem2.translate(new Vector3D(-114.5, 0.7, 142));
         rockGolem2.rotate(new Vector3D(0,Math.toRadians(180),0));
         rockGolem2.showWireFrame(false);
