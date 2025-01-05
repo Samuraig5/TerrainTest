@@ -12,6 +12,9 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 {
     private float stepSize = 5f;
     private float turnStep = 2f;
+    private float jumpStrength = 1f;
+
+    private PlayerObject playerObject;
 
     private boolean wDown = false;
     private boolean aDown = false;
@@ -24,6 +27,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
     public OldSchoolDungeonCameraControls(SceneRenderer renderer, PlayerObject playerObject) {
         super(renderer);
 
+        this.playerObject = playerObject;
         attachTranslatable(playerObject);
         attachRotatable(playerObject);
     }
@@ -40,7 +44,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
         if (wDown) {transDelta.translate(new Vector3D(0, 0, adjStepSize));}
         if (sDown) {transDelta.translate(new Vector3D(0, 0, -adjStepSize));}
-        if (spaceDown) {transDelta.translate(new Vector3D(0, adjStepSize, 0));}
+        //if (spaceDown) {transDelta.translate(new Vector3D(0, adjStepSize, 0));}
         if (shiftDown) {transDelta.translate(new Vector3D(0, -adjStepSize, 0));}
         if (aDown) {rotDelta.translate(new Vector3D(0, adjTurnStep, 0));}
         if (dDown) {rotDelta.translate(new Vector3D(0, -adjTurnStep, 0));}
@@ -65,12 +69,19 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
     @Override
     public void keyPressed(KeyEvent e) {
+        Vector3D adjJump = Vector3D.UP().scaled(jumpStrength);
+
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W -> wDown = true;
             case KeyEvent.VK_A -> aDown = true;
             case KeyEvent.VK_S -> sDown = true;
             case KeyEvent.VK_D -> dDown = true;
-            case KeyEvent.VK_SPACE -> spaceDown = true;
+            case KeyEvent.VK_SPACE -> {
+                spaceDown = true;
+                if (playerObject.isGrounded()) {
+                    playerObject.addMomentum(adjJump);
+                }
+            }
             case KeyEvent.VK_SHIFT -> shiftDown = true;
             case KeyEvent.VK_CONTROL -> ctrlDown = true;
         }

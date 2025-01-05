@@ -17,6 +17,10 @@ public class PlayerObject implements Translatable, Rotatable, Gravitational
         this.camera = camera;
     }
 
+    public void addMomentum(Vector3D delta) {
+        momentum.translate(delta);
+    }
+
     @Override
     public void applyGravity(double g, double deltaTime) {
         Vector3D delta = Vector3D.DOWN();
@@ -26,7 +30,7 @@ public class PlayerObject implements Translatable, Rotatable, Gravitational
             momentum.translate(delta);
         }
         else {
-            momentum.clear();
+            momentum.y(Math.max(momentum.y(), 0));
         }
     }
 
@@ -52,9 +56,8 @@ public class PlayerObject implements Translatable, Rotatable, Gravitational
 
     @Override
     public void update(double deltaTime) {
-        if (!isGrounded()) {
-            translate(momentum);
-        }
+        translate(momentum);
+
     }
 
     @Override

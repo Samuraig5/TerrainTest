@@ -22,6 +22,7 @@ public class Vector3D implements Translatable
     }
     public double x() {return x;}
     public double y() {return y;}
+    public void y(double y) {this.y=y;}
     public double z() {return z;}
     public double w() {return w;}
     public double length() {
@@ -155,5 +156,9 @@ public class Vector3D implements Translatable
     public static Vector3D DOWN()
     {
         return new Vector3D(0,-1,0);
+    }
+    public static Vector3D UP()
+    {
+        return new Vector3D(0,1,0);
     }
 }
