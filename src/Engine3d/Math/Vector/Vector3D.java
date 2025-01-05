@@ -1,49 +1,49 @@
 package Engine3d.Math.Vector;
 
-import Engine3d.Translatable;
-
-public class Vector3D implements Translatable
+public class Vector3D extends VectorW
 {
-    private double x;
-    private double y;
-    private double z;
-    private double w = 1;
+    @Override
+    protected void init() {
+        components = new double[3];
+    }
 
     public Vector3D(double x, double y, double z, double w) {
+        init();
         set(x, y, z, w);
     }
     public Vector3D(double x, double y, double z) {
+        init();
         set(x, y, z);
     }
-    public Vector3D(){set(0,0,0, 1);}
+    public Vector3D() {
+        init();
+        set(0,0,0, 1);
+    }
 
     public Vector3D(Vector3D source) {
-        set(source.x, source.y, source.z, source.w);
+        init();
+        set(source.x(), source.y(), source.z(), source.w());
     }
-    public double x() {return x;}
-    public double y() {return y;}
-    public void y(double y) {this.y=y;}
-    public double z() {return z;}
-    public double w() {return w;}
-    public double length() {
-       return Math.sqrt(x*x+y*y+z*z);
-    }
+
+    public double x() {return getValue(0);}
+    public void x(double x) {setComponent(0,x);}
+    public double y() {return getValue(1);}
+    public void y(double y) {setComponent(1,y);}
+    public double z() {return getValue(2);}
+    public void z(double z) {setComponent(2,z);}
     public void set(double newX, double newY, double newZ, double newW) {
-        this.x = newX; this.y = newY; this.z = newZ; this.w = newW;
+        x(newX); y(newY); z(newZ); w(newW);
     }
     public void set(double newX, double newY, double newZ) {
-        set(newX, newY, newZ, w);
-    }
-    public void set(Vector3D source)
-    {
-        set(source.x, source.y, source.z);
+        set(newX, newY, newZ, w());
     }
     public void translate(double deltaX, double deltaY, double deltaZ){
-        set(x+deltaX, y+deltaY, z+deltaZ);
+        set(x()+deltaX, y()+deltaY, z()+deltaZ);
     }
+
     @Override
     public void translate(Vector3D delta){
-        translate(delta.x, delta.y, delta.z);
+        translate(delta.x(), delta.y(), delta.z());
     }
 
     @Override
@@ -65,7 +65,7 @@ public class Vector3D implements Translatable
         return out;
     }
     public void scale(Vector3D scalars) {
-        set(x*scalars.x,y*scalars.y,z*scalars.z, w*scalars.w);
+        set(x()*scalars.x(),y()*scalars.y(),z()*scalars.z(), w()*scalars.w());
     }
     public void scale(double scalar)
     {
@@ -81,7 +81,7 @@ public class Vector3D implements Translatable
      * Inverts the vector.
      */
     public void invert(){
-        set(-x,-y,-z);
+        set(-x(),-y(),-z());
     }
     /**
      * @return The inverse of the vector.
@@ -95,8 +95,8 @@ public class Vector3D implements Translatable
      * Normalizes the vector to length 1.
      */
     public void normalize(){
-        double length = length();
-        set(x/length, y/length, z/length);
+        double length = magnitude();
+        set(x()/length, y()/length, z()/length);
     }
     public Vector3D normalized(){
         Vector3D clone = new Vector3D(this);
@@ -106,10 +106,10 @@ public class Vector3D implements Translatable
 
     public double distanceTo(Vector3D other)
     {
-        double dx = this.x - other.x;
-        double dy = this.y - other.y;
-        double dz = this.z - other.z;
-        double dw = this.w - other.w;
+        double dx = this.x() - other.x();
+        double dy = this.y() - other.y();
+        double dz = this.z() - other.z();
+        double dw = this.w() - other.w();
         return Math.sqrt(dx * dx + dy * dy + dz * dz + dw * dw);
     }
 
@@ -120,18 +120,18 @@ public class Vector3D implements Translatable
      * @return the dot product between this vector and the other vector
      */
     public double dotProduct(Vector3D other) {
-        return x * other.x + y * other.y + z * other.z;
+        return x() * other.x() + y() * other.y() + z() * other.z();
     }
 
     public Vector3D crossProduct(Vector3D other)
     {
-        double x = this.y * other.z - this.z * other.y;
-        double y = this.z * other.x - this.x * other.z;
-        double z = this.x * other.y - this.y * other.x;
+        double x = this.y() * other.z() - this.z() * other.y();
+        double y = this.z() * other.x() - this.x() * other.z();
+        double z = this.x() * other.y() - this.y() * other.x();
         return new Vector3D(x,y,z);
     }
 
-    public void clear() {x=0;y=0;z=0;w=1;}
+    public void clear() {x(0);y(0);z(0);w(1);}
 
     public String toStringRounded() {
         StringBuilder sb = new StringBuilder("(");
@@ -151,6 +151,11 @@ public class Vector3D implements Translatable
         sb.append(w()); sb.append(", ");
         sb.append(")");
         return sb.toString();
+    }
+
+    @Override
+    public Vector clone() {
+        return null;
     }
 
     public static Vector3D DOWN()

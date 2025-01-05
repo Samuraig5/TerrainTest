@@ -17,7 +17,7 @@ public class BloodGulch extends Scene
     public BloodGulch(Camera camera) {
         super(camera);
 
-        camera.translate(new Vector3D(0,50,0));
+        camera.translate(new Vector3D(0,7,0));
 
         //LightSource sun = new LightSource(this);
         //sun.setRotation(new Vector3D(0,Math.toRadians(-90),0));
