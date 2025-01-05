@@ -43,27 +43,13 @@ public class Object3D implements Translatable, Rotatable
 
     public Vector3D getPosition() {return new Vector3D(position);}
 
-    public void drawObject(Camera camera, List<LightSource> lightSources, TimeMeasurer tm)
+    public void drawObject(Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
     {
         tm.startMeasurement("Get Matrices");
         List<MeshTriangle> trianglesToRaster = new ArrayList<>();
 
-        Matrix4x4 rotX = Matrix4x4.getRotationMatrixX(rotation.x());
-        Matrix4x4 rotY = Matrix4x4.getRotationMatrixY(rotation.y());
-        Matrix4x4 rotZ = Matrix4x4.getRotationMatrixZ(rotation.z());
         Matrix4x4 trans = Matrix4x4.getTranslationMatrix(position);
-
-        Matrix4x4 worldTransform;
-        worldTransform = Matrix4x4.matrixMatrixMultiplication(rotZ, rotX);
-        worldTransform = Matrix4x4.matrixMatrixMultiplication(worldTransform, rotY);
-        worldTransform = Matrix4x4.matrixMatrixMultiplication(worldTransform, trans);
-
-        Vector3D up = new Vector3D(0,1,0);
-        Vector3D cameraLookDirection = camera.getDirection();
-        Vector3D target = cameraLookDirection.translation(camera.getPosition());
-
-        Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(camera.getPosition(), target, up);
-        Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
+        Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(rotation), trans);
         tm.stopMeasurement("Get Matrices");
 
         for (MeshTriangle tri : mesh)
@@ -77,7 +63,7 @@ public class Object3D implements Translatable, Rotatable
 
             //All three points lie on the same plane, so we can choose any
             Vector3D cameraRay = new Vector3D(triTransformed.getPoints()[0]);
-            cameraRay.translate(camera.getPosition().inverse());
+            cameraRay.translate(cameraPos.inverse());
 
             //If the camera can't see the triangle, don't draw it
             if (triNormal.dotProduct(cameraRay) >= 0)

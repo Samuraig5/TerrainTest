@@ -1,6 +1,9 @@
 package Engine3d.Rendering;
 
 import Engine3d.Lighting.LightSource;
+import Engine3d.Math.Matrix4x4;
+import Engine3d.Math.Vector.Vector;
+import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
 import Engine3d.Time.GameTimer;
 import Engine3d.Time.TimeMeasurer;
@@ -59,9 +62,19 @@ public class Scene
                 return Double.compare(distance1, distance2);
             }
         });
+
+        //These values are purely based off the camera.
+        //If they change between two objects on the same frame then the objects can "jitter"
+        //This is also slightly more efficient.
+        Vector3D constCamPos = new Vector3D(camera.position);
+        Vector3D up = new Vector3D(0,1,0);
+        Vector3D target = camera.getDirection().translation(constCamPos);
+        Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);
+        Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
+
         for (Object3D o:objects)
         {
-            o.drawObject(camera, lightSources, timeMeasurer);
+            o.drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
         }
     }
 
