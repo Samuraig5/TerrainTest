@@ -129,4 +129,15 @@ public class Vector3D implements Translatable
         double z = this.x * other.y - this.y * other.x;
         return new Vector3D(x,y,z);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("(");
+        sb.append(Math.round(x() * 10.0) / 10.0); sb.append(", ");
+        sb.append(Math.round(y() * 10.0) / 10.0); sb.append(", ");
+        sb.append(Math.round(z() * 10.0) / 10.0); sb.append(", ");
+        sb.append(Math.round(w() * 10.0) / 10.0); sb.append(", ");
+        sb.append(")");
+        return sb.toString();
+    }
 }

@@ -10,6 +10,8 @@ import Engine3d.Translatable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class Camera implements Translatable, Rotatable
 {
@@ -33,8 +35,16 @@ public class Camera implements Translatable, Rotatable
         this.drawer = new Drawer(this);
         this.screenBuffer = new ScreenBuffer(getResolution());
         this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
+
+        window.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                onFrameSizeChange();
+            }
+        });
     }
 
+    public JFrame getFrame() {return window;}
     public MeshTriangle projectTriangle(MeshTriangle in) {
         return projectionMatrix.multiplyWithTriangle(in);
     }

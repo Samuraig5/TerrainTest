@@ -8,14 +8,17 @@ import java.awt.*;
 public class SceneRenderer extends JPanel
 {
     private Scene activeScene;
-    private final TimeMeasurer timeMeasurer;
-    public SceneRenderer(Scene initialScene)
+    private TimeMeasurer timeMeasurer;
+    public SceneRenderer()
     {
         setFocusable(true);
         requestFocusInWindow();
+    }
+
+    public void setActiveScene(Scene activeScene) {
         timeMeasurer = new TimeMeasurer();
 
-        activeScene = initialScene;
+        this.activeScene = activeScene;
         activeScene.addTimeMeasurer(timeMeasurer);
 
         repaint();
@@ -51,6 +54,17 @@ public class SceneRenderer extends JPanel
         long sceneDrawTime = timeMeasurer.getMeasurement("DrawScene");
 
         g.setColor(Color.white);
+
+        int screenWidth = (int) activeScene.camera.getScreenDimensions().x() - 20;
+
+        String s = "Cam Pos: " + activeScene.camera.getPosition().toString();
+        int sWidth = g.getFontMetrics().stringWidth(s);
+        g.drawString(s,screenWidth-sWidth,20 );
+
+        s = "Cam Rot: " + activeScene.camera.getRotation().toString();
+        sWidth = g.getFontMetrics().stringWidth(s);
+        g.drawString(s,screenWidth-sWidth,40 );
+
         g.drawString("FPS: " + timeMeasurer.getFPS(), 20, 20);
         g.drawString(timeMeasurer.getSelfMeasurement(), 20, 40);
         g.drawString(timeMeasurer.getMsPrintOut("DrawScene"), 20, 60);

@@ -16,14 +16,20 @@ public class Scene
     List<Object3D> objects = new ArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
     Camera camera;
+    final SceneRenderer sceneRenderer = new SceneRenderer();
     GameTimer sceneTimer;
     Color backgroundColour = Color.BLACK;
     private TimeMeasurer timeMeasurer;
 
-    public Scene(Camera camera)
-    {
+    public Scene(Camera camera) {
         this.camera = camera;
         this.sceneTimer = new GameTimer();
+
+        camera.getFrame().add(sceneRenderer);
+        sceneRenderer.setActiveScene(this);
+    }
+    public SceneRenderer getSceneRenderer() {
+        return sceneRenderer;
     }
 
     public void addObject(Object3D object)
