@@ -99,6 +99,8 @@ public class Object3D implements Translatable, Rotatable
                 }
             }
 
+            if (triTransformed.getMaterial().getLuminance() == 0) {continue;}
+
             // = Convert World Space -> View Space =
             MeshTriangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);
             triViewed.setMaterial(triTransformed);
