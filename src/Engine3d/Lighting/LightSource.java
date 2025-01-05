@@ -1,5 +1,6 @@
 package Engine3d.Lighting;
 
+import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.Scene;
 import Engine3d.Rotatable;
@@ -9,6 +10,7 @@ import java.awt.*;
 
 public class LightSource implements Translatable, Rotatable
 {
+    public static final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
     private double lightIntensity = 1;
     private double lightRange = Double.MAX_VALUE;
     private Color lightColour = new Color(255, 255, 255);
@@ -40,21 +42,25 @@ public class LightSource implements Translatable, Rotatable
     public Vector3D getPosition() {
         return position;
     }
-    public Vector3D getRotation() {
-        return rotation;
-    }
 
     public void setRotation(Vector3D rotation) {
         this.rotation = rotation;
+    }
+    @Override
+    public void translate(Vector3D delta) {
+        rotation.translate(delta);
     }
 
     @Override
     public void rotate(Vector3D delta) {
         position.translate(delta);
     }
-
     @Override
-    public void translate(Vector3D delta) {
-        rotation.translate(delta);
+    public Vector3D getRotation() {
+        return rotation;
+    }
+    @Override
+    public Vector3D getDirection() {
+        return Matrix4x4.get3dRotationMatrix(rotation).matrixVectorMultiplication(BASE_LOOK_DIRECTION);
     }
 }

@@ -1,5 +1,6 @@
 package Engine3d.Math;
 
+import Engine3d.Math.Vector.Vector;
 import Engine3d.Math.Vector.Vector3D;
 
 public class Matrix4x4
@@ -120,6 +121,11 @@ public class Matrix4x4
         rotZ.mat[2][2] = 1f;
         rotZ.mat[3][3] = 1f;
         return rotZ;
+    }
+    public static Matrix4x4 get3dRotationMatrix(Vector3D rotation){
+        Matrix4x4 rotMat = Matrix4x4.matrixMatrixMultiplication(getRotationMatrixY(rotation.x()), getRotationMatrixY(rotation.z()));
+        rotMat = Matrix4x4.matrixMatrixMultiplication(rotMat, getRotationMatrixY(rotation.y()));
+        return rotMat;
     }
     public static Matrix4x4 getTranslationMatrix(Vector3D vec)
     {

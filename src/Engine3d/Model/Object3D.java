@@ -17,6 +17,8 @@ import java.util.function.Function;
 
 public class Object3D implements Translatable, Rotatable
 {
+    public static final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
+
     protected Vector3D[] points;
     protected List<MeshTriangle> mesh = new ArrayList<>();
     protected Vector3D rotation = new Vector3D();
@@ -31,6 +33,15 @@ public class Object3D implements Translatable, Rotatable
     public void rotate(Vector3D delta) {
         rotation.translate(delta);
     }
+    @Override
+    public Vector3D getRotation() {
+        return rotation;
+    }
+    @Override
+    public Vector3D getDirection() {
+        return Matrix4x4.get3dRotationMatrix(rotation).matrixVectorMultiplication(BASE_LOOK_DIRECTION);
+    }
+
     public Vector3D getPosition() {return new Vector3D(position);}
 
     public void drawObject(Camera camera, List<LightSource> lightSources, TimeMeasurer tm)
@@ -49,7 +60,7 @@ public class Object3D implements Translatable, Rotatable
         worldTransform = Matrix4x4.matrixMatrixMultiplication(worldTransform, trans);
 
         Vector3D up = new Vector3D(0,1,0);
-        Vector3D cameraLookDirection = camera.getLookDirection();
+        Vector3D cameraLookDirection = camera.getDirection();
         Vector3D target = cameraLookDirection.translation(camera.getPosition());
 
         Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(camera.getPosition(), target, up);
