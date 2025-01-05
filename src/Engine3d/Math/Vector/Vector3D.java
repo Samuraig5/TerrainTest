@@ -130,8 +130,9 @@ public class Vector3D implements Translatable
         return new Vector3D(x,y,z);
     }
 
-    @Override
-    public String toString() {
+    public void clear() {x=0;y=0;z=0;w=1;}
+
+    public String toStringRounded() {
         StringBuilder sb = new StringBuilder("(");
         sb.append(Math.round(x() * 10.0) / 10.0); sb.append(", ");
         sb.append(Math.round(y() * 10.0) / 10.0); sb.append(", ");
@@ -139,5 +140,20 @@ public class Vector3D implements Translatable
         sb.append(Math.round(w() * 10.0) / 10.0); sb.append(", ");
         sb.append(")");
         return sb.toString();
+    }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("(");
+        sb.append(x()); sb.append(", ");
+        sb.append(y()); sb.append(", ");
+        sb.append(z()); sb.append(", ");
+        sb.append(w()); sb.append(", ");
+        sb.append(")");
+        return sb.toString();
+    }
+
+    public static Vector3D DOWN()
+    {
+        return new Vector3D(0,-1,0);
     }
 }

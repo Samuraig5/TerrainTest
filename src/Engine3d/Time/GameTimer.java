@@ -12,23 +12,21 @@ public class GameTimer implements ActionListener
     private long lastTime;
     private final List<Updatable> updatables = new ArrayList<>();
 
-    public GameTimer()
-    {
+    public GameTimer() {
         timer = new Timer(16, this);
         lastTime = System.nanoTime();
         timer.start();
     }
 
-    public void subscribe(Updatable updatable)
-    {
+    public void subscribe(Updatable updatable) {
         updatables.add(updatable);
     }
 
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
+        double deltaTime = deltaTime();
         for (Updatable updatable : updatables) {
-            updatable.update(deltaTime());
+            updatable.update(deltaTime);
         }
     }
 

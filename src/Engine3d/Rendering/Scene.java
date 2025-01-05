@@ -1,5 +1,6 @@
 package Engine3d.Rendering;
 
+import Engine3d.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
@@ -15,20 +16,23 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Scene
+public class Scene implements Updatable
 {
     private ObjParser objParser;
-    List<Object3D> objects = new CopyOnWriteArrayList<>();
-    List<LightSource> lightSources = new ArrayList<>();
     Camera camera;
     final SceneRenderer sceneRenderer = new SceneRenderer();
-    GameTimer sceneTimer;
     Color backgroundColour = Color.BLACK;
+    final GameTimer sceneTimer = new GameTimer();
     private TimeMeasurer timeMeasurer;
+    List<Object3D> objects = new CopyOnWriteArrayList<>();
+    List<LightSource> lightSources = new ArrayList<>();
+    private double gravity = 0.5d;
+    protected List<Gravitational> gravitationals = new ArrayList<>();
 
     public Scene(Camera camera) {
         this.camera = camera;
-        this.sceneTimer = new GameTimer();
+
+        subscribeToTime(this);
 
         objParser = new ObjParser();
 
@@ -46,7 +50,12 @@ public class Scene
         {
             subscribeToTime((Updatable) object);
         }
+        if (object instanceof Gravitational)
+        {
+            gravitationals.add((Gravitational) object);
+        }
     }
+
 
     public void buildScreenBuffer()
     {
@@ -91,11 +100,15 @@ public class Scene
         Object3D loaded = objParser.loadFromObjFile(folderPath, filePath);
         if (loaded == null) {
             getSceneRenderer().logError("ObjParser coulding find file: " + folderPath + "/" + filePath);
-            return new Object3D();
+            loaded = new Object3D();
         }
-        else
-        {
-            return loaded;
+        return loaded;
+    }
+
+    @Override
+    public void update(double deltaTime) {
+        for (Gravitational grav : gravitationals) {
+            grav.applyGravity(gravity, deltaTime);
         }
     }
 }

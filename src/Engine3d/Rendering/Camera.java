@@ -1,5 +1,6 @@
 package Engine3d.Rendering;
 
+import Engine3d.Controls.PlayerObject;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.MeshTriangle;
 import Engine3d.Math.Vector.Vector3D;
@@ -88,7 +89,7 @@ public class Camera implements Translatable, Rotatable
         Vector3D movement = forwardMovement.translation(verticalMovement);
 
         position.translate(movement);
-        //System.out.println("Camera Pos: " + position.x() + ", " + position.y() + ", " + position.z());
+        //System.out.println("Camera Pos: " + position.toString());
     }
     public Vector3D getPosition(){return new Vector3D(position);}
     @Override

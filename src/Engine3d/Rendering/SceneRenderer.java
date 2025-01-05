@@ -63,11 +63,11 @@ public class SceneRenderer extends JPanel
 
         int screenWidth = (int) activeScene.camera.getScreenDimensions().x() - 20;
 
-        String s = "Cam Pos: " + activeScene.camera.getPosition().toString();
+        String s = "Cam Pos: " + activeScene.camera.getPosition().toStringRounded();
         int sWidth = g.getFontMetrics().stringWidth(s);
         g.drawString(s,screenWidth-sWidth,20 );
 
-        s = "Cam Rot: " + activeScene.camera.getRotation().toString();
+        s = "Cam Rot: " + activeScene.camera.getRotation().toStringRounded();
         sWidth = g.getFontMetrics().stringWidth(s);
         g.drawString(s,screenWidth-sWidth,40 );
 

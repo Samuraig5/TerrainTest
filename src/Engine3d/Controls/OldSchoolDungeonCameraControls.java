@@ -1,5 +1,7 @@
 package Engine3d.Controls;
 
+import Engine3d.Gravitational;
+import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Time.Updatable;
 import Engine3d.Math.Vector.Vector3D;
@@ -19,8 +21,11 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
     private boolean shiftDown = false;
     private boolean ctrlDown = false;
 
-    public OldSchoolDungeonCameraControls(SceneRenderer renderer) {
+    public OldSchoolDungeonCameraControls(SceneRenderer renderer, PlayerObject playerObject) {
         super(renderer);
+
+        attachTranslatable(playerObject);
+        attachRotatable(playerObject);
     }
 
     @Override
