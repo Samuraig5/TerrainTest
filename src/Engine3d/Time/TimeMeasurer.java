@@ -1,116 +1,96 @@
 package Engine3d.Time;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class TimeMeasurer {
-    public boolean measureTime = false;
-    private long timeOfLastFrame = System.nanoTime();
-    private int frameCount = 0;
-    private volatile int fps;
+    private final AtomicLong timeOfLastFrame = new AtomicLong(System.nanoTime());
+    private final AtomicInteger frameCount = new AtomicInteger(0);
+    private final AtomicInteger fps = new AtomicInteger(0);
 
-    private final HashMap<String, Long> measurementMap = new HashMap<>();
-    private final HashMap<String, Long> startTime = new HashMap<>();
+    private final ConcurrentHashMap<String, AtomicBoolean> newMeasurementMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, AtomicLong> measurementMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, AtomicLong> startTimeMap = new ConcurrentHashMap<>();
 
     public double getFPS() {
         long currentTime = System.nanoTime();
-        frameCount++;
+        frameCount.incrementAndGet();
 
-        if (currentTime - timeOfLastFrame >= 1_000_000_000) { // 1 second has passed
-            fps = frameCount;
-            frameCount = 0;
-            timeOfLastFrame = currentTime;
+        if (currentTime - timeOfLastFrame.get() >= 1_000_000_000L) { // 1 second
+            fps.set(frameCount.getAndSet(0));
+            timeOfLastFrame.set(currentTime);
         }
-        return fps;
+
+        return fps.get();
     }
 
     public void clearMeasurements() {
-        startTime.clear();
         measurementMap.clear();
-    }
-
-    private void startSelfMeasurement()
-    {
-        measurementMap.putIfAbsent("SelfMeasurement", 0L);
-        startTime.put("SelfMeasurement",  System.nanoTime());
-    }
-    private void stopSelfMeasurement()
-    {
-        Long start = startTime.get("SelfMeasurement");
-        Long total = measurementMap.get("SelfMeasurement");
-        if (start == null || total == null) {return;}
-        long currentTime = System.nanoTime();
-        long elapsed = currentTime - start;
-        measurementMap.put("SelfMeasurement", total + elapsed);
-        startTime.remove("SelfMeasurement"); // Stop tracking the start time
-    }
-    public String getSelfMeasurement() {
-        return getMsPrintOut("SelfMeasurement");
+        startTimeMap.clear();
     }
 
     public void startMeasurement(String measurementName) {
-        if (!measureTime) {return;}
-        startSelfMeasurement();
-        measurementMap.putIfAbsent(measurementName, 0L);
-        startTime.put(measurementName, System.nanoTime());
-        stopSelfMeasurement();
+        startTimeMap.put(measurementName, new AtomicLong(System.nanoTime()));
     }
 
-    public void stopMeasurement(String measurementName) {
-        if (!measureTime) {return;}
-        startSelfMeasurement();
-        updateMeasurement(measurementName);
-        startTime.remove(measurementName); // Stop tracking the start time
-        stopSelfMeasurement();
+    public void pauseMeasurement(String measurementName) {
+        AtomicLong startTime = startTimeMap.get(measurementName);
+        if (startTime == null) return;
+
+        long elapsed = System.nanoTime() - startTime.get();
+
+        if (!newMeasurementMap.getOrDefault(measurementName, new AtomicBoolean(false)).get()) {
+            measurementMap.merge(measurementName, new AtomicLong(elapsed), (existing, added) -> {
+                existing.addAndGet(added.get());
+                return existing;
+            });
+        }
+        else {
+            measurementMap.put(measurementName, new AtomicLong(elapsed));
+            newMeasurementMap.put(measurementName, new AtomicBoolean(false));
+        }
+        startTimeMap.remove(measurementName);
+    }
+
+    public void pauseAndEndMeasurement(String measurementName) {
+        pauseMeasurement(measurementName);
+        startTimeMap.remove(measurementName);
+        newMeasurementMap.put(measurementName, new AtomicBoolean(true));
+    }
+    public void endMeasurement(String measurementName) {
+        startTimeMap.remove(measurementName);
+        newMeasurementMap.put(measurementName, new AtomicBoolean(true));
     }
 
     public long getMeasurement(String measurementName) {
-        if (!measureTime) {measureTime = true;}
-        startSelfMeasurement();
-        measurementMap.putIfAbsent(measurementName, 0L);
-        updateMeasurement(measurementName);
-        stopSelfMeasurement();
-        return measurementMap.get(measurementName);
-    }
-
-    private void updateMeasurement(String measurementName) {
-        if (!measureTime) {return;}
-        startSelfMeasurement();
-        Long start = startTime.get(measurementName);
-        Long total = measurementMap.get(measurementName);
-
-        if (start == null || total == null) {
-            return; // Measurement not started or doesn't exist
+        // If not measuring, start the measurement
+        if (!newMeasurementMap.containsKey(measurementName) || !newMeasurementMap.get(measurementName).get()) {
+            startMeasurement(measurementName);
         }
-
-        long currentTime = System.nanoTime();
-        long elapsed = currentTime - start;
-        measurementMap.put(measurementName, total + elapsed);
-        startTime.put(measurementName, currentTime);
-
-        stopSelfMeasurement();
+        return measurementMap.getOrDefault(measurementName, new AtomicLong(0)).get();
     }
 
-    public double getRelativeMeasurement(long measurement, long comparison)
-    {
-        double result = ((double) measurement / (double) comparison) * 100;
-        return Math.round(result * 10) / 10.0;
-    }
-
-    public double nanoToMili(long ns) {
+    public double nanoToMilli(long ns) {
         return ns / 1_000_000.0;
     }
 
-    public String getMsPrintOut(String measurementName)
-    {
-        return measurementName + ": " + nanoToMili(getMeasurement(measurementName)) + "ms";
+    public String getMsPrintOut(String measurementName) {
+        return measurementName + ": " + nanoToMilli(getMeasurement(measurementName)) + "ms";
     }
 
-    public String getPercentAndMsPrintOut(String measurementName, long comparison)
-    {
+    public String getMsPrintOut(String measurementName, long value) {
+        return measurementName + ": " + nanoToMilli(value) + "ms";
+    }
+
+    public String getPercentAndMsPrintOut(String measurementName, long comparison) {
         long measurement = getMeasurement(measurementName);
         double percentage = getRelativeMeasurement(measurement, comparison);
-        return "(" + percentage + "%) " + measurementName + ": " + nanoToMili(measurement) + "ms";
+        return "(" + percentage + "%) " + measurementName + ": " + nanoToMilli(measurement) + "ms";
+    }
+
+    public double getRelativeMeasurement(long measurement, long comparison) {
+        return Math.round(((double) measurement / comparison) * 1000) / 10.0;
     }
 }

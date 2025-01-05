@@ -2,7 +2,6 @@ package Engine3d.Rendering;
 
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Matrix4x4;
-import Engine3d.Math.Vector.Vector;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
 import Engine3d.Time.GameTimer;
@@ -49,7 +48,7 @@ public class Scene
         }
     }
 
-    public void drawScene()
+    public void buildScreenBuffer()
     {
         camera.getScreenBuffer().clear(backgroundColour);
         objects.sort(new Comparator<Object3D>() {

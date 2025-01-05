@@ -1,6 +1,5 @@
 package Engine3d.Rendering;
 
-import Engine3d.Math.Vector.Vector;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Time.TimeMeasurer;
 
@@ -54,16 +53,13 @@ public class SceneRenderer extends JPanel
 
     private void paintActiveScene(Graphics g)
     {
-        timeMeasurer.clearMeasurements();
+        timeMeasurer.pauseAndEndMeasurement("frameTime");
+        long frameTime = timeMeasurer.getMeasurement("frameTime");
+        timeMeasurer.startMeasurement("frameTime");
 
-        timeMeasurer.startMeasurement("DrawScene");
-        //activeScene.drawScene();
-
-        timeMeasurer.startMeasurement("DrawBuffer");
+        timeMeasurer.startMeasurement("drawScreenBuffer");
         activeScene.getCamera().drawScreenBuffer(g);
-        timeMeasurer.stopMeasurement("DrawBuffer");
-        long sceneDrawTime = timeMeasurer.getMeasurement("DrawScene");
-
+        timeMeasurer.pauseAndEndMeasurement("drawScreenBuffer");
 
         int screenWidth = (int) activeScene.camera.getScreenDimensions().x() - 20;
 
@@ -76,13 +72,15 @@ public class SceneRenderer extends JPanel
         g.drawString(s,screenWidth-sWidth,40 );
 
         g.drawString("FPS: " + timeMeasurer.getFPS(), 20, 20);
-        g.drawString(timeMeasurer.getSelfMeasurement(), 20, 40);
-        g.drawString(timeMeasurer.getMsPrintOut("DrawScene"), 20, 60);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", sceneDrawTime), 30, 80);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", sceneDrawTime), 30, 100);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", sceneDrawTime),30, 120);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", sceneDrawTime),30, 140);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("DrawBuffer", sceneDrawTime),30, 160);
+        //g.drawString(timeMeasurer.getSelfMeasurement(), 20, 40);
+        g.drawString(timeMeasurer.getMsPrintOut("frameTime", frameTime), 20, 40);
+        g.drawString(timeMeasurer.getMsPrintOut("drawScreenBuffer", frameTime), 20, 60);
+        g.drawString(timeMeasurer.getMsPrintOut("buildScreenBuffer"), 20, 80);
+        long buildScreenBuffer = timeMeasurer.getMeasurement("buildScreenBuffer");
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", buildScreenBuffer), 30, 100);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", buildScreenBuffer), 30, 120);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", buildScreenBuffer),30, 140);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", buildScreenBuffer),30, 160);
 
         g.setColor(Color.red);
 
@@ -105,7 +103,9 @@ public class SceneRenderer extends JPanel
         buildThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 if (activeScene != null) {
-                    activeScene.drawScene();
+                    timeMeasurer.startMeasurement("buildScreenBuffer");
+                    activeScene.buildScreenBuffer();
+                    timeMeasurer.pauseAndEndMeasurement("buildScreenBuffer");
 
                     synchronized (activeScene.getCamera()) {
                         activeScene.getCamera().swapBuffers();

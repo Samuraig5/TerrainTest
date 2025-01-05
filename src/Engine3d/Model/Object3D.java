@@ -50,7 +50,7 @@ public class Object3D implements Translatable, Rotatable
 
         Matrix4x4 trans = Matrix4x4.getTranslationMatrix(position);
         Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(rotation), trans);
-        tm.stopMeasurement("Get Matrices");
+        tm.pauseAndEndMeasurement("Get Matrices");
 
         for (MeshTriangle tri : mesh)
         {
@@ -68,7 +68,7 @@ public class Object3D implements Translatable, Rotatable
             //If the camera can't see the triangle, don't draw it
             if (triNormal.dotProduct(cameraRay) >= 0)
             {
-                tm.stopMeasurement("ObjWorldToScreen");
+                tm.pauseMeasurement("ObjWorldToScreen");
                 continue;
             }
 
@@ -89,14 +89,14 @@ public class Object3D implements Translatable, Rotatable
             // = Convert World Space -> View Space =
             MeshTriangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);
             triViewed.setMaterial(triTransformed);
-            tm.stopMeasurement("ObjWorldToScreen");
+            tm.pauseMeasurement("ObjWorldToScreen");
 
             tm.startMeasurement("TriangleClipping");
             // = Clip Viewed Triangle =
             Vector3D planePosition = camera.getNearPlane();
             Vector3D planeNormal = new Vector3D(0,0,1);
             List<MeshTriangle> clippedTriangles = clipTriangleAgainstPlane(planePosition, planeNormal, triViewed);
-            tm.stopMeasurement("TriangleClipping");
+            tm.pauseMeasurement("TriangleClipping");
 
             tm.startMeasurement("ObjWorldToScreen");
             for (MeshTriangle triClipped : clippedTriangles)
@@ -136,7 +136,7 @@ public class Object3D implements Translatable, Rotatable
                 //= Add triangle to list=
                 trianglesToRaster.add(triProj);
             }
-            tm.stopMeasurement("ObjWorldToScreen");
+            tm.pauseMeasurement("ObjWorldToScreen");
         }
 
         //Sorting no longer needed due to depth buffer
@@ -177,20 +177,23 @@ public class Object3D implements Translatable, Rotatable
                 }
                 numNewTriangles = triangleQueue.size();
             }
-            tm.stopMeasurement("TriangleClipping");
+            tm.pauseMeasurement("TriangleClipping");
 
             for (MeshTriangle triToDraw : triangleQueue) {
                 if (showWireFrame) { camera.drawer.drawDebugTriangle(Color.white, triToDraw); }
                 if (!(triToDraw.getMaterial().getTexture() == null)) {
                     tm.startMeasurement("Texturizer");
                     camera.drawer.textureTriangle(triToDraw);
-                    tm.stopMeasurement("Texturizer");
+                    tm.pauseMeasurement("Texturizer");
                 }
                 else {
                     camera.drawer.fillTriangle(triToDraw);
                 }
             }
         }
+        tm.endMeasurement("ObjWorldToScreen");
+        tm.endMeasurement("TriangleClipping");
+        tm.endMeasurement("Texturizer");
     }
 
     private List<MeshTriangle> clipTriangleAgainstPlane(Vector3D planePosition, Vector3D planeNormal, MeshTriangle in)
