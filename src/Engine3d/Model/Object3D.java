@@ -183,7 +183,7 @@ public class Object3D implements Translatable, Rotatable
 
             for (MeshTriangle triToDraw : triangleQueue) {
                 if (showWireFrame) { camera.drawer.drawDebugTriangle(Color.white, triToDraw); }
-                if (!(triToDraw.getMaterial().getTexturePath() == null)) {
+                if (!(triToDraw.getMaterial().getTexture() == null)) {
                     tm.startMeasurement("Texturizer");
                     camera.drawer.textureTriangle(triToDraw);
                     tm.stopMeasurement("Texturizer");

@@ -16,7 +16,6 @@ public class Drawer
     static double SHADING_HARSHNESS = 0; //The lower this is the darker the shadows will be (0-1)
     Camera camera;
     PixelDrawer p;
-    SpriteManager spriteManager = new SpriteManager();
 
     public Drawer(Camera camera)
     {
@@ -63,7 +62,7 @@ public class Drawer
 
     public void textureTriangle(MeshTriangle tri)
     {
-        BufferedImage sprite = spriteManager.getResource(tri.getMaterial().getTexturePath());
+        BufferedImage sprite = tri.getMaterial().getTexture();
         if (sprite == null) {System.err.println("Drawer: Triangle doesn't have a texture!"); return;}
 
         p.textureTriangle(camera.getScreenBuffer(),tri,sprite);

@@ -4,8 +4,10 @@ import Engine3d.Math.MeshTriangle;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.Material;
+import Engine3d.Rendering.ResourceManager.SpriteManager;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,7 +18,10 @@ import java.util.Objects;
 
 public class ObjParser
 {
-    public static Object3D loadFromObjFile(String folderPath, String objFile)
+
+    SpriteManager spriteManager = new SpriteManager();
+
+    public Object3D loadFromObjFile(String folderPath, String objFile)
     {
         Object3D object3D = new Object3D();
 
@@ -68,17 +73,17 @@ public class ObjParser
         return object3D;
     }
 
-    private static Vector3D generateVertex(String[] data) {
+    private Vector3D generateVertex(String[] data) {
         return new Vector3D(-Double.parseDouble(data[1]), //For some reason if we don't invert this, loaded objects are mirrored across x
                 Double.parseDouble(data[2]),
                 Double.parseDouble(data[3]));
 
     }
-    private static Vector2D generateTextureVertex(String[] data) {
+    private Vector2D generateTextureVertex(String[] data) {
         return new Vector2D(Double.parseDouble(data[1]),
                 Double.parseDouble(data[2]));
     }
-    private static MeshTriangle generateFace(String[] data, MTL mtl, List<Vector3D> vertices, List<Vector2D> texturePoints) {
+    private MeshTriangle generateFace(String[] data, MTL mtl, List<Vector3D> vertices, List<Vector2D> texturePoints) {
         String[] token0 = data[3].split("/+");
         String[] token1 = data[2].split("/+");
         String[] token2 = data[1].split("/+");
@@ -90,6 +95,8 @@ public class ObjParser
                 texturePoints.get(Integer.parseInt(token1[1]) - 1),
                 texturePoints.get(Integer.parseInt(token2[1]) - 1));
         mat.setMTL(mtl);
+        BufferedImage sprite = spriteManager.getResource(mtl.getColourTexture());
+        mat.setTexture(sprite);
         face.setMaterial(mat);
         return face;
     }

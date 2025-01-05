@@ -46,6 +46,7 @@ public class Main {
         cl4.setLightIntensity(0.5);
         cl4.setLightRange(100);
 
+        ObjParser objParser = new ObjParser();
 
         //Cube cube = new Cube(1);
         //cube.translate(new Vector3D(-0.5,-0.5,0.5));
@@ -57,20 +58,20 @@ public class Main {
         //cubeRot.showWireFrame(false);
         //testScene.addObject(cubeRot);
 
-        Object3D map = ObjParser.loadFromObjFile("Resources/Models/BloodGulch", "bloodgulch.obj");
+        Object3D map = objParser.loadFromObjFile("Resources/Models/BloodGulch", "bloodgulch.obj");
         map.translate(new Vector3D(0, -90, 5));
         map.showWireFrame(false);
         testScene.addObject(map);
 
 
-        Object3D rockGolem = ObjParser.loadFromObjFile("Resources/Models/RockGolem", "Stone.obj");
+        Object3D rockGolem = objParser.loadFromObjFile("Resources/Models/RockGolem", "Stone.obj");
         rockGolem.translate(new Vector3D(0, 0, 7));
         rockGolem.rotate(new Vector3D(0,Math.toRadians(180),0));
         rockGolem.showWireFrame(false);
         testScene.addObject(rockGolem);
 
         //Object3D axis = new Object3D();
-        //ObjLoader.loadFromObjFile("src/Engine3d.Testing/axis.obj", axis, true);
+        //objParser.loadFromObjFile("src/Engine3d.Testing/axis.obj", axis, true);
         //axis.translate(new Vector3D(0,0,5));
         //axis.showWireFrame(false);
         //testScene.addObject(axis);

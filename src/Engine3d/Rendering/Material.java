@@ -5,11 +5,13 @@ import Engine3d.Rendering.ScreenDrawing.Drawer;
 import Engine3d.Math.Vector.Vector2D;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Material
 {
     private double luminance = 0;
     private final Vector2D[] textureCoords = new Vector2D[3];
+    private BufferedImage texture;
     private MTL mtl;
 
     public Material()
@@ -30,6 +32,7 @@ public class Material
         for (int i = 0; i < 3; i++) {
             textureCoords[i] = new Vector2D(source.getTextureCoords()[i]);
         }
+        this.setTexture(source.getTexture());
         this.mtl = source.getMTL();
     }
 
@@ -65,6 +68,12 @@ public class Material
     }
     public void setMTL(MTL mtl) {
         this.mtl = mtl;
+    }
+    public void setTexture(BufferedImage texture) {
+        this.texture = texture;
+    }
+    public BufferedImage getTexture() {
+        return texture;
     }
     public String getTexturePath() {
         return mtl.getColourTexture();
