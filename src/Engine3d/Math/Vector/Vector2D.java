@@ -33,4 +33,9 @@ public class Vector2D extends Vector {
     public Vector clone() {
         return new Vector2D(this);
     }
+
+    @Override
+    public Vector3D getPosition() {
+        return new Vector3D(u(), v(), 0);
+    }
 }

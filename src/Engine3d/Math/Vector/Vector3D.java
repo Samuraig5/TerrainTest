@@ -44,6 +44,12 @@ public class Vector3D implements Translatable
     public void translate(Vector3D delta){
         translate(delta.x, delta.y, delta.z);
     }
+
+    @Override
+    public Vector3D getPosition() {
+        return new Vector3D(this);
+    }
+
     public void translate(double uniformTranslation) {
         translate(uniformTranslation, uniformTranslation, uniformTranslation);
     }
