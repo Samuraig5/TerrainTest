@@ -76,7 +76,7 @@ public class Scene implements Updatable
         //This is also slightly more efficient.
         Vector3D constCamPos = new Vector3D(camera.position);
         Vector3D up = new Vector3D(0,1,0);
-        Vector3D target = camera.getDirection().translation(constCamPos);
+        Vector3D target = camera.getDirection().translated(constCamPos);
         Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);
         Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
 

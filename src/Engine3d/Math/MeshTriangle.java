@@ -29,8 +29,8 @@ public class MeshTriangle implements Translatable
         Vector3D line1 = new Vector3D(points[1]);
         Vector3D line2 = new Vector3D(points[2]);
 
-        line1.translate(points[0].inverse());
-        line2.translate(points[0].inverse());
+        line1.translate(points[0].inverted());
+        line2.translate(points[0].inverted());
 
         Vector3D normal = line1.crossProduct(line2);
         normal.normalize();
@@ -60,9 +60,9 @@ public class MeshTriangle implements Translatable
     }
 
     public MeshTriangle translation(Vector3D delta){
-        Vector3D p1 = points[0].translation(delta);
-        Vector3D p2 = points[1].translation(delta);
-        Vector3D p3 = points[2].translation(delta);
+        Vector3D p1 = points[0].translated(delta);
+        Vector3D p2 = points[1].translated(delta);
+        Vector3D p3 = points[2].translated(delta);
         return new MeshTriangle(p1, p2, p3);
     }
     public void scale(Vector3D scalar) {

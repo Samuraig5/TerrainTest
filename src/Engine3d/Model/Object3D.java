@@ -63,7 +63,7 @@ public class Object3D implements Translatable, Rotatable
 
             //All three points lie on the same plane, so we can choose any
             Vector3D cameraRay = new Vector3D(triTransformed.getPoints()[0]);
-            cameraRay.translate(cameraPos.inverse());
+            cameraRay.translate(cameraPos.inverted());
 
             //If the camera can't see the triangle, don't draw it
             if (triNormal.dotProduct(cameraRay) >= 0)
@@ -76,7 +76,7 @@ public class Object3D implements Translatable, Rotatable
                 double lightIntensity = ls.getLightIntensity(triTransformed.getMidPoint().distanceTo(ls.getPosition()));
                 if (lightIntensity == 0) {continue;}
 
-                Vector3D lightDirection = ls.getRotation().normalized().inverse();
+                Vector3D lightDirection = ls.getRotation().normalized().inverted();
 
                 double lightDotProduct = (triNormal.dotProduct(lightDirection)*lightIntensity);
                 if (triTransformed.getMaterial().getLuminance() < lightDotProduct) {

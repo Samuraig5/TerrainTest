@@ -76,11 +76,10 @@ public abstract class Vector implements Translatable
 
     @Override
     public void translate(Vector3D other) {
-        double[] deltas = new double[4];
+        double[] deltas = new double[3];
         deltas[0] = other.x();
         deltas[1] = other.y();
         deltas[2] = other.z();
-        deltas[3] = other.w();
         translate(deltas);
     }
 
@@ -94,6 +93,12 @@ public abstract class Vector implements Translatable
         return clone;
     }
 
+    public Vector translated(Vector3D other) {
+        Vector clone = clone();
+        clone.translate(other);
+        return clone;
+    }
+
     /**
      * Scales the components of this vector by some scalar.
      * @param scalar scalar.
@@ -104,13 +109,25 @@ public abstract class Vector implements Translatable
         }
     }
 
+    public void scale(double[] scalar) {
+        int maxIndex = Math.min(getDimension(), scalar.length);
+        for (int i = 0; i < maxIndex; i++) {
+            components[i] *= scalar[i];
+        }
+    }
+
+    public void scale(Vector scalar) {
+        scale(scalar.getComponents());
+    }
+
+
     /**
      * @param scalar scalar
      * @return A scaled clone
      */
     public Vector scaled(double scalar) {
         Vector clone = clone();
-        clone.scaled(scalar);
+        clone.scale(scalar);
         return clone;
     }
 
@@ -172,7 +189,7 @@ public abstract class Vector implements Translatable
 
         double result = 0;
         for (int i = 0; i < getDimension(); i++) {
-            result += Math.pow(2, getValue(i) - other.getValue(i));
+            result += Math.pow(getValue(i) - other.getValue(i), 2);
         }
         return Math.sqrt(result);
     }
@@ -193,12 +210,13 @@ public abstract class Vector implements Translatable
         if (getDimension() != other.getDimension()) {
             throw new IllegalArgumentException("Dimension Mismatch!");
         }
-        Vector thisNormalized = this.normalized();
-        Vector otherNormalized = other.normalized();
+
+        double[] c1 = getComponents();
+        double[] c2 = other.getComponents();
 
         double result = 0;
         for (int i = 0; i < getDimension(); i++) {
-            result += getValue(i) * other.getValue(i);
+            result += c1[i] * c2[i];
         }
         return result;
     }

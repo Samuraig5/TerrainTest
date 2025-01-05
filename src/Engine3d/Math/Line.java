@@ -33,9 +33,9 @@ public class Line
         double bd = p2.dotProduct(planeNormal);
         distanceToLastIntersect = (-plane_d - ad) / (bd - ad);
 
-        Vector3D lineStartToEnd = p2.translation(p1.inverse());
+        Vector3D lineStartToEnd = p2.translated(p1.inverted());
         Vector3D lineToIntersect = lineStartToEnd.scaled(distanceToLastIntersect);
-        return p1.translation(lineToIntersect);
+        return p1.translated(lineToIntersect);
     }
 
     public double getDistanceToLastIntersect() {

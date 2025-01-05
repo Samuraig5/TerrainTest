@@ -21,7 +21,7 @@ public class CameraLight extends LightSource{
     }
     @Override
     public Vector3D getRotation() {
-        Vector3D finalRot = offRot.translation(camera.getRotation());
+        Vector3D finalRot = offRot.translated(camera.getRotation());
 
         Matrix4x4 yRot = Matrix4x4.getRotationMatrixY(finalRot.y());
         Matrix4x4 xRot = Matrix4x4.getRotationMatrixX(finalRot.x());

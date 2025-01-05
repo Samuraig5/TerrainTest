@@ -1,6 +1,5 @@
 package Engine3d.Math;
 
-import Engine3d.Math.Vector.Vector;
 import Engine3d.Math.Vector.Vector3D;
 
 public class Matrix4x4
@@ -152,11 +151,11 @@ public class Matrix4x4
     }
     public static Matrix4x4 getPointAtMatrix(Vector3D position, Vector3D target, Vector3D up)
     {
-        Vector3D newForward = target.translation(position.inverse());
+        Vector3D newForward = target.translated(position.inverted());
         newForward.normalize();
 
         Vector3D a = newForward.scaled(up.dotProduct(newForward));
-        Vector3D newUp = up.translation(a.inverse());
+        Vector3D newUp = up.translated(a.inverted());
         newUp.normalize();
 
         Vector3D newRight = newUp.crossProduct(newForward);
