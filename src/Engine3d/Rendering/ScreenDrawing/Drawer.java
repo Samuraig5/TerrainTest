@@ -23,9 +23,9 @@ public class Drawer
         p = new PixelDrawer(camera);
     }
 
-    public void drawBuffer(Graphics g)
+    public void drawBuffer(Graphics g, ScreenBuffer screenBuffer)
     {
-        BufferedImage buffer = camera.getScreenBuffer().getBufferedImage();
+        BufferedImage buffer = screenBuffer.getBufferedImage();
         int screenWidth = (int) (buffer.getWidth() / camera.getResolutionFactor());
         int screenHeight = (int) (buffer.getHeight() / camera.getResolutionFactor());
 

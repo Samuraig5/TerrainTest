@@ -24,7 +24,8 @@ public class Camera implements Translatable, Rotatable
     double zNear = 0.25d;
     double zFar = 1000;
 
-    private ScreenBuffer screenBuffer;
+    private ScreenBuffer displayBuffer;
+    private ScreenBuffer buildBuffer;
 
     Vector3D position = new Vector3D();
     Vector3D rotation = new Vector3D();
@@ -33,7 +34,9 @@ public class Camera implements Translatable, Rotatable
     {
         this.window = window;
         this.drawer = new Drawer(this);
-        this.screenBuffer = new ScreenBuffer(getResolution());
+        this.displayBuffer = new ScreenBuffer(getResolution());
+        this.buildBuffer = new ScreenBuffer(getResolution());
+
         this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
 
         window.addComponentListener(new ComponentAdapter() {
@@ -59,13 +62,22 @@ public class Camera implements Translatable, Rotatable
     {
         return getScreenDimensions().y() / getScreenDimensions().x();
     }
-    public ScreenBuffer getScreenBuffer(){ return screenBuffer; }
+    public ScreenBuffer getScreenBuffer(){ return buildBuffer; }
     public void onFrameSizeChange() {
         this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
-        this.screenBuffer.recompute(getResolution());
+        this.buildBuffer.recompute(getResolution());
+        this.displayBuffer.recompute(getResolution());
     }
     public void drawScreenBuffer(Graphics g){
-        drawer.drawBuffer(g);
+        synchronized (this) {
+            drawer.drawBuffer(g, displayBuffer); // Ensure thread-safe rendering
+        }
+    }
+
+    public synchronized void swapBuffers() {
+        ScreenBuffer temp = displayBuffer;
+        displayBuffer = buildBuffer;
+        buildBuffer = temp;
     }
 
     @Override

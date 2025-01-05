@@ -7,6 +7,7 @@ import java.awt.*;
 
 public class SceneRenderer extends JPanel
 {
+    private Thread buildThread;
     private Scene activeScene;
     private TimeMeasurer timeMeasurer;
     public SceneRenderer()
@@ -20,6 +21,7 @@ public class SceneRenderer extends JPanel
 
         this.activeScene = activeScene;
         activeScene.addTimeMeasurer(timeMeasurer);
+        startBuildThread();
 
         repaint();
         revalidate();
@@ -43,14 +45,13 @@ public class SceneRenderer extends JPanel
     private void paintActiveScene(Graphics g)
     {
         timeMeasurer.clearMeasurements();
-        timeMeasurer.startMeasurement("DrawScene");
 
-        activeScene.drawScene();
+        timeMeasurer.startMeasurement("DrawScene");
+        //activeScene.drawScene();
 
         timeMeasurer.startMeasurement("DrawBuffer");
         activeScene.getCamera().drawScreenBuffer(g);
         timeMeasurer.stopMeasurement("DrawBuffer");
-
         long sceneDrawTime = timeMeasurer.getMeasurement("DrawScene");
 
         g.setColor(Color.white);
@@ -73,5 +74,31 @@ public class SceneRenderer extends JPanel
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", sceneDrawTime),30, 120);
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", sceneDrawTime),30, 140);
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("DrawBuffer", sceneDrawTime),30, 160);
+    }
+
+    private void startBuildThread() {
+        if (buildThread != null && buildThread.isAlive()) {
+            buildThread.interrupt(); // Stop the current thread
+        }
+
+        buildThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                if (activeScene != null) {
+                    activeScene.drawScene();
+
+                    synchronized (activeScene.getCamera()) {
+                        activeScene.getCamera().swapBuffers();
+                    }
+                }
+
+                try {
+                    Thread.sleep(16);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+
+        buildThread.start();
     }
 }

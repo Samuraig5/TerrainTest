@@ -18,7 +18,6 @@ import java.util.function.Function;
 public class Object3D implements Translatable, Rotatable
 {
     public static final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
-
     protected Vector3D[] points;
     protected List<MeshTriangle> mesh = new ArrayList<>();
     protected Vector3D rotation = new Vector3D();
@@ -99,7 +98,7 @@ public class Object3D implements Translatable, Rotatable
                 }
             }
 
-            if (triTransformed.getMaterial().getLuminance() == 0) {continue;}
+            //if (triTransformed.getMaterial().getLuminance() == 0) {continue;}
 
             // = Convert World Space -> View Space =
             MeshTriangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);

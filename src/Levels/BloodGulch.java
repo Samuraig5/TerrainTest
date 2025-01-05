@@ -2,6 +2,7 @@ package Levels;
 
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.Lighting.CameraLight;
+import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
 import Engine3d.Model.Object3D;
@@ -14,6 +15,9 @@ public class BloodGulch extends Scene
 
     public BloodGulch(Camera camera) {
         super(camera);
+
+        LightSource sun = new LightSource(this);
+        sun.setRotation(new Vector3D(0,Math.toRadians(-90),0));
 
         CameraLight cl = new CameraLight(camera, this, new Vector3D());
         cl.setLightRange(100);

@@ -10,10 +10,11 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Scene
 {
-    List<Object3D> objects = new ArrayList<>();
+    List<Object3D> objects = new CopyOnWriteArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
     Camera camera;
     final SceneRenderer sceneRenderer = new SceneRenderer();
