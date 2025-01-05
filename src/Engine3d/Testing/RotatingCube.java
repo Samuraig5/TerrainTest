@@ -1,7 +1,7 @@
 package Engine3d.Testing;
 
 import Engine3d.Time.Updatable;
-import Engine3d.Math.Vector3D;
+import Engine3d.Math.Vector.Vector3D;
 
 public class RotatingCube extends Cube implements Updatable
 {

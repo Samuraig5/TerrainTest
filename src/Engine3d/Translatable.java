@@ -1,6 +1,6 @@
 package Engine3d;
 
-import Engine3d.Math.Vector3D;
+import Engine3d.Math.Vector.Vector3D;
 
 public interface Translatable
 {

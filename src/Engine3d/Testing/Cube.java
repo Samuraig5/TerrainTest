@@ -3,8 +3,8 @@ package Engine3d.Testing;
 import Engine3d.Rendering.Material;
 import Engine3d.Model.Object3D;
 import Engine3d.Math.MeshTriangle;
-import Engine3d.Math.Vector2D;
-import Engine3d.Math.Vector3D;
+import Engine3d.Math.Vector.Vector2D;
+import Engine3d.Math.Vector.Vector3D;
 
 public class Cube extends Object3D
 {

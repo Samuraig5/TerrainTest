@@ -1,7 +1,6 @@
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.Lighting.CameraLight;
-import Engine3d.Lighting.LightSource;
-import Engine3d.Math.Vector3D;
+import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Scene;
 import Engine3d.Rendering.SceneRenderer;

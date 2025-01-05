@@ -1,13 +1,13 @@
 package Engine3d.Lighting;
 
 import Engine3d.Math.Matrix4x4;
-import Engine3d.Math.Vector3D;
+import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Scene;
 
 public class CameraLight extends LightSource{
 
-    Vector3D offRot = new Vector3D();
+    Vector3D offRot;
     Camera camera;
     public CameraLight(Camera camera, Scene scene, Vector3D offRot) {
         super(scene);

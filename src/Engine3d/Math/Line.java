@@ -1,6 +1,6 @@
 package Engine3d.Math;
 
-import Engine3d.Math.Vector3D;
+import Engine3d.Math.Vector.Vector3D;
 
 public class Line
 {

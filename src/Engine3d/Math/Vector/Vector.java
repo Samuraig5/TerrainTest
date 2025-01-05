@@ -1,10 +1,12 @@
-package Engine3d.Math;
+package Engine3d.Math.Vector;
 
 import Engine3d.Translatable;
 
 public abstract class Vector implements Translatable
 {
-    private double[] components;
+    double[] components;
+
+    protected abstract void init();
 
     /**
      * Get the (actual) dimensionality of the vector.
@@ -24,6 +26,10 @@ public abstract class Vector implements Translatable
             throw new IllegalArgumentException("Index out of bounds");
         }
         return components[index];
+    }
+
+    public double[] getComponents() {
+        return components;
     }
 
     /**
@@ -50,15 +56,32 @@ public abstract class Vector implements Translatable
     }
 
     /**
+     * Set multiple components, starting at component 0.
+     * @param newComponents new components in form of a vector.
+     */
+    public void setComponents(Vector newComponents) {
+        setComponents(newComponents.getComponents());
+    }
+
+    /**
      * Translates the components of this vector by some deltas starting at component 0.
      * @param deltas component wise change.
-     * @return
      */
     public void translate(double[] deltas) {
         int maxIndex = Math.min(getDimension(), deltas.length);
         for (int i = 0; i < maxIndex; i++) {
             components[i] += deltas[i];
         }
+    }
+
+    @Override
+    public void translate(Vector3D other) {
+        double[] deltas = new double[4];
+        deltas[0] = other.x();
+        deltas[1] = other.y();
+        deltas[2] = other.z();
+        deltas[3] = other.w();
+        translate(deltas);
     }
 
     /**
@@ -162,7 +185,7 @@ public abstract class Vector implements Translatable
      * The dot product is a measure for the "likeness" of two vectors.
      * A larger positive number means the vectors are alike (point in the same general direction).
      * A larger negative number means the vectors are opposing (point away from each other).
-     * If the result is 0, the the two vectors are orthogonal to eachother.
+     * If the result is 0, the two vectors are orthogonal to each other.
      * @param other the other vector.
      * @return a double value of arbitrary size.
      */

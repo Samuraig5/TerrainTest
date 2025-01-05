@@ -2,12 +2,11 @@ package Engine3d.Rendering.ScreenDrawing;
 
 import Engine3d.Rendering.Camera;
 import Engine3d.Math.MeshTriangle;
-import Engine3d.Math.Vector2D;
-import Engine3d.Math.Vector3D;
+import Engine3d.Math.Vector.Vector2D;
+import Engine3d.Math.Vector.Vector3D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.lang.Math.abs;
@@ -100,7 +99,7 @@ public class PixelDrawer
         int x3 = (int) points[2].x(); int y3 = (int) points[2].y();
 
         double u1 = texPoints[0].u(); double v1 = texPoints[0].v(); double w1 = texPoints[0].w();
-        double u2 = texPoints[1].u(); double v2 = texPoints[1].v(); double w2 = texPoints[1].w();;
+        double u2 = texPoints[1].u(); double v2 = texPoints[1].v(); double w2 = texPoints[1].w();
         double u3 = texPoints[2].u(); double v3 = texPoints[2].v(); double w3 = texPoints[2].w();
 
         Texturizer.textureTriangle(screenBuffer,tri.getMaterial().getMTL(),

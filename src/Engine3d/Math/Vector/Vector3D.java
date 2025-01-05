@@ -1,4 +1,4 @@
-package Engine3d.Math;
+package Engine3d.Math.Vector;
 
 import Engine3d.Translatable;
 

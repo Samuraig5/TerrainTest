@@ -1,18 +1,14 @@
 package Engine3d.Rendering;
 
-import Engine3d.Math.Vector3D;
 import Engine3d.Time.TimeMeasurer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-
-import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
 public class SceneRenderer extends JPanel
 {
     private Scene activeScene;
-    private TimeMeasurer timeMeasurer;
+    private final TimeMeasurer timeMeasurer;
     public SceneRenderer(Scene initialScene)
     {
         setFocusable(true);

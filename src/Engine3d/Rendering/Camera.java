@@ -2,7 +2,7 @@ package Engine3d.Rendering;
 
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.MeshTriangle;
-import Engine3d.Math.Vector3D;
+import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.ScreenDrawing.Drawer;
 import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
 import Engine3d.Rotatable;
@@ -10,7 +10,6 @@ import Engine3d.Translatable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public class Camera implements Translatable, Rotatable
 {

@@ -2,6 +2,8 @@ package Engine3d.Model;
 
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.*;
+import Engine3d.Math.Vector.Vector2D;
+import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Material;
 import Engine3d.Rotatable;
