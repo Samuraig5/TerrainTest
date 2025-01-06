@@ -5,19 +5,20 @@ import Engine3d.Controls.PlayerObject;
 import Engine3d.Lighting.CameraLight;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Physics.Object3D;
+import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
 
 public class BloodGulch extends Scene
 {
 
-    public BloodGulch(PlayerCamera camera) {
+    public BloodGulch(Camera camera) {
         super(camera);
 
         camera.translate(new Vector3D(0,7,0));
 
         //LightSource sun = new LightSource(this);
-        //sun.setRotation(new Vector3D(0,Math.toRadians(-90),0));
+        //sun.setRotation(new Vector3D(Math.toRadians(-90),0,0));
         //sun.setLightIntensity(0.5);
 
         CameraLight cl = new CameraLight(camera, this, new Vector3D());
@@ -70,7 +71,7 @@ public class BloodGulch extends Scene
         //axis.showWireFrame(false);
         //testScene.addObject(axis);
 
-        PlayerObject playerObject = new PlayerObject(camera);
+        PlayerObject playerObject = new PlayerObject((PlayerCamera) camera);
         addObject(playerObject);
 
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);

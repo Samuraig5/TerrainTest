@@ -2,7 +2,6 @@ package Engine3d.Controls;
 
 import Engine3d.Math.Box;
 import Engine3d.Math.Matrix4x4;
-import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Physics.Gravitational;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Physics.Object3D;
@@ -20,7 +19,6 @@ public class PlayerObject extends Object3D implements Gravitational
     {
         this.camera = camera;
         camera.setPlayerObject(this );
-        Box collider = new Box(new Vector3D(-0.5, 0, -0.5), new Vector3D(0.5,2,0.5));
     }
 
     public void addMomentum(Vector3D delta) {
@@ -46,7 +44,7 @@ public class PlayerObject extends Object3D implements Gravitational
 
     @Override
     public boolean isGrounded() {
-        return camera.getPosition().y() <= 5;
+        return getPosition().y() <= 0;
     }
 
     @Override

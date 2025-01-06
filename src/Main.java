@@ -1,6 +1,7 @@
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
 import Levels.BloodGulch;
+import Levels.TestLevel;
 
 import javax.swing.*;
 
@@ -17,7 +18,8 @@ public class Main {
 
         PlayerCamera camera = new PlayerCamera(frame);
 
-        new BloodGulch(camera);
+        //new BloodGulch(camera);
+        new TestLevel(camera);
 
         frame.setVisible(true);
     }

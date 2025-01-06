@@ -23,7 +23,7 @@ public class Scene implements Updatable
     private final ObjParser objParser = new ObjParser();
     Camera camera;
     final SceneRenderer sceneRenderer = new SceneRenderer();
-    Color backgroundColour = Color.BLACK;
+    protected Color backgroundColour = Color.BLACK;
     final GameTimer sceneTimer = new GameTimer();
     private TimeMeasurer timeMeasurer;
     List<Object3D> objects = new CopyOnWriteArrayList<>();

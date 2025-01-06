@@ -10,7 +10,7 @@ public class CameraLight extends LightSource {
 
     Vector3D offRot;
     Camera camera;
-    public CameraLight(PlayerCamera camera, Scene scene, Vector3D offRot) {
+    public CameraLight(Camera camera, Scene scene, Vector3D offRot) {
         super(scene);
         this.camera = camera;
         this.offRot = offRot;

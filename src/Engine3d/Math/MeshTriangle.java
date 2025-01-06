@@ -7,9 +7,10 @@ import Engine3d.Translatable;
 public class MeshTriangle implements Translatable
 {
     private final Vector3D[] points = new Vector3D[3];
-    private Material material = new Material();
+    private Material material;
     public MeshTriangle(Vector3D point0, Vector3D point1, Vector3D point2)
     {
+        material = new Material();
         points[0] = point0;
         points[1] = point1;
         points[2] = point2;
@@ -59,12 +60,6 @@ public class MeshTriangle implements Translatable
         return points[0];
     }
 
-    public MeshTriangle translation(Vector3D delta){
-        Vector3D p1 = points[0].translated(delta);
-        Vector3D p2 = points[1].translated(delta);
-        Vector3D p3 = points[2].translated(delta);
-        return new MeshTriangle(p1, p2, p3);
-    }
     public void scale(Vector3D scalar) {
         points[0].scale(scalar);
         points[1].scale(scalar);
