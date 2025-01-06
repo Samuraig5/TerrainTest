@@ -9,9 +9,9 @@ import Engine3d.Rendering.Material;
 
 import java.awt.*;
 
-public class Box extends Mesh
+public class BoxMesh extends Mesh
 {
-    public Box(Object3D object3D, Vector3D size) {
+    public BoxMesh(Object3D object3D, Vector3D size) {
         super(object3D);
         buildPoints(size);
         buildFaces();

@@ -4,7 +4,6 @@ import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.Controls.PlayerObject;
 import Engine3d.Lighting.CameraLight;
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Model.SimpleMeshes.Box;
 import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Scene;

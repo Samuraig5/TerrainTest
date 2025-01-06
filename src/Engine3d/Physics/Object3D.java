@@ -3,7 +3,7 @@ package Engine3d.Physics;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
-import Engine3d.Model.SimpleMeshes.Cube;
+import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Rotatable;
 import Engine3d.Translatable;
 
@@ -52,7 +52,7 @@ public class Object3D implements Translatable, Rotatable
     // === DEBUGGING ===
 
     double sourceBoxSize = 0.25d;
-    Mesh source = new Cube(this, sourceBoxSize);
+    Mesh source = new CubeMesh(this, sourceBoxSize);
     private void setUpDebugging() {
         //Centers the box on the source of the object
         source.translate(new Vector3D(-sourceBoxSize/2,-sourceBoxSize/2,-sourceBoxSize/2));

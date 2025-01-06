@@ -1,11 +1,11 @@
 package Engine3d.Testing;
 
-import Engine3d.Model.SimpleMeshes.Cube;
+import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Physics.Object3D;
 import Engine3d.Time.Updatable;
 import Engine3d.Math.Vector.Vector3D;
 
-public class RotatingCube extends Cube implements Updatable
+public class RotatingCube extends CubeMesh implements Updatable
 {
     Vector3D rotationSpeed;
     public RotatingCube(Object3D object3D, double size, Vector3D rotationSpeed) {
