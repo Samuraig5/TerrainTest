@@ -12,7 +12,7 @@ public class Material
     private double luminance = 0;
     private final Vector2D[] textureCoords = new Vector2D[3];
     private BufferedImage texture;
-    private MTL mtl;
+    private MTL mtl = new MTL("Empty");
 
     public Material()
     {

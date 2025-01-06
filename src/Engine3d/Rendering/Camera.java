@@ -30,6 +30,8 @@ public class Camera implements Translatable, Rotatable
     Vector3D position = new Vector3D();
     Vector3D rotation = new Vector3D();
 
+    public boolean debugging = true;
+
     public Camera(JFrame window)
     {
         this.window = window;

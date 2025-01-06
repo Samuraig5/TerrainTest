@@ -3,6 +3,7 @@ package Engine3d.Physics;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
+import Engine3d.Model.SimpleMeshes.Cube;
 import Engine3d.Rotatable;
 import Engine3d.Translatable;
 
@@ -12,7 +13,9 @@ public class Object3D implements Translatable, Rotatable
     protected Vector3D rotation = new Vector3D();
     protected Vector3D position = new Vector3D();
 
-    public Object3D() {}
+    public Object3D() {
+        setUpDebugging();
+    }
 
     public void setMesh(Mesh mesh) {
         this.mesh = mesh;
@@ -23,7 +26,7 @@ public class Object3D implements Translatable, Rotatable
 
     @Override
     public void rotate(Vector3D delta) {
-        rotation.translate(rotation);
+        rotation.translate(delta);
     }
 
     @Override
@@ -44,5 +47,18 @@ public class Object3D implements Translatable, Rotatable
     @Override
     public Vector3D getPosition() {
         return position;
+    }
+
+    // === DEBUGGING ===
+
+    double sourceBoxSize = 0.25d;
+    Mesh source = new Cube(this, sourceBoxSize);
+    private void setUpDebugging() {
+        //Centers the box on the source of the object
+        source.translate(new Vector3D(-sourceBoxSize/2,-sourceBoxSize/2,-sourceBoxSize/2));
+        source.showWireFrame(true);
+    }
+    public Mesh getSource() {
+        return source;
     }
 }

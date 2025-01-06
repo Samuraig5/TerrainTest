@@ -27,7 +27,7 @@ public class Scene implements Updatable
     private TimeMeasurer timeMeasurer;
     List<Object3D> objects = new CopyOnWriteArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
-    private double gravity = 0.5d;
+    private double gravity = 2d;
     protected List<Gravitational> gravitationals = new ArrayList<>();
 
     public Scene(Camera camera) {
@@ -82,6 +82,9 @@ public class Scene implements Updatable
         for (Object3D o:objects)
         {
             o.getMesh().drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+            if (camera.debugging) {
+                o.getSource().drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+            }
         }
     }
 

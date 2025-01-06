@@ -1,5 +1,6 @@
 package Engine3d.Testing;
 
+import Engine3d.Model.SimpleMeshes.Cube;
 import Engine3d.Physics.Object3D;
 import Engine3d.Time.Updatable;
 import Engine3d.Math.Vector.Vector3D;

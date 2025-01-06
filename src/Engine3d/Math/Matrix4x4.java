@@ -122,8 +122,8 @@ public class Matrix4x4
         return rotZ;
     }
     public static Matrix4x4 get3dRotationMatrix(Vector3D rotation){
-        Matrix4x4 rotMat = Matrix4x4.matrixMatrixMultiplication(getRotationMatrixY(rotation.x()), getRotationMatrixY(rotation.z()));
-        rotMat = Matrix4x4.matrixMatrixMultiplication(rotMat, getRotationMatrixY(rotation.y()));
+        Matrix4x4 rotMat = Matrix4x4.matrixMatrixMultiplication(getRotationMatrixY(rotation.y()), getRotationMatrixX(rotation.x()));
+        rotMat = Matrix4x4.matrixMatrixMultiplication(rotMat, getRotationMatrixZ(rotation.z()));
         return rotMat;
     }
     public static Matrix4x4 getTranslationMatrix(Vector3D vec)

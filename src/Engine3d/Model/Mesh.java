@@ -190,7 +190,7 @@ public class Mesh implements Translatable, Rotatable
                     camera.drawer.textureTriangle(triToDraw);
                     tm.pauseMeasurement("Texturizer");
                 }
-                else {
+                else if (triToDraw.getMaterial().getBaseColour().getAlpha() > 0) {
                     camera.drawer.fillTriangle(triToDraw);
                 }
             }
