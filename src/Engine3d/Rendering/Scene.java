@@ -1,6 +1,7 @@
 package Engine3d.Rendering;
 
 import Engine3d.Controls.PlayerObject;
+import Engine3d.Physics.CollidableObject;
 import Engine3d.Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Matrix4x4;
@@ -30,6 +31,7 @@ public class Scene implements Updatable
     List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 2d;
     protected List<Gravitational> gravitationals = new ArrayList<>();
+    protected List<CollidableObject> collidables = new ArrayList<>();
 
     public Scene(Camera camera) {
         this.camera = camera;
@@ -56,6 +58,10 @@ public class Scene implements Updatable
         if (object instanceof Gravitational)
         {
             gravitationals.add((Gravitational) object);
+        }
+        if (object instanceof CollidableObject)
+        {
+            collidables.add((CollidableObject) object);
         }
     }
 
@@ -116,6 +122,13 @@ public class Scene implements Updatable
     public void update(double deltaTime) {
         for (Gravitational grav : gravitationals) {
             grav.applyGravity(gravity, deltaTime);
+        }
+        for (int i = 0; i < collidables.size()-1; i++) {
+            for (int j = i+1; j < collidables.size(); j++) {
+                collidables.get(i).
+                        getAABBCollider().handleCollision(
+                                collidables.get(j).getAABBCollider());
+            }
         }
     }
 }

@@ -4,9 +4,10 @@ import Engine3d.Lighting.LightSource;
 import Engine3d.Math.*;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
+import Engine3d.Physics.AABB;
+import Engine3d.Physics.Octree.OctreeSpace;
 import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.Camera;
-import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Material;
 import Engine3d.Rotatable;
 import Engine3d.Time.TimeMeasurer;
@@ -309,6 +310,34 @@ public class Mesh implements Translatable, Rotatable
         return out;
     }
 
+    public AABB getAABB() {
+        if (points == null || points.length == 0) {
+            throw new IllegalStateException("Mesh contains no points");
+        }
+
+        // Initialize min and max with the coordinates of the first point
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double minZ = Double.MAX_VALUE;
+        double maxX = 0;
+        double maxY = 0;
+        double maxZ = 0;
+
+        // Iterate through the points to find the min and max coordinates
+        for (Vector3D point : points) {
+            if (point.x() < minX) { minX = point.x(); }
+            if (point.y() < minY) { minY = point.y(); }
+            if (point.z() < minZ) { minZ = point.z(); }
+            if (point.x() > maxX) { maxX = point.x(); }
+            if (point.y() > maxY) { maxY = point.y(); }
+            if (point.z() > maxZ) { maxZ = point.z(); }
+        }
+
+        // Create and return the AABB
+        Vector3D min = new Vector3D(minX, minY, minZ).translated(getPosition());
+        Vector3D max = new Vector3D(maxX, maxY, maxZ).translated(getPosition());
+        return new AABB(min, max);
+    }
     public void showWireFrame(boolean showWireFrame) {
         this.showWireFrame = showWireFrame;
     }

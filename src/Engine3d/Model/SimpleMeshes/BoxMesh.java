@@ -12,8 +12,10 @@ import java.awt.image.BufferedImage;
 
 public class BoxMesh extends Mesh
 {
+    Vector3D size;
     public BoxMesh(Object3D object3D, Vector3D size) {
         super(object3D);
+        this.size = size;
         buildPoints(size);
         buildFaces(size);
 
@@ -99,5 +101,12 @@ public class BoxMesh extends Mesh
         for (int i = 0; i < faces.size(); i++) {
             faces.get(i).getMaterial().setBaseColour(colour);
         }
+    }
+
+    public void centreOn(Vector3D target) {
+        Vector3D centre = size.scaled(0.5);
+        Vector3D newOffset = target.translated(centre.inverted());
+        translate(meshOffset.inverted());
+        translate(newOffset);
     }
 }

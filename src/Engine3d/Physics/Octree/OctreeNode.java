@@ -1,20 +1,19 @@
 package Engine3d.Physics.Octree;
 
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Physics.AABB;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OctreeNode<T>
 {
-    private final AABB boundary;  // Axis-aligned bounding box defining this node's region
+    private final OctreeSpace boundary;  // Axis-aligned bounding box defining this node's region
     private final List objects; // Objects contained in this node
     private final int capacity;   // Maximum objects before subdividing
     private boolean isDivided;    // Whether this node has been subdivided
     private OctreeNode<T>[] children; // The 8 child nodes
 
-    public OctreeNode(AABB boundary, int capacity) {
+    public OctreeNode(OctreeSpace boundary, int capacity) {
         this.boundary = boundary;
         this.capacity = capacity;
         this.objects = new ArrayList<>();
@@ -28,14 +27,14 @@ public class OctreeNode<T>
         double halfSize = boundary.getSize() / 2;
 
         children = new OctreeNode[8];
-        children[0] = new OctreeNode<>(new AABB(new Vector3D(x - halfSize, y - halfSize, z - halfSize), halfSize), capacity);
-        children[1] = new OctreeNode<>(new AABB(new Vector3D(x + halfSize, y - halfSize, z - halfSize), halfSize), capacity);
-        children[2] = new OctreeNode<>(new AABB(new Vector3D(x - halfSize, y + halfSize, z - halfSize), halfSize), capacity);
-        children[3] = new OctreeNode<>(new AABB(new Vector3D(x + halfSize, y + halfSize, z - halfSize), halfSize), capacity);
-        children[4] = new OctreeNode<>(new AABB(new Vector3D(x - halfSize, y - halfSize, z + halfSize), halfSize), capacity);
-        children[5] = new OctreeNode<>(new AABB(new Vector3D(x + halfSize, y - halfSize, z + halfSize), halfSize), capacity);
-        children[6] = new OctreeNode<>(new AABB(new Vector3D(x - halfSize, y + halfSize, z + halfSize), halfSize), capacity);
-        children[7] = new OctreeNode<>(new AABB(new Vector3D(x + halfSize, y + halfSize, z + halfSize), halfSize), capacity);
+        children[0] = new OctreeNode<>(new OctreeSpace(new Vector3D(x - halfSize, y - halfSize, z - halfSize), halfSize), capacity);
+        children[1] = new OctreeNode<>(new OctreeSpace(new Vector3D(x + halfSize, y - halfSize, z - halfSize), halfSize), capacity);
+        children[2] = new OctreeNode<>(new OctreeSpace(new Vector3D(x - halfSize, y + halfSize, z - halfSize), halfSize), capacity);
+        children[3] = new OctreeNode<>(new OctreeSpace(new Vector3D(x + halfSize, y + halfSize, z - halfSize), halfSize), capacity);
+        children[4] = new OctreeNode<>(new OctreeSpace(new Vector3D(x - halfSize, y - halfSize, z + halfSize), halfSize), capacity);
+        children[5] = new OctreeNode<>(new OctreeSpace(new Vector3D(x + halfSize, y - halfSize, z + halfSize), halfSize), capacity);
+        children[6] = new OctreeNode<>(new OctreeSpace(new Vector3D(x - halfSize, y + halfSize, z + halfSize), halfSize), capacity);
+        children[7] = new OctreeNode<>(new OctreeSpace(new Vector3D(x + halfSize, y + halfSize, z + halfSize), halfSize), capacity);
 
         isDivided = true;
     }

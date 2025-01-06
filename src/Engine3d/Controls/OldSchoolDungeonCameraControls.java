@@ -42,7 +42,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
         if (wDown) {transDelta.translate(new Vector3D(0, 0, adjStepSize));}
         if (sDown) {transDelta.translate(new Vector3D(0, 0, -adjStepSize));}
-        //if (spaceDown) {transDelta.translate(new Vector3D(0, adjStepSize, 0));}
+        if (spaceDown) {transDelta.translate(new Vector3D(0, adjStepSize, 0));}
         if (shiftDown) {transDelta.translate(new Vector3D(0, -adjStepSize, 0));}
         if (aDown) {rotDelta.translate(new Vector3D(0, adjTurnStep, 0));}
         if (dDown) {rotDelta.translate(new Vector3D(0, -adjTurnStep, 0));}
@@ -77,7 +77,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
             case KeyEvent.VK_SPACE -> {
                 spaceDown = true;
                 if (playerObject.isGrounded()) {
-                    playerObject.addMomentum(adjJump);
+                    // playerObject.addMomentum(adjJump);
                 }
             }
             case KeyEvent.VK_SHIFT -> shiftDown = true;

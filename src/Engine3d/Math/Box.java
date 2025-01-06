@@ -7,6 +7,10 @@ public class Box
     Vector3D min;
     Vector3D max;
 
+    public Vector3D min() {return min;}
+    public Vector3D max() {return max;}
+
+
     public Box(Vector3D min, Vector3D max) {
         this.min = min; this.max = max;
     }

@@ -221,6 +221,13 @@ public abstract class Vector implements Translatable
         return result;
     }
 
+    public boolean isEmpty() {
+        for (double val : components) {
+            if (val != 0) { return false; }
+        }
+        return true;
+    }
+
     // Override the toString method for representation
     @Override
     public String toString() {

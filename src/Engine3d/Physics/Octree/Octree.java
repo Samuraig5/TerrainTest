@@ -1,12 +1,11 @@
 package Engine3d.Physics.Octree;
 
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Physics.AABB;
 
 class Octree<T> {
     private final OctreeNode<T> root;
 
-    public Octree(AABB boundary, int capacity) {
+    public Octree(OctreeSpace boundary, int capacity) {
         this.root = new OctreeNode<>(boundary, capacity);
     }
 

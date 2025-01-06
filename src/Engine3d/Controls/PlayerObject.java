@@ -2,12 +2,15 @@ package Engine3d.Controls;
 
 import Engine3d.Math.Box;
 import Engine3d.Math.Matrix4x4;
+import Engine3d.Model.Mesh;
+import Engine3d.Model.SimpleMeshes.BoxMesh;
+import Engine3d.Physics.AABBObject;
 import Engine3d.Physics.Gravitational;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.PlayerCamera;
 
-public class PlayerObject extends Object3D implements Gravitational
+public class PlayerObject extends AABBObject implements Gravitational
 {
     private Vector3D position = new Vector3D();
     private Vector3D rotation = new Vector3D();
@@ -19,6 +22,9 @@ public class PlayerObject extends Object3D implements Gravitational
     {
         this.camera = camera;
         camera.setPlayerObject(this );
+        BoxMesh playerMesh = new BoxMesh(this, new Vector3D(1,1.8,1));
+        playerMesh.centreOn(new Vector3D(0,0,0));
+        setMesh(playerMesh);
     }
 
     public void addMomentum(Vector3D delta) {
@@ -44,7 +50,8 @@ public class PlayerObject extends Object3D implements Gravitational
 
     @Override
     public boolean isGrounded() {
-        return getPosition().y() <= 0;
+        return true;
+        //return getPosition().y() <= 0;
     }
 
     @Override
