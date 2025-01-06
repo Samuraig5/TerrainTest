@@ -1,6 +1,7 @@
 package Engine3d.Rendering.ScreenDrawing;
 
 import Engine3d.Rendering.Camera;
+import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Math.MeshTriangle;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;

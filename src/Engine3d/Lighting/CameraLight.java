@@ -3,13 +3,14 @@ package Engine3d.Lighting;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
+import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
 
-public class CameraLight extends LightSource{
+public class CameraLight extends LightSource {
 
     Vector3D offRot;
     Camera camera;
-    public CameraLight(Camera camera, Scene scene, Vector3D offRot) {
+    public CameraLight(PlayerCamera camera, Scene scene, Vector3D offRot) {
         super(scene);
         this.camera = camera;
         this.offRot = offRot;
@@ -21,12 +22,7 @@ public class CameraLight extends LightSource{
     }
     @Override
     public Vector3D getRotation() {
-        Vector3D finalRot = offRot.translated(camera.getRotation());
-
-        Matrix4x4 yRot = Matrix4x4.getRotationMatrixY(finalRot.y());
-        Matrix4x4 xRot = Matrix4x4.getRotationMatrixX(finalRot.x());
-        Matrix4x4 rotMat = Matrix4x4.matrixMatrixMultiplication(xRot, yRot);
-
-        return rotMat.matrixVectorMultiplication(Camera.BASE_LOOK_DIRECTION);
+        return camera.getRotation().translated(offRot);
+        //return Matrix4x4.get3dRotationMatrix(finalRot).matrixVectorMultiplication(Vector3D.FORWARD());
     }
 }

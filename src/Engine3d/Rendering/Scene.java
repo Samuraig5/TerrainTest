@@ -1,5 +1,6 @@
 package Engine3d.Rendering;
 
+import Engine3d.Controls.PlayerObject;
 import Engine3d.Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Matrix4x4;
@@ -32,6 +33,9 @@ public class Scene implements Updatable
 
     public Scene(Camera camera) {
         this.camera = camera;
+        if (camera instanceof PlayerCamera) {
+            new PlayerObject((PlayerCamera) camera);
+        }
 
         subscribeToTime(this);
 
@@ -73,7 +77,7 @@ public class Scene implements Updatable
         //These values are purely based off the camera.
         //If they change between two objects on the same frame then the objects can "jitter"
         //This is also slightly more efficient.
-        Vector3D constCamPos = new Vector3D(camera.position);
+        Vector3D constCamPos = new Vector3D(camera.getPosition());
         Vector3D up = new Vector3D(0,1,0);
         Vector3D target = camera.getDirection().translated(constCamPos);
         Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);

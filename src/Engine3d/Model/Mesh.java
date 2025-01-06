@@ -6,6 +6,7 @@ import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.Camera;
+import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Material;
 import Engine3d.Rotatable;
 import Engine3d.Time.TimeMeasurer;
@@ -80,7 +81,7 @@ public class Mesh implements Translatable, Rotatable
                 double lightIntensity = ls.getLightIntensity(triTransformed.getMidPoint().distanceTo(ls.getPosition()));
                 if (lightIntensity == 0) {continue;}
 
-                Vector3D lightDirection = ls.getRotation().normalized().inverted();
+                Vector3D lightDirection = ls.getDirection().normalized().inverted();
 
                 double lightDotProduct = (triNormal.dotProduct(lightDirection)*lightIntensity);
                 if (triTransformed.getMaterial().getLuminance() < lightDotProduct) {

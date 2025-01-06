@@ -13,24 +13,19 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
-public class Camera implements Translatable, Rotatable
-{
-    public static final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
-    JFrame window;
-    public Drawer drawer;
-    Matrix4x4 projectionMatrix;
+public abstract class Camera implements Rotatable, Translatable {
     double resolution = 0.25f;
     double fov = 90;
     double zNear = 0.25d;
     double zFar = 1000;
+    public boolean debugging = true;
+
+    JFrame window;
+    public Drawer drawer;
+    Matrix4x4 projectionMatrix;
 
     private ScreenBuffer displayBuffer;
     private ScreenBuffer buildBuffer;
-
-    Vector3D position = new Vector3D();
-    Vector3D rotation = new Vector3D();
-
-    public boolean debugging = true;
 
     public Camera(JFrame window)
     {
@@ -48,64 +43,40 @@ public class Camera implements Translatable, Rotatable
             }
         });
     }
-
-    public JFrame getFrame() {return window;}
+    public void drawScreenBuffer(Graphics g){
+        synchronized (this) {
+            drawer.drawBuffer(g, displayBuffer); // Ensure thread-safe rendering
+        }
+    }
+    public synchronized void swapBuffers() {
+        ScreenBuffer temp = displayBuffer;
+        displayBuffer = buildBuffer;
+        buildBuffer = temp;
+    }
+    public void onFrameSizeChange() {
+        this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
+        this.buildBuffer.recompute(getResolution());
+        this.displayBuffer.recompute(getResolution());
+    }
     public MeshTriangle projectTriangle(MeshTriangle in) {
         return projectionMatrix.multiplyWithTriangle(in);
     }
     public Vector3D getScreenDimensions() {
         return new Vector3D(window.getWidth(), window.getHeight(), 0);
     }
-    public Vector3D getResolution() { return getScreenDimensions().scaled(resolution); }
-    public double getResolutionFactor() {return resolution;}
-    public Vector3D getNearPlane() {return new Vector3D(0,0,zNear);}
-    public Vector3D getFarPlane() {return new Vector3D(0,0,zFar);}
     private double getAspectRatio()
     {
         return getScreenDimensions().y() / getScreenDimensions().x();
     }
+    public JFrame getFrame() {return window;}
+    public Vector3D getResolution() { return getScreenDimensions().scaled(resolution); }
+    public double getResolutionFactor() {return resolution;}
     public ScreenBuffer getScreenBuffer(){ return buildBuffer; }
-    public void onFrameSizeChange() {
-        this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
-        this.buildBuffer.recompute(getResolution());
-        this.displayBuffer.recompute(getResolution());
-    }
-    public void drawScreenBuffer(Graphics g){
-        synchronized (this) {
-            drawer.drawBuffer(g, displayBuffer); // Ensure thread-safe rendering
-        }
-    }
-
-    public synchronized void swapBuffers() {
-        ScreenBuffer temp = displayBuffer;
-        displayBuffer = buildBuffer;
-        buildBuffer = temp;
-    }
+    public Vector3D getNearPlane() {return new Vector3D(0,0,zNear);}
+    public Vector3D getFarPlane() {return new Vector3D(0,0,zFar);}
 
     @Override
-    public void translate(Vector3D delta) {
-        Vector3D forwardMovement = getDirection().scaled(delta.z());
-        Vector3D verticalMovement = new Vector3D(0,delta.y(),0);
-
-        Vector3D movement = forwardMovement.translated(verticalMovement);
-
-        position.translate(movement);
-        //System.out.println("Camera Pos: " + position.toString());
-    }
-    public Vector3D getPosition(){return new Vector3D(position);}
-    @Override
-    public void rotate(Vector3D delta) {
-        rotation.translate(delta);
-        //System.out.println("Camera Rot: " + rotation.x() + ", " + rotation.y() + ", " + rotation.z());
-    }
-    @Override
-    public Vector3D getRotation() {
-        return new Vector3D(rotation);
-    }
-    @Override
-    public Vector3D getDirection()
-    {
-        Matrix4x4 cameraRot = Matrix4x4.getRotationMatrixY(rotation.y());
-        return cameraRot.matrixVectorMultiplication(BASE_LOOK_DIRECTION);
+    public Vector3D getDirection() {
+        return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(Vector3D.FORWARD());
     }
 }

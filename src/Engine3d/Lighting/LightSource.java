@@ -61,6 +61,6 @@ public class LightSource implements Translatable, Rotatable
     }
     @Override
     public Vector3D getDirection() {
-        return Matrix4x4.get3dRotationMatrix(rotation).matrixVectorMultiplication(BASE_LOOK_DIRECTION);
+        return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(BASE_LOOK_DIRECTION);
     }
 }

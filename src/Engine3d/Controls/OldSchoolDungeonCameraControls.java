@@ -47,8 +47,8 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         if (aDown) {rotDelta.translate(new Vector3D(0, adjTurnStep, 0));}
         if (dDown) {rotDelta.translate(new Vector3D(0, -adjTurnStep, 0));}
 
-        updateTranslatables(transDelta);
-        updateRotatables(rotDelta);
+        playerObject.localTranslate(transDelta);
+        playerObject.rotate(rotDelta);
     }
 
     @Override
