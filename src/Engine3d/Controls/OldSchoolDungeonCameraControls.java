@@ -1,7 +1,5 @@
 package Engine3d.Controls;
 
-import Engine3d.Gravitational;
-import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Time.Updatable;
 import Engine3d.Math.Vector.Vector3D;

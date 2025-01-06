@@ -4,6 +4,7 @@ import Engine3d.Lighting.LightSource;
 import Engine3d.Math.*;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
+import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Material;
 import Engine3d.Rotatable;
@@ -15,44 +16,47 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class Object3D implements Translatable, Rotatable
+public class Mesh implements Translatable, Rotatable
 {
-    public static final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
+    private Object3D object3D;
     protected Vector3D[] points;
-    protected List<MeshTriangle> mesh = new ArrayList<>();
-    protected Vector3D rotation = new Vector3D();
-    protected Vector3D position = new Vector3D();
+    protected List<MeshTriangle> faces = new ArrayList<>();
+    protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
+    protected Vector3D meshOffset = new Vector3D(0,0,0,1);
     protected boolean showWireFrame = false;
-    public Object3D(){}
+    public Mesh(Object3D object3D) {
+        this.object3D = object3D;
+        object3D.setMesh(this);
+    }
     @Override
     public void translate(Vector3D delta) {
-        position.translate(delta);
+        meshOffset.translate(delta);
     }
     @Override
     public void rotate(Vector3D delta) {
-        rotation.translate(delta);
+        meshOffrot.translate(delta);
     }
     @Override
     public Vector3D getRotation() {
-        return rotation;
+        return meshOffrot.translated(object3D.getRotation());
     }
     @Override
     public Vector3D getDirection() {
-        return Matrix4x4.get3dRotationMatrix(rotation).matrixVectorMultiplication(BASE_LOOK_DIRECTION);
+        return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(Vector3D.FORWARD());
     }
 
-    public Vector3D getPosition() {return new Vector3D(position);}
+    public Vector3D getPosition() {return meshOffset.translated(object3D.getPosition());}
 
     public void drawObject(Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
     {
         tm.startMeasurement("Get Matrices");
         List<MeshTriangle> trianglesToRaster = new ArrayList<>();
 
-        Matrix4x4 trans = Matrix4x4.getTranslationMatrix(position);
-        Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(rotation), trans);
+        Matrix4x4 trans = Matrix4x4.getTranslationMatrix(getPosition());
+        Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(getRotation()), trans);
         tm.pauseAndEndMeasurement("Get Matrices");
 
-        for (MeshTriangle tri : mesh)
+        for (MeshTriangle tri : faces)
         {
             tm.startMeasurement("ObjWorldToScreen");
             MeshTriangle triTransformed = worldTransform.multiplyWithTriangle(tri);

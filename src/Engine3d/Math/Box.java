@@ -22,4 +22,8 @@ public class Box
                 (max.y() >= other.min.y() && min.y() <= other.max.y()) &&
                 (max.z() >= other.min.z() && min.z() <= other.max.z());
     }
+
+    public Vector3D getCenterPoint() {
+        return (min.translated(max)).scaled(0.5f);
+    }
 }

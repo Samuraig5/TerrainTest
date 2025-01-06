@@ -3,6 +3,7 @@ package Engine3d.Model;
 import Engine3d.Math.MeshTriangle;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
+import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.Material;
 import Engine3d.Rendering.ResourceManager.SpriteManager;
 
@@ -21,9 +22,9 @@ public class ObjParser
 
     SpriteManager spriteManager = new SpriteManager();
 
-    public Object3D loadFromObjFile(String folderPath, String objFile)
+    public Mesh loadFromObjFile(Object3D object3D, String folderPath, String objFile)
     {
-        Object3D object3D = new Object3D();
+        Mesh mesh = new Mesh(object3D);
 
         HashMap<String, MTL> mtlLib = new HashMap<>();
 
@@ -53,7 +54,7 @@ public class ObjParser
                         triangles.add(data);
                     }
                     for (String[] face: triangles) {
-                        object3D.mesh.add(generateFace(face, mtl, vertices, textureVertices));
+                        mesh.faces.add(generateFace(face, mtl, vertices, textureVertices));
                     }
                 }
                 else if (Objects.equals(data[0],"usemtl")) {
@@ -63,14 +64,14 @@ public class ObjParser
                     mtlLib = readMTLlib(folderPath, recombineString(data));
                 }
             }
-            object3D.points = vertices.toArray(new Vector3D[0]);
+            mesh.points = vertices.toArray(new Vector3D[0]);
         }
         catch (IOException e)
         {
             System.err.println("Error reading obj file: " + e.getMessage());
             return null;
         }
-        return object3D;
+        return mesh;
     }
 
     private Vector3D generateVertex(String[] data) {

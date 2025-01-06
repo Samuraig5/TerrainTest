@@ -1,7 +1,6 @@
 package Engine3d.Controls;
 
-import Engine3d.Gravitational;
-import Engine3d.Math.Vector.Vector;
+import Engine3d.Physics.Gravitational;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rotatable;

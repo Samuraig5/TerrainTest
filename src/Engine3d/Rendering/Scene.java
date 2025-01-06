@@ -1,14 +1,15 @@
 package Engine3d.Rendering;
 
-import Engine3d.Gravitational;
+import Engine3d.Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
+import Engine3d.Physics.Object3D;
 import Engine3d.Time.GameTimer;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
-import Engine3d.Model.Object3D;
+import Engine3d.Model.Mesh;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Scene implements Updatable
 {
-    private ObjParser objParser;
+    private final ObjParser objParser = new ObjParser();
     Camera camera;
     final SceneRenderer sceneRenderer = new SceneRenderer();
     Color backgroundColour = Color.BLACK;
@@ -33,8 +34,6 @@ public class Scene implements Updatable
         this.camera = camera;
 
         subscribeToTime(this);
-
-        objParser = new ObjParser();
 
         camera.getFrame().add(sceneRenderer);
         sceneRenderer.setActiveScene(this);
@@ -82,7 +81,7 @@ public class Scene implements Updatable
 
         for (Object3D o:objects)
         {
-            o.drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+            o.getMesh().drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
         }
     }
 
@@ -97,12 +96,13 @@ public class Scene implements Updatable
         lightSources.add(lightSource);
     }
     public Object3D loadFromFile(String folderPath, String filePath) {
-        Object3D loaded = objParser.loadFromObjFile(folderPath, filePath);
+        Object3D object3D = new Object3D();
+        Mesh loaded = objParser.loadFromObjFile(object3D, folderPath, filePath);
         if (loaded == null) {
             getSceneRenderer().logError("ObjParser coulding find file: " + folderPath + "/" + filePath);
-            loaded = new Object3D();
+            loaded = new Mesh(object3D);
         }
-        return loaded;
+        return object3D;
     }
 
     @Override

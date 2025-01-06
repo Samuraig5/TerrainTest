@@ -1,4 +1,4 @@
-package Engine3d;
+package Engine3d.Physics;
 
 import Engine3d.Time.Updatable;
 

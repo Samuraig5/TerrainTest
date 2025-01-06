@@ -3,13 +3,11 @@ package Levels;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.Controls.PlayerObject;
 import Engine3d.Lighting.CameraLight;
-import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Model.ObjParser;
-import Engine3d.Model.Object3D;
+import Engine3d.Model.Mesh;
+import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Scene;
-import Engine3d.Rendering.SceneRenderer;
 
 public class BloodGulch extends Scene
 {
@@ -50,19 +48,19 @@ public class BloodGulch extends Scene
 
         Object3D map = loadFromFile("Resources/Models/BloodGulch", "bloodgulch.obj");
         map.translate(new Vector3D(0, -90, 5));
-        map.showWireFrame(false);
+        map.getMesh().showWireFrame(false);
         addObject(map);
 
         Object3D rockGolem = loadFromFile("Resources/Models/RockGolem", "Stone.obj");
         rockGolem.translate(new Vector3D(0, 0, 7));
         rockGolem.rotate(new Vector3D(0,Math.toRadians(180),0));
-        rockGolem.showWireFrame(false);
+        rockGolem.getMesh().showWireFrame(false);
         addObject(rockGolem);
 
         Object3D rockGolem2 = loadFromFile( "Resources/Models/RockGolem", "Stone.obj");
         rockGolem2.translate(new Vector3D(-114.5, 0.7, 142));
         rockGolem2.rotate(new Vector3D(0,Math.toRadians(180),0));
-        rockGolem2.showWireFrame(false);
+        rockGolem2.getMesh().showWireFrame(false);
         addObject(rockGolem2);
 
         //Object3D axis = new Object3D();
