@@ -13,6 +13,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     private Vector3D rotation = new Vector3D();
     private final PlayerCamera camera;
     private final Vector3D cameraOffset = new Vector3D(0,1.5,0);
+    private boolean grounded = false;
     private final Vector3D momentum = new Vector3D();
 
     public PlayerObject(PlayerCamera camera)
@@ -26,8 +27,13 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     public void addMomentum(Vector3D delta) {
         momentum.translate(delta);
+        if (delta.y() > 0) {grounded = false;} //Handle falling off edges too
     }
 
+    @Override
+    public void onCollision(Vector3D appliedMove) {
+        if (appliedMove.y() > 0) { grounded = true; }
+    }
     public Vector3D getCameraOffset() {
         return cameraOffset;
     }
@@ -47,8 +53,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     @Override
     public boolean isGrounded() {
-        return true;
-        //return getPosition().y() <= 0;
+        return grounded;
     }
 
     @Override

@@ -8,10 +8,10 @@ public class DynamicAABBCollider extends AABBCollider
 {
     private double weight = 1;
 
-    public DynamicAABBCollider(Object3D object3D) {
+    public DynamicAABBCollider(DynamicAABBObject object3D) {
         super(object3D);
     }
-    public DynamicAABBCollider(Object3D object3D, Mesh colliderMesh) {
+    public DynamicAABBCollider(DynamicAABBObject object3D, Mesh colliderMesh) {
         super(object3D, colliderMesh);
     }
 

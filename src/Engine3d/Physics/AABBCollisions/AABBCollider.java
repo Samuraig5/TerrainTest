@@ -7,15 +7,15 @@ import Engine3d.Translatable;
 
 public abstract class AABBCollider implements Translatable
 {
-    private Object3D obj;
+    private AABBObject obj;
     private Mesh colliderMesh;
     //private AABB aabb;
 
-    public AABBCollider(Object3D object3D) {
+    public AABBCollider(AABBObject object3D) {
         this.obj = object3D;
         colliderMesh = object3D.getMesh();
     }
-    public AABBCollider(Object3D object3D, Mesh colliderMesh) {
+    public AABBCollider(AABBObject object3D, Mesh colliderMesh) {
         this.obj = object3D;
         this.colliderMesh = colliderMesh;
     }
@@ -33,16 +33,16 @@ public abstract class AABBCollider implements Translatable
 
         if (other.getWeight() <= 0 && getWeight() <= 0) { return false; }
 
-        if (other.getWeight() <= 0 && getWeight() > 0) { translate(move); } //Other object is immovable but this isn't
-        else if (other.getWeight() > 0 && getWeight() <= 0) { other.translate(move.inverted()); }
+        if (other.getWeight() <= 0 && getWeight() > 0) { translate(move); obj.onCollision(move);} //Other object is immovable but this isn't
+        else if (other.getWeight() > 0 && getWeight() <= 0) { other.translate(move.inverted()); other.obj.onCollision(move.inverted());}
         else {
             double weightFactor = getWeight() / other.getWeight();
 
             Vector3D myMove = move.scaled(1/weightFactor);
             Vector3D otherMove = move.scaled(weightFactor);
 
-            translate(myMove);
-            other.translate(otherMove.inverted());
+            translate(myMove); obj.onCollision(myMove);
+            other.translate(otherMove.inverted()); other.obj.onCollision(otherMove.inverted());
         }
 
         return true;

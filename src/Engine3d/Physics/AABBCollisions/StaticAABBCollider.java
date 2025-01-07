@@ -5,11 +5,11 @@ import Engine3d.Physics.Object3D;
 
 public class StaticAABBCollider extends AABBCollider
 {
-    public StaticAABBCollider(Object3D object3D) {
+    public StaticAABBCollider(StaticAABBObject object3D) {
         super(object3D);
     }
 
-    public StaticAABBCollider(Object3D object3D, Mesh colliderMesh) {
+    public StaticAABBCollider(StaticAABBObject object3D, Mesh colliderMesh) {
         super(object3D, colliderMesh);
     }
 
