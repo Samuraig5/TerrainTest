@@ -1,7 +1,8 @@
 package Engine3d.Rendering;
 
 import Engine3d.Controls.PlayerObject;
-import Engine3d.Physics.CollidableObject;
+import Engine3d.Physics.AABBCollisions.DynamicAABBObject;
+import Engine3d.Physics.AABBCollisions.StaticAABBObject;
 import Engine3d.Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Matrix4x4;
@@ -31,10 +32,10 @@ public class Scene implements Updatable
     List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 2d;
     protected List<Gravitational> gravitationals = new ArrayList<>();
-    protected List<CollidableObject> collidables = new ArrayList<>();
+    protected List<DynamicAABBObject> dynamicAABBObjects = new ArrayList<>();
+    protected List<StaticAABBObject> staticAABBObjects = new ArrayList<>();
 
-    public Scene(Camera camera) {
-        this.camera = camera;
+    public Scene(Camera camera) {        this.camera = camera;
         if (camera instanceof PlayerCamera) {
             new PlayerObject((PlayerCamera) camera);
         }
@@ -59,9 +60,13 @@ public class Scene implements Updatable
         {
             gravitationals.add((Gravitational) object);
         }
-        if (object instanceof CollidableObject)
+        if (object instanceof DynamicAABBObject)
         {
-            collidables.add((CollidableObject) object);
+            dynamicAABBObjects.add((DynamicAABBObject) object);
+        }
+        else if (object instanceof StaticAABBObject)
+        {
+            staticAABBObjects.add((StaticAABBObject) object);
         }
     }
 
@@ -69,15 +74,12 @@ public class Scene implements Updatable
     public void buildScreenBuffer()
     {
         camera.getScreenBuffer().clear(backgroundColour);
-        objects.sort(new Comparator<Object3D>() {
-            @Override
-            public int compare(Object3D o1, Object3D o2) {
-                // Calculate distances to the camera
-                double distance1 = o1.getPosition().distanceTo(camera.getPosition());
-                double distance2 = o2.getPosition().distanceTo(camera.getPosition());
-                // Sort objects by distance (closer first)
-                return Double.compare(distance1, distance2);
-            }
+        objects.sort((o1, o2) -> {
+            // Calculate distances to the camera
+            double distance1 = o1.getPosition().distanceTo(camera.getPosition());
+            double distance2 = o2.getPosition().distanceTo(camera.getPosition());
+            // Sort objects by distance (closer first)
+            return Double.compare(distance1, distance2);
         });
 
         //These values are purely based off the camera.
@@ -104,6 +106,7 @@ public class Scene implements Updatable
 
     public void addTimeMeasurer(TimeMeasurer tm) {
         this.timeMeasurer = tm;
+         sceneTimer.addTimeMeasurer(tm);
     }
     public void addLight(LightSource lightSource) {
         lightSources.add(lightSource);
@@ -120,15 +123,25 @@ public class Scene implements Updatable
 
     @Override
     public void update(double deltaTime) {
+        timeMeasurer.startMeasurement("applyGravity");
         for (Gravitational grav : gravitationals) {
             grav.applyGravity(gravity, deltaTime);
         }
-        for (int i = 0; i < collidables.size()-1; i++) {
-            for (int j = i+1; j < collidables.size(); j++) {
-                collidables.get(i).
+        timeMeasurer.pauseAndEndMeasurement("applyGravity");
+
+        timeMeasurer.startMeasurement("handleCollision");
+        for (int i = 0; i < dynamicAABBObjects.size(); i++) {
+            for (int j = 0; j < staticAABBObjects.size(); j++) {
+                dynamicAABBObjects.get(i).
                         getAABBCollider().handleCollision(
-                                collidables.get(j).getAABBCollider());
+                                staticAABBObjects.get(j).getAABBCollider());
+            }
+            for (int j = i+1; j < dynamicAABBObjects.size(); j++) {
+                dynamicAABBObjects.get(i).
+                        getAABBCollider().handleCollision(
+                                dynamicAABBObjects.get(j).getAABBCollider());
             }
         }
+        timeMeasurer.pauseAndEndMeasurement("handleCollision");
     }
 }

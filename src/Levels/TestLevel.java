@@ -6,7 +6,7 @@ import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
-import Engine3d.Physics.*;
+import Engine3d.Physics.AABBCollisions.StaticAABBObject;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
@@ -45,15 +45,15 @@ public class TestLevel extends Scene
             double roomSize = 50;
             double wallHeight = 20;
 
-            AABBObject ground = spawnWall(rock, new Vector3D(roomSize,1,roomSize));
+            StaticAABBObject ground = spawnWall(rock, new Vector3D(roomSize,1,roomSize));
 
-            AABBObject wall1 = spawnWall(rock, new Vector3D(roomSize,wallHeight,1));
+            StaticAABBObject wall1 = spawnWall(rock, new Vector3D(roomSize,wallHeight,1));
             wall1.translate(Vector3D.FORWARD().scaled(roomSize/2));
-            AABBObject wall2 = spawnWall(rock, new Vector3D(roomSize,wallHeight,1));
+            StaticAABBObject wall2 = spawnWall(rock, new Vector3D(roomSize,wallHeight,1));
             wall2.translate(Vector3D.BACK().scaled(roomSize/2));
-            AABBObject wall3 = spawnWall(rock, new Vector3D(1,wallHeight,roomSize));
+            StaticAABBObject wall3 = spawnWall(rock, new Vector3D(1,wallHeight,roomSize));
             wall3.translate(Vector3D.RIGHT().scaled(roomSize/2));
-            AABBObject wall4 = spawnWall(rock, new Vector3D(1,wallHeight,roomSize));
+            StaticAABBObject wall4 = spawnWall(rock, new Vector3D(1,wallHeight,roomSize));
             wall4.translate(Vector3D.LEFT().scaled(roomSize/2));
         }
         catch (IOException e1) {
@@ -61,15 +61,14 @@ public class TestLevel extends Scene
         }
     }
 
-    private AABBObject spawnWall(BufferedImage sprite, Vector3D size) {
-        AABBObject wall = new AABBObject();
+    private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {
+        StaticAABBObject wall = new StaticAABBObject();
         BoxMesh boxMesh = new BoxMesh(wall, size);
         boxMesh.setTexture(sprite);
         boxMesh.setDiffuseColour(Color.white);
         boxMesh.showWireFrame(false);
         boxMesh.centreToMiddleBottom();
         addObject(wall);
-        wall.getAABBCollider().setWeight(-1);
         return wall;
     }
 }

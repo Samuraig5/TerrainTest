@@ -39,6 +39,7 @@ public class ScreenBuffer
 
     public boolean pixelOnTop(int x, int y, double depth) {
         if (!inBounds(x,y)) {return false;}
+        //TODO: If the window size is changed between these two lines we get an array out of bounds exception!
         return (depth > depthBuffer[x][y]);
     }
     public void updateDepth(int x, int y, double depth) {

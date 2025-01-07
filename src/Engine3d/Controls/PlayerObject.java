@@ -1,16 +1,13 @@
 package Engine3d.Controls;
 
-import Engine3d.Math.Box;
 import Engine3d.Math.Matrix4x4;
-import Engine3d.Model.Mesh;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
-import Engine3d.Physics.AABBObject;
+import Engine3d.Physics.AABBCollisions.DynamicAABBObject;
 import Engine3d.Physics.Gravitational;
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.PlayerCamera;
 
-public class PlayerObject extends AABBObject implements Gravitational
+public class PlayerObject extends DynamicAABBObject implements Gravitational
 {
     private Vector3D position = new Vector3D();
     private Vector3D rotation = new Vector3D();

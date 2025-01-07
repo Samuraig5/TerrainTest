@@ -1,4 +1,4 @@
-package Engine3d.Physics;
+package Engine3d.Physics.AABBCollisions;
 
 import Engine3d.Math.Box;
 import Engine3d.Math.Vector.Vector3D;

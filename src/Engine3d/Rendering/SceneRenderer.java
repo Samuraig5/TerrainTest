@@ -61,8 +61,9 @@ public class SceneRenderer extends JPanel
         activeScene.getCamera().drawScreenBuffer(g);
         timeMeasurer.pauseAndEndMeasurement("drawScreenBuffer");
 
-        int screenWidth = (int) activeScene.camera.getScreenDimensions().x() - 20;
 
+        g.setColor(Color.white);
+        int screenWidth = (int) activeScene.camera.getScreenDimensions().x() - 20;
         String s = "Cam Pos: " + activeScene.camera.getPosition().toStringRounded();
         int sWidth = g.getFontMetrics().stringWidth(s);
         g.drawString(s,screenWidth-sWidth,20 );
@@ -81,6 +82,12 @@ public class SceneRenderer extends JPanel
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", buildScreenBuffer), 30, 120);
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", buildScreenBuffer),30, 140);
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", buildScreenBuffer),30, 160);
+
+        long updateTime = timeMeasurer.getMeasurement("update");
+        g.drawString(timeMeasurer.getMsPrintOut("frameTime", frameTime), 20, 190);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("applyGravity", updateTime), 30, 210);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("handleCollision", updateTime), 30, 230);
+
 
         g.setColor(Color.red);
 

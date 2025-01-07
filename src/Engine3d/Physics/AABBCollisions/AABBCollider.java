@@ -1,12 +1,12 @@
-package Engine3d.Physics;
+package Engine3d.Physics.AABBCollisions;
 
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
+import Engine3d.Physics.Object3D;
 import Engine3d.Translatable;
 
-public class AABBCollider implements Translatable
+public abstract class AABBCollider implements Translatable
 {
-    private double weight = 1;
     private Object3D obj;
     private Mesh colliderMesh;
     //private AABB aabb;
@@ -48,13 +48,9 @@ public class AABBCollider implements Translatable
         return true;
     }
 
-    public double getWeight() {
-        return weight;
-    }
+    abstract public double getWeight();
 
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
+    abstract public void setWeight(double weight);
 
     @Override
     public void translate(Vector3D delta) {
