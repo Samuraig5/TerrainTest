@@ -33,19 +33,23 @@ public class AABB extends Box
         double overlapY = totalY - projYLen;
         double overlapZ = totalZ - projZLen;
 
-        Vector3D separatingVector;
-
         if (overlapX <= overlapY && overlapX <= projZLen) {
             // X-axis has the smallest overlap
-            separatingVector = new Vector3D(overlapX < 0 ? -overlapX : overlapX, 0, 0);
-        } else if (overlapY <= overlapX && overlapY <= projZLen) {
-            // Y-axis has the smallest overlap
-            separatingVector = new Vector3D(0, overlapY < 0 ? -overlapY : overlapY, 0);
-        } else {
-            // Z-axis has the smallest overlap
-            separatingVector = new Vector3D(0, 0, overlapZ < 0 ? -projZLen : projZLen);
+            Vector3D deltaX = new Vector3D(1, 0, 0);
+            if (max().x() < other.max().x()) { deltaX.invert();}
+            return deltaX.scaled(overlapX);
         }
-
-        return separatingVector;
+        else if (overlapY <= overlapX && overlapY <= projZLen) {
+            // Y-axis has the smallest overlap
+            Vector3D deltaY = new Vector3D(0, 1, 0);
+            if (max().y() < other.max().y()) { deltaY.invert();}
+            return deltaY.scaled(overlapY);
+        }
+        else {
+            // Z-axis has the smallest overlap
+            Vector3D deltaZ = new Vector3D(0, 0, 1);
+            if (max().z() < other.max().z()) { deltaZ.invert();}
+            return deltaZ.scaled(overlapZ);
+        }
     }
 }
