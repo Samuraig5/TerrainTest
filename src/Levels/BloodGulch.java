@@ -75,6 +75,6 @@ public class BloodGulch extends Scene
         addObject(playerObject);
 
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
-        subscribeToTime(cameraController);
+        addUpdatable(cameraController);
     }
 }

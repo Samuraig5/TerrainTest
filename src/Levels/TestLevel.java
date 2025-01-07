@@ -36,7 +36,7 @@ public class TestLevel extends Scene
         addObject(playerObject);
 
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
-        subscribeToTime(cameraController);
+        addUpdatable(cameraController);
 
         String filepath = "Resources/Textures/Rock.png";
         try {

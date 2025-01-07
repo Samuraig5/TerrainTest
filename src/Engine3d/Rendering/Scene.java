@@ -9,14 +9,12 @@ import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
 import Engine3d.Physics.Object3D;
-import Engine3d.Time.GameTimer;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -26,21 +24,20 @@ public class Scene implements Updatable
     Camera camera;
     final SceneRenderer sceneRenderer = new SceneRenderer();
     protected Color backgroundColour = Color.BLACK;
-    final GameTimer sceneTimer = new GameTimer();
     private TimeMeasurer timeMeasurer;
     List<Object3D> objects = new CopyOnWriteArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 2d;
+    protected List<Updatable> updatables = new ArrayList<>();
     protected List<Gravitational> gravitationals = new ArrayList<>();
     protected List<DynamicAABBObject> dynamicAABBObjects = new ArrayList<>();
     protected List<StaticAABBObject> staticAABBObjects = new ArrayList<>();
 
-    public Scene(Camera camera) {        this.camera = camera;
+    public Scene(Camera camera) {
+        this.camera = camera;
         if (camera instanceof PlayerCamera) {
             new PlayerObject((PlayerCamera) camera);
         }
-
-        subscribeToTime(this);
 
         camera.getFrame().add(sceneRenderer);
         sceneRenderer.setActiveScene(this);
@@ -54,7 +51,7 @@ public class Scene implements Updatable
         objects.add(object);
         if (object instanceof Updatable)
         {
-            subscribeToTime((Updatable) object);
+            addUpdatable((Updatable) object);
         }
         if (object instanceof Gravitational)
         {
@@ -68,6 +65,10 @@ public class Scene implements Updatable
         {
             staticAABBObjects.add((StaticAABBObject) object);
         }
+    }
+
+    public void addUpdatable(Updatable updatable) {
+        updatables.add(updatable);
     }
 
 
@@ -102,11 +103,8 @@ public class Scene implements Updatable
 
     public Camera getCamera() {return camera;}
 
-    public void subscribeToTime (Updatable updatable) {sceneTimer.subscribe(updatable);}
-
     public void addTimeMeasurer(TimeMeasurer tm) {
         this.timeMeasurer = tm;
-         sceneTimer.addTimeMeasurer(tm);
     }
     public void addLight(LightSource lightSource) {
         lightSources.add(lightSource);
@@ -123,6 +121,10 @@ public class Scene implements Updatable
 
     @Override
     public void update(double deltaTime) {
+        for (Updatable updatable : updatables) {
+            updatable.update(deltaTime);
+        }
+
         timeMeasurer.startMeasurement("applyGravity");
         for (Gravitational grav : gravitationals) {
             grav.applyGravity(gravity, deltaTime);

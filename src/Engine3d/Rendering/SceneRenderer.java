@@ -10,7 +10,11 @@ import java.util.List;
 
 public class SceneRenderer extends JPanel
 {
-    private Thread buildThread;
+    private Thread updateThread;
+    private Thread bufferThread;
+    private volatile boolean running = true; // For controlled thread shutdown
+    private long lastTime;
+
     private Scene activeScene;
     private TimeMeasurer timeMeasurer;
     Vector3D errorMessagePos;
@@ -28,20 +32,20 @@ public class SceneRenderer extends JPanel
 
         this.activeScene = activeScene;
         activeScene.addTimeMeasurer(timeMeasurer);
-        startBuildThread();
 
         errorMessagePos = new Vector3D(20, activeScene.camera.getScreenDimensions().y()/2,0);
 
+        startBuildThread();
+        startUpdateThread();
+
         repaint();
-        revalidate();
+        //revalidate();
     }
 
     @Override
     protected void paintComponent(Graphics g)
     {
         super.paintComponent(g);
-        repaint();
-        revalidate();
 
         if (activeScene != null) {
             paintActiveScene(g);
@@ -49,18 +53,17 @@ public class SceneRenderer extends JPanel
         else {
             System.err.println("Engine3d.Rendering.SceneRenderer: No scene is loaded!");
         }
+        repaint();
     }
 
     private void paintActiveScene(Graphics g)
     {
         timeMeasurer.pauseAndEndMeasurement("frameTime");
+        timeMeasurer.addCycle("frameTime");
         long frameTime = timeMeasurer.getMeasurement("frameTime");
         timeMeasurer.startMeasurement("frameTime");
 
-        timeMeasurer.startMeasurement("drawScreenBuffer");
-        activeScene.getCamera().drawScreenBuffer(g);
-        timeMeasurer.pauseAndEndMeasurement("drawScreenBuffer");
-
+        activeScene.getCamera().drawScreenBuffer(g); //This is the only non-UI call :helenaPepe:
 
         g.setColor(Color.white);
         int screenWidth = (int) activeScene.camera.getScreenDimensions().x() - 20;
@@ -72,21 +75,22 @@ public class SceneRenderer extends JPanel
         sWidth = g.getFontMetrics().stringWidth(s);
         g.drawString(s,screenWidth-sWidth,40 );
 
-        g.drawString("FPS: " + timeMeasurer.getFPS(), 20, 20);
-        //g.drawString(timeMeasurer.getSelfMeasurement(), 20, 40);
+        g.drawString("FPS: " + timeMeasurer.getCyclesPerSecond("frameTime"), 20, 20);
         g.drawString(timeMeasurer.getMsPrintOut("frameTime", frameTime), 20, 40);
-        g.drawString(timeMeasurer.getMsPrintOut("drawScreenBuffer", frameTime), 20, 60);
-        g.drawString(timeMeasurer.getMsPrintOut("buildScreenBuffer"), 20, 80);
-        long buildScreenBuffer = timeMeasurer.getMeasurement("buildScreenBuffer");
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", buildScreenBuffer), 30, 100);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", buildScreenBuffer), 30, 120);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", buildScreenBuffer),30, 140);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", buildScreenBuffer),30, 160);
 
+        g.drawString("Buffers/s: " + timeMeasurer.getCyclesPerSecond("buildScreenBuffer"), 20, 70);
+        g.drawString(timeMeasurer.getMsPrintOut("buildScreenBuffer"), 20, 90);
+        long buildScreenBuffer = timeMeasurer.getMeasurement("buildScreenBuffer");
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", buildScreenBuffer), 30, 110);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", buildScreenBuffer), 30, 130);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", buildScreenBuffer),30, 150);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", buildScreenBuffer),30, 170);
+
+        g.drawString("Updates/s: " + timeMeasurer.getCyclesPerSecond("update"), 20, 200);
         long updateTime = timeMeasurer.getMeasurement("update");
-        g.drawString(timeMeasurer.getMsPrintOut("frameTime", frameTime), 20, 190);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("applyGravity", updateTime), 30, 210);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("handleCollision", updateTime), 30, 230);
+        g.drawString(timeMeasurer.getMsPrintOut("updateTime", updateTime), 20, 220);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("applyGravity", updateTime), 30, 240);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("handleCollision", updateTime), 30, 260);
 
 
         g.setColor(Color.red);
@@ -102,17 +106,31 @@ public class SceneRenderer extends JPanel
         errors.add(message);
     }
 
+    private double deltaTime()
+    {
+        long currentTime = System.nanoTime();
+        long deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+        return nanoToSec(deltaTime);
+    }
+
+    private double nanoToSec(long ns)
+    {
+        return (double) ns / 1_000_000_000;
+    }
+
     private void startBuildThread() {
-        if (buildThread != null && buildThread.isAlive()) {
-            buildThread.interrupt(); // Stop the current thread
+        if (bufferThread != null && bufferThread.isAlive()) {
+            bufferThread.interrupt(); // Stop the current thread
         }
 
-        buildThread = new Thread(() -> {
+        bufferThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 if (activeScene != null) {
                     timeMeasurer.startMeasurement("buildScreenBuffer");
                     activeScene.buildScreenBuffer();
                     timeMeasurer.pauseAndEndMeasurement("buildScreenBuffer");
+                    timeMeasurer.addCycle("buildScreenBuffer");
 
                     synchronized (activeScene.getCamera()) {
                         activeScene.getCamera().swapBuffers();
@@ -127,6 +145,38 @@ public class SceneRenderer extends JPanel
             }
         });
 
-        buildThread.start();
+        bufferThread.start();
+    }
+
+    private void startUpdateThread() {
+        if (updateThread != null && updateThread.isAlive()) {
+            updateThread.interrupt();
+        }
+
+        updateThread = new Thread(() -> {
+            while (running) {
+                if (activeScene != null) {
+                    timeMeasurer.startMeasurement("update");
+                    activeScene.update(deltaTime()); // Update game logic
+                    timeMeasurer.pauseAndEndMeasurement("update");
+                    timeMeasurer.addCycle("update");
+                }
+
+                try {
+                    Thread.sleep(16); // ~60 FPS logic updates
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+
+        updateThread.start();
+    }
+
+    public void stopThreads() {
+        running = false;
+
+        if (bufferThread != null) bufferThread.interrupt();
+        if (updateThread != null) updateThread.interrupt();
     }
 }

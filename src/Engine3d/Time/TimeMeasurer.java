@@ -10,20 +10,30 @@ public class TimeMeasurer {
     private final AtomicInteger frameCount = new AtomicInteger(0);
     private final AtomicInteger fps = new AtomicInteger(0);
 
+    private final ConcurrentHashMap<String, AtomicLong> perSecondMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, AtomicLong> cycleCount = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, AtomicLong> timeOfLastCycle = new ConcurrentHashMap<>();
+
+
     private final ConcurrentHashMap<String, AtomicBoolean> newMeasurementMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, AtomicLong> measurementMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, AtomicLong> startTimeMap = new ConcurrentHashMap<>();
 
-    public double getFPS() {
+    public void addCycle(String key) {
         long currentTime = System.nanoTime();
-        frameCount.incrementAndGet();
+        cycleCount.putIfAbsent(key, new AtomicLong());
+        timeOfLastCycle.putIfAbsent(key, new AtomicLong(currentTime));
+        perSecondMap.putIfAbsent(key, new AtomicLong());
 
-        if (currentTime - timeOfLastFrame.get() >= 1_000_000_000L) { // 1 second
-            fps.set(frameCount.getAndSet(0));
-            timeOfLastFrame.set(currentTime);
+        cycleCount.get(key).incrementAndGet();
+
+        if (currentTime - timeOfLastCycle.get(key).get() >= 1_000_000_000L) { // 1 second
+            perSecondMap.get(key).set(cycleCount.get(key).getAndSet(0));
+            timeOfLastCycle.get(key).set(currentTime);
         }
-
-        return fps.get();
+    }
+    public double getCyclesPerSecond(String key) {
+        return perSecondMap.get(key).get();
     }
 
     public void clearMeasurements() {
