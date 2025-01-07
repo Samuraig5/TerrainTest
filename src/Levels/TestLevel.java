@@ -6,10 +6,7 @@ import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
-import Engine3d.Physics.AABBCollider;
-import Engine3d.Physics.AABBObject;
-import Engine3d.Physics.CollidableObject;
-import Engine3d.Physics.Object3D;
+import Engine3d.Physics.*;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
@@ -35,7 +32,7 @@ public class TestLevel extends Scene
 
 
         PlayerObject playerObject = new PlayerObject((PlayerCamera) camera);
-        playerObject.translate(new Vector3D(0,25,0));
+        playerObject.translate(new Vector3D(0,10,0));
         addObject(playerObject);
 
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
@@ -45,18 +42,34 @@ public class TestLevel extends Scene
         try {
             BufferedImage rock = ImageIO.read(new File(filepath));
 
-            AABBObject ground = new AABBObject();
-            BoxMesh boxMesh = new BoxMesh(ground, new Vector3D(25,5,25));
-            boxMesh.translate(new Vector3D(0,-5,0));
-            boxMesh.setTexture(rock);
-            boxMesh.setDiffuseColour(Color.white);
-            boxMesh.showWireFrame(false);
-            boxMesh.centreOn(new Vector3D(0,0,0));
-            addObject(ground);
-            ground.getAABBCollider().setWeight(-1);
+            double roomSize = 50;
+            double wallHeight = 20;
+
+            AABBObject ground = spawnWall(rock, new Vector3D(roomSize,1,roomSize));
+
+            AABBObject wall1 = spawnWall(rock, new Vector3D(roomSize,wallHeight,1));
+            wall1.translate(Vector3D.FORWARD().scaled(roomSize/2));
+            AABBObject wall2 = spawnWall(rock, new Vector3D(roomSize,wallHeight,1));
+            wall2.translate(Vector3D.BACK().scaled(roomSize/2));
+            AABBObject wall3 = spawnWall(rock, new Vector3D(1,wallHeight,roomSize));
+            wall3.translate(Vector3D.RIGHT().scaled(roomSize/2));
+            AABBObject wall4 = spawnWall(rock, new Vector3D(1,wallHeight,roomSize));
+            wall4.translate(Vector3D.LEFT().scaled(roomSize/2));
         }
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file " + filepath);
         }
+    }
+
+    private AABBObject spawnWall(BufferedImage sprite, Vector3D size) {
+        AABBObject wall = new AABBObject();
+        BoxMesh boxMesh = new BoxMesh(wall, size);
+        boxMesh.setTexture(sprite);
+        boxMesh.setDiffuseColour(Color.white);
+        boxMesh.showWireFrame(false);
+        boxMesh.centreToMiddleBottom();
+        addObject(wall);
+        wall.getAABBCollider().setWeight(-1);
+        return wall;
     }
 }

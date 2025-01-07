@@ -109,4 +109,9 @@ public class BoxMesh extends Mesh
         translate(meshOffset.inverted());
         translate(newOffset);
     }
+
+    public void centreToMiddleBottom() {
+        centreOn(new Vector3D());
+        translate(new Vector3D(0, -meshOffset.y(), 0));
+    }
 }

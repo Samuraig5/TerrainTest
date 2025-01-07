@@ -31,6 +31,8 @@ public class AABBCollider implements Translatable
         Vector3D move = getAABB().collision(other.getAABB());
         if (move.isEmpty()) {return false;}
 
+        if (other.getWeight() <= 0 && getWeight() <= 0) { return false; }
+
         if (other.getWeight() <= 0 && getWeight() > 0) { translate(move); } //Other object is immovable but this isn't
         else if (other.getWeight() > 0 && getWeight() <= 0) { other.translate(move.inverted()); }
         else {
