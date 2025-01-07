@@ -1,25 +1,26 @@
 package Engine3d.Controls;
 
 import Engine3d.Math.Matrix4x4;
+import Engine3d.Math.Ray;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Physics.AABBCollisions.DynamicAABBObject;
 import Engine3d.Physics.Gravitational;
 import Engine3d.Math.Vector.Vector3D;
+import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.PlayerCamera;
+import Engine3d.Rendering.Scene;
 
 public class PlayerObject extends DynamicAABBObject implements Gravitational
 {
     private Vector3D position = new Vector3D();
     private Vector3D rotation = new Vector3D();
-    private final PlayerCamera camera;
     private final Vector3D cameraOffset = new Vector3D(0,1.5,0);
-    private boolean grounded = false;
     private final Vector3D momentum = new Vector3D();
 
-    public PlayerObject(PlayerCamera camera)
+    public PlayerObject(Scene scene, PlayerCamera camera)
     {
-        this.camera = camera;
-        camera.setPlayerObject(this );
+        super(scene);
+        camera.setPlayerObject(this);
         BoxMesh playerMesh = new BoxMesh(this, new Vector3D(1,1.8,1));
         playerMesh.centreOn(new Vector3D(0,0,0));
         setMesh(playerMesh);
@@ -27,12 +28,11 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     public void addMomentum(Vector3D delta) {
         momentum.translate(delta);
-        if (delta.y() > 0) {grounded = false;} //Handle falling off edges too
     }
 
     @Override
     public void onCollision(Vector3D appliedMove) {
-        if (appliedMove.y() > 0) { grounded = true; }
+
     }
     public Vector3D getCameraOffset() {
         return cameraOffset;
@@ -53,7 +53,10 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     @Override
     public boolean isGrounded() {
-        return grounded;
+        Ray ray = new Ray(this, getPosition(), Vector3D.DOWN().scaled(0.5));
+        ray.advance();
+        boolean res = getScene().checkForCollision(3, ray);
+        return res;
     }
 
     @Override

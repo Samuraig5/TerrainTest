@@ -4,16 +4,20 @@ import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
+import Engine3d.Rendering.Scene;
 import Engine3d.Rotatable;
 import Engine3d.Translatable;
 
 public class Object3D implements Translatable, Rotatable
 {
+    private Scene scene;
     private Mesh mesh;
     protected Vector3D rotation = new Vector3D();
     protected Vector3D position = new Vector3D();
 
-    public Object3D() {
+    public Object3D(Scene scene) {
+        this.scene = scene;
+        scene.addObject(this);
         setUpDebugging();
     }
 
@@ -48,6 +52,8 @@ public class Object3D implements Translatable, Rotatable
     public Vector3D getPosition() {
         return position;
     }
+
+    public Scene getScene() {return scene;}
 
     // === DEBUGGING ===
 

@@ -1,6 +1,7 @@
 package Engine3d.Physics.AABBCollisions;
 
 import Engine3d.Math.Box;
+import Engine3d.Math.Ray;
 import Engine3d.Math.Vector.Vector3D;
 
 public class AABB extends Box
@@ -10,7 +11,6 @@ public class AABB extends Box
     }
 
     public Vector3D collision(AABB other) {
-
         double totalX = (max().x() - min().x()) + (other.max().x() - other.min().x());
         double projXLen = Math.max(
                 max().x() - other.min().x(),
@@ -51,5 +51,9 @@ public class AABB extends Box
             if (max().z() < other.max().z()) { deltaZ.invert();}
             return deltaZ.scaled(overlapZ);
         }
+    }
+
+    public boolean collision(Ray ray) {
+        return contains(ray.getOrigin());
     }
 }

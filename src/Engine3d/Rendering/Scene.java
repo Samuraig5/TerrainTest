@@ -1,6 +1,8 @@
 package Engine3d.Rendering;
 
 import Engine3d.Controls.PlayerObject;
+import Engine3d.Math.Ray;
+import Engine3d.Physics.AABBCollisions.AABBObject;
 import Engine3d.Physics.AABBCollisions.DynamicAABBObject;
 import Engine3d.Physics.AABBCollisions.StaticAABBObject;
 import Engine3d.Physics.Gravitational;
@@ -28,17 +30,18 @@ public class Scene implements Updatable
     private TimeMeasurer timeMeasurer;
     List<Object3D> objects = new CopyOnWriteArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
-    private double gravity = 2d;
+    private double gravity = 1d;
     protected List<Updatable> updatables = new ArrayList<>();
     protected List<Gravitational> gravitationals = new ArrayList<>();
+    protected List<AABBObject> AABBObjects = new ArrayList<>();
     protected List<DynamicAABBObject> dynamicAABBObjects = new ArrayList<>();
     protected List<StaticAABBObject> staticAABBObjects = new ArrayList<>();
 
     public Scene(Camera camera) {
         this.camera = camera;
-        if (camera instanceof PlayerCamera) {
-            new PlayerObject((PlayerCamera) camera);
-        }
+        //if (camera instanceof PlayerCamera) {
+        //    new PlayerObject(this, (PlayerCamera) camera);
+        //}
 
         camera.getFrame().add(sceneRenderer);
         sceneRenderer.setActiveScene(this);
@@ -58,13 +61,18 @@ public class Scene implements Updatable
         {
             gravitationals.add((Gravitational) object);
         }
-        if (object instanceof DynamicAABBObject)
+        if (object instanceof AABBObject)
         {
-            dynamicAABBObjects.add((DynamicAABBObject) object);
-        }
-        else if (object instanceof StaticAABBObject)
-        {
-            staticAABBObjects.add((StaticAABBObject) object);
+            AABBObjects.add((AABBObject) object);
+
+            if (object instanceof DynamicAABBObject)
+            {
+                dynamicAABBObjects.add((DynamicAABBObject) object);
+            }
+            else if (object instanceof StaticAABBObject)
+            {
+                staticAABBObjects.add((StaticAABBObject) object);
+            }
         }
     }
 
@@ -110,8 +118,12 @@ public class Scene implements Updatable
     public void addLight(LightSource lightSource) {
         lightSources.add(lightSource);
     }
+
+    public void setGravity(double grav) {
+        gravity = grav;
+    }
     public Object3D loadFromFile(String folderPath, String filePath) {
-        Object3D object3D = new Object3D();
+        Object3D object3D = new Object3D(this);
         Mesh loaded = objParser.loadFromObjFile(object3D, folderPath, filePath);
         if (loaded == null) {
             getSceneRenderer().logError("ObjParser coulding find file: " + folderPath + "/" + filePath);
@@ -146,5 +158,19 @@ public class Scene implements Updatable
             }
         }
         timeMeasurer.pauseAndEndMeasurement("handleCollision");
+    }
+
+    public boolean checkForCollision(int numSteps, Ray ray) {
+        for (int i = 0; i < numSteps; i++) {
+            for (int j = 0; j < AABBObjects.size(); j++) {
+                AABBObject obj = AABBObjects.get(j);
+                if (obj == ray.getSource()) { continue; }
+                if (obj.getAABBCollider().getAABB().collision(ray)) {
+                    return true;
+                }
+            }
+            ray.advance();
+        }
+        return false;
     }
 }

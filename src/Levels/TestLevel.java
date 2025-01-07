@@ -26,15 +26,15 @@ public class TestLevel extends Scene
 
         backgroundColour = new Color(0, 128, 134);
 
+
         LightSource sun = new LightSource(this);
         sun.setRotation(new Vector3D(Math.toRadians(90),0,0));
         sun.setLightIntensity(1);
 
         new HeadLight(camera, this);
 
-        PlayerObject playerObject = new PlayerObject((PlayerCamera) camera);
+        PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
         playerObject.translate(new Vector3D(0,10,0));
-        addObject(playerObject);
 
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
         addUpdatable(cameraController);
@@ -44,9 +44,9 @@ public class TestLevel extends Scene
             BufferedImage rock = ImageIO.read(new File(filepath));
 
             double roomSize = 50;
-            double wallHeight = 20;
+            double wallHeight = 10;
 
-            StaticAABBObject ground = spawnWall(rock, new Vector3D(roomSize,1,roomSize));
+            StaticAABBObject ground = spawnWall(rock, new Vector3D(roomSize*2,1,roomSize*2));
 
             StaticAABBObject wall1 = spawnWall(rock, new Vector3D(roomSize,wallHeight,1));
             wall1.translate(Vector3D.FORWARD().scaled(roomSize/2));
@@ -56,6 +56,9 @@ public class TestLevel extends Scene
             wall3.translate(Vector3D.RIGHT().scaled(roomSize/2));
             StaticAABBObject wall4 = spawnWall(rock, new Vector3D(1,wallHeight,roomSize));
             wall4.translate(Vector3D.LEFT().scaled(roomSize/2));
+
+            StaticAABBObject box = spawnWall(rock, new Vector3D(5,5,5));
+            box.translate(Vector3D.UP());
         }
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file " + filepath);
@@ -63,13 +66,12 @@ public class TestLevel extends Scene
     }
 
     private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {
-        StaticAABBObject wall = new StaticAABBObject();
+        StaticAABBObject wall = new StaticAABBObject(this);
         BoxMesh boxMesh = new BoxMesh(wall, size);
         boxMesh.setTexture(sprite);
         boxMesh.setDiffuseColour(Color.white);
         boxMesh.showWireFrame(false);
         boxMesh.centreToMiddleBottom();
-        addObject(wall);
         return wall;
     }
 }

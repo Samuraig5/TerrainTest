@@ -10,7 +10,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 {
     private float stepSize = 5f;
     private float turnStep = 2f;
-    private float jumpStrength = 1f;
+    private float jumpStrength = 0.35f;
 
     private PlayerObject playerObject;
 
