@@ -9,6 +9,7 @@ import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
 import Engine3d.Physics.Object3D;
+import Engine3d.Testing.RotatingObject;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
@@ -119,7 +120,7 @@ public class Scene implements Updatable
         return object3D;
     }
 
-    @Override
+        @Override
     public void update(double deltaTime) {
         for (Updatable updatable : updatables) {
             updatable.update(deltaTime);

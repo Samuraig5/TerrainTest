@@ -7,9 +7,11 @@ import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Physics.AABBCollisions.StaticAABBObject;
+import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
+import Engine3d.Testing.RotatingObject;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -29,7 +31,6 @@ public class TestLevel extends Scene
         sun.setLightIntensity(1);
 
         new HeadLight(camera, this);
-
 
         PlayerObject playerObject = new PlayerObject((PlayerCamera) camera);
         playerObject.translate(new Vector3D(0,10,0));

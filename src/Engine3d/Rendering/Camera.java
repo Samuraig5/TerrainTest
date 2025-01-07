@@ -18,7 +18,7 @@ public abstract class Camera implements Rotatable, Translatable {
     double fov = 90;
     double zNear = 0.25d;
     double zFar = 1000;
-    public boolean debugging = true;
+    public boolean debugging = false;
 
     JFrame window;
     public Drawer drawer;
