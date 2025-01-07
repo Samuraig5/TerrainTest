@@ -165,7 +165,7 @@ public class Scene implements Updatable
             for (int j = 0; j < AABBObjects.size(); j++) {
                 AABBObject obj = AABBObjects.get(j);
                 if (obj == ray.getSource()) { continue; }
-                if (obj.getAABBCollider().getAABB().collision(ray)) {
+                if (!obj.getAABBCollider().getAABB().collision(ray).isEmpty()) {
                     return true;
                 }
             }

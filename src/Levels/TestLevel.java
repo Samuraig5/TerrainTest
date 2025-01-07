@@ -39,29 +39,36 @@ public class TestLevel extends Scene
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
         addUpdatable(cameraController);
 
-        String filepath = "Resources/Textures/Rock.png";
+        String stone = "Resources/Textures/Stone Floor.png";
+        String metal = "Resources/Textures/Metal Wall Top.png";
+        String grime = "Resources/Textures/Grime Top.png";
+
         try {
-            BufferedImage rock = ImageIO.read(new File(filepath));
+            BufferedImage stoneImg = ImageIO.read(new File(stone));
+            BufferedImage metalImg = ImageIO.read(new File(metal));
+            BufferedImage grimeImg = ImageIO.read(new File(grime));
 
             double roomSize = 50;
-            double wallHeight = 10;
+            double wallHeight = 4;
 
-            StaticAABBObject ground = spawnWall(rock, new Vector3D(roomSize*2,1,roomSize*2));
+            StaticAABBObject ground = spawnWall(stoneImg, new Vector3D(roomSize*2,1,roomSize*2));
 
-            StaticAABBObject wall1 = spawnWall(rock, new Vector3D(roomSize,wallHeight,1));
+            StaticAABBObject wall1 = spawnWall(metalImg, new Vector3D(roomSize,wallHeight,1));
             wall1.translate(Vector3D.FORWARD().scaled(roomSize/2));
-            StaticAABBObject wall2 = spawnWall(rock, new Vector3D(roomSize,wallHeight,1));
+            StaticAABBObject wall2 = spawnWall(metalImg, new Vector3D(roomSize,wallHeight,1));
             wall2.translate(Vector3D.BACK().scaled(roomSize/2));
-            StaticAABBObject wall3 = spawnWall(rock, new Vector3D(1,wallHeight,roomSize));
+            StaticAABBObject wall3 = spawnWall(metalImg, new Vector3D(1,wallHeight,roomSize));
             wall3.translate(Vector3D.RIGHT().scaled(roomSize/2));
-            StaticAABBObject wall4 = spawnWall(rock, new Vector3D(1,wallHeight,roomSize));
+            StaticAABBObject wall4 = spawnWall(metalImg, new Vector3D(1,wallHeight,roomSize));
             wall4.translate(Vector3D.LEFT().scaled(roomSize/2));
 
-            StaticAABBObject box = spawnWall(rock, new Vector3D(5,5,5));
+            StaticAABBObject box = spawnWall(grimeImg, new Vector3D(5,5,5));
             box.translate(Vector3D.UP());
+            StaticAABBObject box2 = spawnWall(metalImg, new Vector3D(7,2.5,7));
+            box2.translate(Vector3D.UP());
         }
         catch (IOException e1) {
-            getSceneRenderer().logError("Can't find file " + filepath);
+            getSceneRenderer().logError("Can't find file ");
         }
     }
 

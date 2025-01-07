@@ -2,6 +2,9 @@ package Engine3d.Math;
 
 import Engine3d.Math.Vector.Vector3D;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Box
 {
     Vector3D min;
@@ -29,5 +32,24 @@ public class Box
 
     public Vector3D getCenterPoint() {
         return (min.translated(max)).scaled(0.5f);
+    }
+
+    public List<Plane> getPlanes() {
+        List<Plane> planes = new ArrayList<>();
+
+        // Left plane
+        planes.add(new Plane(new Vector3D(min.x(), min.y(), min.z()), new Vector3D(-1, 0, 0)));
+        // Right plane
+        planes.add(new Plane(new Vector3D(max.x(), min.y(), min.z()), new Vector3D(1, 0, 0)));
+        // Bottom plane
+        planes.add(new Plane(new Vector3D(min.x(), min.y(), min.z()), new Vector3D(0, -1, 0)));
+        // Top plane
+        planes.add(new Plane(new Vector3D(min.x(), max.y(), min.z()), new Vector3D(0, 1, 0)));
+        // Front plane
+        planes.add(new Plane(new Vector3D(min.x(), min.y(), min.z()), new Vector3D(0, 0, -1)));
+        // Back plane
+        planes.add(new Plane(new Vector3D(min.x(), min.y(), max.z()), new Vector3D(0, 0, 1)));
+
+        return planes;
     }
 }

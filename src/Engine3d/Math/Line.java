@@ -11,8 +11,8 @@ public class Line
 
     public Line(Vector3D p1, Vector3D p2)
     {
-        this.p1 = p1;
-        this.p2 = p2;
+        this.p1 = new Vector3D(p1);
+        this.p2 = new Vector3D(p2);
     }
 
     public Vector3D p1() {return p1;}
@@ -36,6 +36,10 @@ public class Line
         Vector3D lineStartToEnd = p2.translated(p1.inverted());
         Vector3D lineToIntersect = lineStartToEnd.scaled(distanceToLastIntersect);
         return p1.translated(lineToIntersect);
+    }
+
+    public Vector3D getIntersectToPlane(Plane plane) {
+        return getIntersectToPlane(plane.getPosition(), plane.getNormal());
     }
 
     public double getDistanceToLastIntersect() {

@@ -327,6 +327,7 @@ public class Mesh implements Translatable, Rotatable
             if (point.x() < minX) { minX = point.x(); }
             if (point.y() < minY) { minY = point.y(); }
             if (point.z() < minZ) { minZ = point.z(); }
+
             if (point.x() > maxX) { maxX = point.x(); }
             if (point.y() > maxY) { maxY = point.y(); }
             if (point.z() > maxZ) { maxZ = point.z(); }

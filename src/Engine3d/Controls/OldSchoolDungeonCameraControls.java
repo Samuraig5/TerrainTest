@@ -9,7 +9,7 @@ import java.awt.event.KeyEvent;
 public class OldSchoolDungeonCameraControls extends Controller implements Updatable
 {
     private float stepSize = 5f;
-    private float turnStep = 2f;
+    private float turnStep = 4f;
     private float jumpStrength = 0.35f;
 
     private PlayerObject playerObject;
