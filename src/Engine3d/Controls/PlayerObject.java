@@ -6,7 +6,6 @@ import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Physics.AABBCollisions.DynamicAABBObject;
 import Engine3d.Physics.Gravitational;
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Physics.Object3D;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
 
