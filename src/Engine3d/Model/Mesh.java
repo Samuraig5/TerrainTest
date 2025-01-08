@@ -14,21 +14,23 @@ import Engine3d.Translatable;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 public class Mesh implements Translatable, Rotatable
 {
     private Object3D object3D;
-    protected Vector3D[] points;
+    protected List<Vector3D> points = new ArrayList<>();
     protected List<MeshTriangle> faces = new CopyOnWriteArrayList<>();
     protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
     protected Vector3D meshOffset = new Vector3D(0,0,0,1);
     protected boolean showWireFrame = false;
     public Mesh(Object3D object3D) {
         this.object3D = object3D;
-        object3D.setMesh(this);
+        //object3D.setMesh(this);
     }
     @Override
     public void translate(Vector3D delta) {
@@ -54,56 +56,71 @@ public class Mesh implements Translatable, Rotatable
         tm.startMeasurement("Get Matrices");
         List<MeshTriangle> trianglesToRaster = new ArrayList<>();
 
+        // Step 1: Create a copy of the points
+        Map<Vector3D, Vector3D> pointMap = new HashMap<>();
+        List<Vector3D> copiedPoints = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++) {
+            copiedPoints.add(new Vector3D(points.get(i)));
+            pointMap.put(points.get(i), copiedPoints.get(i));
+        }
+
+        List<MeshTriangle> copiedFaces = generateCopyFaces(pointMap, faces);
+
         Matrix4x4 trans = Matrix4x4.getTranslationMatrix(getPosition());
         Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(getRotation()), trans);
-        tm.pauseAndEndMeasurement("Get Matrices");
+        tm.pauseMeasurement("Get Matrices");
 
-        for (MeshTriangle tri : faces)
-        {
-            tm.startMeasurement("ObjWorldToScreen");
-            MeshTriangle triTransformed = worldTransform.multiplyWithTriangle(tri);
-            triTransformed.setMaterial(tri);
+        tm.startMeasurement("ObjWorldToScreen");
 
+        worldTransform.matrixVectorManipulation(copiedPoints);
+
+
+        for (MeshTriangle tri : copiedFaces) {
             //= Check if triangle normal is facing the camera =
-            Vector3D triNormal = triTransformed.getNormal();
-
+            Vector3D triNormal = new Vector3D();
+            try {
+                triNormal = tri.getNormal();
+            }
+            catch (NullPointerException e) {
+                //System.err.println(e.getMessage());
+                return;
+            }
             //All three points lie on the same plane, so we can choose any
-            Vector3D cameraRay = new Vector3D(triTransformed.getPoints()[0]);
+            Vector3D cameraRay = new Vector3D(tri.getPoints()[0]);
             cameraRay.translate(cameraPos.inverted());
 
             //If the camera can't see the triangle, don't draw it
-            if (triNormal.dotProduct(cameraRay) >= 0)
-            {
+            if (triNormal.dotProduct(cameraRay) >= 0) {
                 tm.pauseMeasurement("ObjWorldToScreen");
                 continue;
             }
+            tm.pauseMeasurement("ObjWorldToScreen");
 
             tm.startMeasurement("Lighting");
             for (LightSource ls : lightSources) {
-                double lightIntensity = ls.getLightIntensity(triTransformed.getMidPoint().distanceTo(ls.getPosition()));
+                double lightIntensity = ls.getLightIntensity(tri.getMidPoint().distanceTo(ls.getPosition()));
                 if (lightIntensity == 0) {continue;}
 
                 Vector3D lightDirection = ls.getDirection().normalized().inverted();
 
                 double lightDotProduct = (triNormal.dotProduct(lightDirection)*lightIntensity);
-                if (triTransformed.getMaterial().getLuminance() < lightDotProduct) {
-                    triTransformed.getMaterial().setLuminance(lightDotProduct);
+                if (tri.getMaterial().getLuminance() < lightDotProduct) {
+                    tri.getMaterial().setLuminance(lightDotProduct);
                 }
             }
-            tm.pauseAndEndMeasurement("Lighting");
+            tm.pauseMeasurement("Lighting");
+        }
 
-            //if (triTransformed.getMaterial().getLuminance() == 0) {continue;}
+        tm.startMeasurement("ObjWorldToScreen");
+        viewMatrix.matrixVectorManipulation(copiedPoints);
+        tm.pauseMeasurement("ObjWorldToScreen");
 
-            // = Convert World Space -> View Space =
-            MeshTriangle triViewed = viewMatrix.multiplyWithTriangle(triTransformed);
-            triViewed.setMaterial(triTransformed);
-            tm.pauseMeasurement("ObjWorldToScreen");
-
+        for (MeshTriangle tri : copiedFaces) {
             tm.startMeasurement("TriangleClipping");
             // = Clip Viewed Triangle =
             Vector3D planePosition = camera.getNearPlane();
             Vector3D planeNormal = new Vector3D(0,0,1);
-            List<MeshTriangle> clippedTriangles = clipTriangleAgainstPlane(planePosition, planeNormal, triViewed);
+            List<MeshTriangle> clippedTriangles = clipTriangleAgainstPlane(planePosition, planeNormal, tri);
             tm.pauseMeasurement("TriangleClipping");
 
             tm.startMeasurement("ObjWorldToScreen");
@@ -199,9 +216,6 @@ public class Mesh implements Translatable, Rotatable
                 }
             }
         }
-        tm.endMeasurement("ObjWorldToScreen");
-        tm.endMeasurement("TriangleClipping");
-        tm.endMeasurement("Texturizer");
     }
 
     private List<MeshTriangle> clipTriangleAgainstPlane(Vector3D planePosition, Vector3D planeNormal, MeshTriangle in)
@@ -313,7 +327,7 @@ public class Mesh implements Translatable, Rotatable
     }
 
     public AABB getAABB() {
-        if (points == null || points.length == 0) {
+        if (points == null || points.isEmpty()) {
             throw new IllegalStateException("Mesh contains no points");
         }
 
@@ -346,17 +360,43 @@ public class Mesh implements Translatable, Rotatable
     }
 
     public void copy(Mesh source) {
-        points = new Vector3D[source.points.length];
-        for (int i = 0; i < points.length; i++) {
-            points[i] = new Vector3D(source.points[i]);
+        points = new ArrayList<>(source.points.size());
+
+        Map<Vector3D, Vector3D> pointMap = new HashMap<>();
+
+        for (int i = 0; i < source.points.size(); i++) {
+            Vector3D newVec = new Vector3D(source.points.get(i));
+            points.add(newVec);
+            pointMap.put(source.points.get(i), newVec);
         }
 
-        for (int i = 0; i < source.faces.size(); i++) {
-            faces.add(new MeshTriangle(source.faces.get(i)));
-        }
+        faces = generateCopyFaces(pointMap, source.faces);
 
         meshOffrot = new Vector3D(source.meshOffrot);
         meshOffset = new Vector3D(source.meshOffset);
         showWireFrame = source.showWireFrame;
+    }
+
+    /**
+     * Since the faces of a mesh necessarily need to reference the points of the mesh, when the points of a mesh are changed,
+     * the faces need to be updated to use the new points.
+     * @param pointMap A HashMap that maps the old points to the new points.
+     * @param originalFaces The original list of faces.
+     * @return The list of new faces.
+     */
+    public List<MeshTriangle> generateCopyFaces(Map<Vector3D, Vector3D> pointMap, List<MeshTriangle> originalFaces) {
+        List<MeshTriangle> copiedFaces = new ArrayList<>(originalFaces.size());
+
+        for (MeshTriangle originalFace : originalFaces) {
+            Vector3D[] newTrianglePoints = new Vector3D[3];
+            Vector3D[] oldPoints = originalFace.getPoints();
+            for (int j = 0; j < 3; j++) {
+                newTrianglePoints[j] = pointMap.get(oldPoints[j]);
+            }
+            MeshTriangle newTri = new MeshTriangle(newTrianglePoints[0], newTrianglePoints[1], newTrianglePoints[2]);
+            newTri.setMaterial(originalFace);
+            copiedFaces.add(newTri);
+        }
+        return copiedFaces;
     }
 }

@@ -38,14 +38,13 @@ public class TestLevel extends Scene
 
         new HeadLight(camera, this);
 
-
         RotatingObject bug = new RotatingObject(loadFromFile("Resources/Models/Ladybug", "ladybug.obj"));
         bug.translate(new Vector3D(5,2,5));
         bug.setRotationSpeed(new Vector3D(0,2,0));
 
         RotatingObject newBug;
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
                 newBug = new RotatingObject(bug);
                 newBug.translate(new Vector3D(i*2,0,j*2));
                 newBug.rotate(new Vector3D(3,i+1*j,0));
@@ -91,6 +90,7 @@ public class TestLevel extends Scene
     private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {
         StaticAABBObject wall = new StaticAABBObject(this);
         BoxMesh boxMesh = new BoxMesh(wall, size);
+        wall.setMesh(boxMesh);
         boxMesh.setTexture(sprite);
         boxMesh.setDiffuseColour(Color.white);
         boxMesh.showWireFrame(false);

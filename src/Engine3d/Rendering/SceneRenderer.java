@@ -133,6 +133,12 @@ public class SceneRenderer extends JPanel
                     timeMeasurer.pauseAndEndMeasurement("buildScreenBuffer");
                     timeMeasurer.addCycle("buildScreenBuffer");
 
+                    timeMeasurer.endMeasurement("Get Matrices");
+                    timeMeasurer.endMeasurement("ObjWorldToScreen");
+                    timeMeasurer.endMeasurement("Lighting");
+                    timeMeasurer.endMeasurement("TriangleClipping");
+                    timeMeasurer.endMeasurement("Texturizer");
+
                     synchronized (activeScene.getCamera()) {
                         activeScene.getCamera().swapBuffers();
                     }

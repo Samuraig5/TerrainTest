@@ -25,10 +25,10 @@ public class ObjParser
     public Mesh loadFromObjFile(Object3D object3D, String folderPath, String objFile)
     {
         Mesh mesh = new Mesh(object3D);
+        object3D.setMesh(mesh);
 
         HashMap<String, MTL> mtlLib = new HashMap<>();
 
-        List<Vector3D> vertices = new ArrayList<>();
         List<Vector2D> textureVertices = new ArrayList<>();
         MTL mtl = null;
 
@@ -40,7 +40,7 @@ public class ObjParser
                 String[] data = line.split(" +");
 
                 if (Objects.equals(data[0], "v")) {
-                    vertices.add(generateVertex(data));
+                    mesh.points.add(generateVertex(data));
                 }
                 else if (Objects.equals(data[0], "vt")) {
                     textureVertices.add(generateTextureVertex(data));
@@ -55,7 +55,7 @@ public class ObjParser
                         triangles.add(data);
                     }
                     for (String[] face: triangles) {
-                        mesh.faces.add(generateFace(face, mtl, vertices, textureVertices));
+                        mesh.faces.add(generateFace(face, mtl, mesh.points, textureVertices));
                     }
                 }
                 else if (Objects.equals(data[0],"usemtl")) {
@@ -65,7 +65,6 @@ public class ObjParser
                     mtlLib = readMTLlib(folderPath, recombineString(data));
                 }
             }
-            mesh.points = vertices.toArray(new Vector3D[0]);
         }
         catch (IOException e)
         {
@@ -142,7 +141,7 @@ public class ObjParser
 
         // Ensure the input face has at least 4 vertices (1 "f" token + 3 vertices).
         if (data.length < 4) {
-            throw new IllegalArgumentException("Face must have at least 3 vertices.");
+            throw new IllegalArgumentException("Face must have at least 4 vertices to be triangulated.");
         }
 
         // Use the first vertex as the base for triangulation.

@@ -29,7 +29,7 @@ public class Scene implements Updatable
     List<Object3D> objects = new CopyOnWriteArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 1d;
-    protected List<Updatable> updatables = new ArrayList<>();
+    protected List<Updatable> updatables = new CopyOnWriteArrayList<>();
     protected List<Gravitational> gravitationals = new ArrayList<>();
     protected List<AABBObject> AABBObjects = new ArrayList<>();
     protected List<DynamicAABBObject> dynamicAABBObjects = new ArrayList<>();
@@ -82,7 +82,6 @@ public class Scene implements Updatable
     public void buildScreenBuffer()
     {
         camera.getScreenBuffer().clear(backgroundColour);
-
         objects.sort((o1, o2) -> {
             // Calculate distances to the camera
             double distance1 = o1.getPosition().distanceTo(camera.getPosition());
@@ -125,13 +124,13 @@ public class Scene implements Updatable
         Object3D object3D = new Object3D(this);
         Mesh loaded = objParser.loadFromObjFile(object3D, folderPath, filePath);
         if (loaded == null) {
-            getSceneRenderer().logError("ObjParser coulding find file: " + folderPath + "/" + filePath);
-            loaded = new Mesh(object3D);
+            getSceneRenderer().logError("ObjParser couldn't find file: " + folderPath + "/" + filePath);
+            object3D.setMesh(new Mesh(object3D));
         }
         return object3D;
     }
 
-        @Override
+    @Override
     public void update(double deltaTime) {
         for (Updatable updatable : updatables) {
             updatable.update(deltaTime);

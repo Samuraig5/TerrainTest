@@ -18,9 +18,9 @@ public class MeshTriangle implements Translatable
     public MeshTriangle(MeshTriangle tri)
     {
         material = new Material(tri.getMaterial());
-        points[0] = new Vector3D(tri.points[0].x(), tri.points[0].y(), tri.points[0].z());
-        points[1] = new Vector3D(tri.points[1].x(), tri.points[1].y(), tri.points[1].z());
-        points[2] = new Vector3D(tri.points[2].x(), tri.points[2].y(), tri.points[2].z());
+        points[0] = tri.points[0];
+        points[1] = tri.points[1];
+        points[2] = tri.points[2];
     }
 
     public Vector3D[] getPoints() {return points;}
@@ -82,5 +82,10 @@ public class MeshTriangle implements Translatable
     }
     public void setMaterial(MeshTriangle tri){
         setMaterial(new Material (tri.getMaterial()));
+    }
+
+    @Override
+    public String toString() {
+        return "<" + points[0] + ", " + points[1] + ", " + points[2] + ">";
     }
 }

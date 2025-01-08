@@ -2,17 +2,37 @@ package Engine3d.Math;
 
 import Engine3d.Math.Vector.Vector3D;
 
+import java.util.List;
+
 public class Matrix4x4
 {
     public double[][] mat = new double[4][4];
 
-    public MeshTriangle multiplyWithTriangle(MeshTriangle triangle)
+    public void matrixVectorManipulation(Vector3D in)
     {
-        Vector3D[] points = triangle.getPoints();
-        Vector3D p1 = matrixVectorMultiplication(points[0]);
-        Vector3D p2 = matrixVectorMultiplication(points[1]);
-        Vector3D p3 = matrixVectorMultiplication(points[2]);
-        return new MeshTriangle(p1, p2, p3);
+        double x = in.x() * mat[0][0]
+                + in.y() * mat[1][0]
+                + in.z() * mat[2][0]
+                + in.w() * mat[3][0];
+        double y = in.x() * mat[0][1]
+                + in.y() * mat[1][1]
+                + in.z() * mat[2][1]
+                + in.w() * mat[3][1];
+        double z = in.x() * mat[0][2]
+                + in.y() * mat[1][2]
+                + in.z() * mat[2][2]
+                + in.w() * mat[3][2];
+        double w = in.x() * mat[0][3]
+                + in.y() * mat[1][3]
+                + in.z() * mat[2][3]
+                + in.w() * mat[3][3];
+        in.x(x); in.y(y); in.z(z); in.w(w);
+    }
+
+    public void matrixVectorManipulation(List<Vector3D> in) {
+        for (int i = 0; i < in.size(); i++) {
+            matrixVectorManipulation(in.get(i));
+        }
     }
 
     public Vector3D matrixVectorMultiplication(Vector3D in)
@@ -34,6 +54,15 @@ public class Matrix4x4
                 + in.z() * mat[2][3]
                 + in.w() * mat[3][3];
         return new Vector3D(x, y, z, w);
+    }
+
+    public MeshTriangle multiplyWithTriangle(MeshTriangle triangle)
+    {
+        Vector3D[] points = triangle.getPoints();
+        Vector3D p1 = matrixVectorMultiplication(points[0]);
+        Vector3D p2 = matrixVectorMultiplication(points[1]);
+        Vector3D p3 = matrixVectorMultiplication(points[2]);
+        return new MeshTriangle(p1, p2, p3);
     }
 
     public static Matrix4x4 matrixMatrixMultiplication(Matrix4x4 m1, Matrix4x4 m2)
