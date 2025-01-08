@@ -38,7 +38,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         double adjStepSize = stepSize * deltaTime;
         double adjTurnStep = turnStep * deltaTime;
 
-        if (ctrlDown) {adjStepSize *= 5;}
+        if (ctrlDown) {adjStepSize *= 2;}
 
         if (wDown) {transDelta.translate(new Vector3D(0, 0, adjStepSize));}
         if (sDown) {transDelta.translate(new Vector3D(0, 0, -adjStepSize));}

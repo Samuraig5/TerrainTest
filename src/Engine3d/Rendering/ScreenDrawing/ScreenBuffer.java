@@ -37,7 +37,7 @@ public class ScreenBuffer
         depthBuffer = new double[(int) screenSize.x()][(int) screenSize.y()];
     }
 
-    public boolean pixelOnTop(int x, int y, double depth) {
+    public synchronized boolean pixelOnTop(int x, int y, double depth) {
         if (!inBounds(x,y)) {return false;}
         //TODO: If the window size is changed between these two lines we get an array out of bounds exception!
         try{
@@ -48,13 +48,22 @@ public class ScreenBuffer
         }
         return false;
     }
-    public void updateDepth(int x, int y, double depth) {
+    public synchronized void updateDepth(int x, int y, double depth) {
         depthBuffer[x][y] = depth;
     }
-    public boolean inBounds(int x, int y){
+    public synchronized boolean inBounds(int x, int y){
         return (x >= 0 && x < bufferedImage.getWidth()) && (y >= 0 && y < bufferedImage.getHeight());
     }
-    public BufferedImage getBufferedImage() {
+    public synchronized void setPixel(int x, int y, Color c) {
+        try {
+            y = bufferedImage.getHeight() - y;
+            bufferedImage.setRGB(x, y, ScreenBuffer.colorToARGB(c));
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+
+        }
+    }
+    public synchronized BufferedImage getBufferedImage() {
         return bufferedImage;
     }
 

@@ -99,6 +99,8 @@ public class Scene implements Updatable
         Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);
         Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
 
+
+        /*
         for (Object3D o:objects)
         {
             o.getMesh().drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
@@ -106,6 +108,15 @@ public class Scene implements Updatable
                 o.getSource().drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
             }
         }
+
+         */
+
+        objects.parallelStream().forEach(o -> {
+            o.getMesh().drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+            if (camera.debugging) {
+                o.getSource().drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+            }
+        });
     }
 
     public Camera getCamera() {return camera;}
@@ -161,10 +172,15 @@ public class Scene implements Updatable
     public boolean checkForCollision(int numSteps, Ray ray) {
         for (int i = 0; i < numSteps; i++) {
             for (int j = 0; j < AABBObjects.size(); j++) {
-                AABBObject obj = AABBObjects.get(j);
-                if (obj == ray.getSource()) { continue; }
-                if (!obj.getAABBCollider().getAABB().collision(ray).isEmpty()) {
-                    return true;
+                try {
+                    AABBObject obj = AABBObjects.get(j);
+                    if (obj == ray.getSource()) { continue; }
+                    if (!obj.getAABBCollider().getAABB().collision(ray).isEmpty()) {
+                        return true;
+                    }
+                }
+                catch (NullPointerException e) {
+
                 }
             }
             ray.advance();

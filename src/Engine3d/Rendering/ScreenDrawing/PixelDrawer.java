@@ -21,12 +21,8 @@ public class PixelDrawer
         this.camera = camera;
     }
 
-    public static void drawPixel(ScreenBuffer screenBuffer, Color c, int x, int y)
-    {
-        BufferedImage bufferedImage = screenBuffer.getBufferedImage();
-        y = bufferedImage.getHeight() - y;
-        if (!screenBuffer.inBounds(x,y)) {return;}
-        bufferedImage.setRGB(x, y, ScreenBuffer.colorToARGB(c));
+    public static void drawPixel(ScreenBuffer screenBuffer, Color c, int x, int y) {
+        screenBuffer.setPixel(x,y,c);
     }
 
     public static void checkAndDrawPixel(ScreenBuffer screenBuffer, Color c, int x, int y, double depth)
@@ -90,7 +86,7 @@ public class PixelDrawer
         textureTriangle(screenBuffer, t, colour);
     }
 
-    public void textureTriangle(ScreenBuffer screenBuffer, MeshTriangle tri, BufferedImage sprite)
+    public synchronized void textureTriangle(ScreenBuffer screenBuffer, MeshTriangle tri, BufferedImage sprite)
     {
         Vector3D[] points = tri.getPoints();
         Vector2D[] texPoints = tri.getMaterial().getTextureCoords();

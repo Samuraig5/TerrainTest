@@ -27,24 +27,29 @@ public abstract class AABBCollider implements Translatable
     }
 
     public boolean handleCollision(AABBCollider other) {
-        Vector3D move = getAABB().collision(other.getAABB());
-        if (move.isEmpty()) {return false;}
+        try {
+            Vector3D move = getAABB().collision(other.getAABB());
+            if (move.isEmpty()) {return false;}
 
-        if (other.getWeight() <= 0 && getWeight() <= 0) { return false; }
+            if (other.getWeight() <= 0 && getWeight() <= 0) { return false; }
 
-        if (other.getWeight() <= 0 && getWeight() > 0) { translate(move); obj.onCollision(move);} //Other object is immovable but this isn't
-        else if (other.getWeight() > 0 && getWeight() <= 0) { other.translate(move.inverted()); other.obj.onCollision(move.inverted());}
-        else {
-            double weightFactor = getWeight() / other.getWeight();
+            if (other.getWeight() <= 0 && getWeight() > 0) { translate(move); obj.onCollision(move);} //Other object is immovable but this isn't
+            else if (other.getWeight() > 0 && getWeight() <= 0) { other.translate(move.inverted()); other.obj.onCollision(move.inverted());}
+            else {
+                double weightFactor = getWeight() / other.getWeight();
 
-            Vector3D myMove = move.scaled(1/weightFactor);
-            Vector3D otherMove = move.scaled(weightFactor);
+                Vector3D myMove = move.scaled(1/weightFactor);
+                Vector3D otherMove = move.scaled(weightFactor);
 
-            translate(myMove); obj.onCollision(myMove);
-            other.translate(otherMove.inverted()); other.obj.onCollision(otherMove.inverted());
+                translate(myMove); obj.onCollision(myMove);
+                other.translate(otherMove.inverted()); other.obj.onCollision(otherMove.inverted());
+            }
+
+            return true;
         }
-
-        return true;
+        catch (NullPointerException e) {
+            return false;
+        }
     }
 
     abstract public double getWeight();

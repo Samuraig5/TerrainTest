@@ -38,6 +38,7 @@ public class TestLevel extends Scene
 
         new HeadLight(camera, this);
 
+        /*
         RotatingObject bug = new RotatingObject(loadFromFile("Resources/Models/Ladybug", "ladybug.obj"));
         bug.translate(new Vector3D(5,2,5));
         bug.setRotationSpeed(new Vector3D(0,2,0));
@@ -51,6 +52,8 @@ public class TestLevel extends Scene
             }
         }
         bug.translate(new Vector3D(0,-2,0));
+
+         */
 
         String stone = "Resources/Textures/SmoothStoneWall.png";
         String lightMoss = "Resources/Textures/StoneBrickWallLightlyMossy.png";
@@ -67,6 +70,7 @@ public class TestLevel extends Scene
             double wallHeight = 4;
 
             StaticAABBObject ground = spawnWall(stoneImg, new Vector3D(roomSize*2,1,roomSize*2));
+            ground.translate(Vector3D.DOWN().scaled(0.5));
 
             StaticAABBObject wall1 = spawnWall(lightMossImg, new Vector3D(roomSize,wallHeight,1));
             wall1.translate(Vector3D.FORWARD().scaled(roomSize/2));
@@ -81,6 +85,16 @@ public class TestLevel extends Scene
             box.translate(Vector3D.UP());
             StaticAABBObject box2 = spawnWall(heavyMossImg, new Vector3D(7,2.5,7));
             box2.translate(Vector3D.UP());
+
+            /*
+            for (int i = 0; i < 20; i++) {
+                for (int j = 0; j < 20; j++) {
+                    StaticAABBObject wa = spawnWall(grimeImg, new Vector3D(1,1,1));
+                    wa.translate(new Vector3D(i*2,1,j*2));
+                }
+            }
+
+             */
         }
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file ");
