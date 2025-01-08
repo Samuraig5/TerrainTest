@@ -17,6 +17,11 @@ public class BloodGulch extends Scene
 
         camera.translate(new Vector3D(0,7,0));
 
+        PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
+
+        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
+        addUpdatable(cameraController);
+
         //LightSource sun = new LightSource(this);
         //sun.setRotation(new Vector3D(Math.toRadians(-90),0,0));
         //sun.setLightIntensity(0.5);
@@ -67,10 +72,5 @@ public class BloodGulch extends Scene
         //axis.translate(new Vector3D(0,0,5));
         //axis.showWireFrame(false);
         //testScene.addObject(axis);
-
-        PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
-
-        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
-        addUpdatable(cameraController);
     }
 }

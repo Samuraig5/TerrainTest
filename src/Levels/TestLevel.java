@@ -26,6 +26,11 @@ public class TestLevel extends Scene
 
         backgroundColour = new Color(0, 128, 134);
 
+        PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
+        playerObject.translate(new Vector3D(0,20,0));
+
+        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
+        addUpdatable(cameraController);
 
         LightSource sun = new LightSource(this);
         sun.setRotation(new Vector3D(Math.toRadians(90),0,0));
@@ -33,11 +38,8 @@ public class TestLevel extends Scene
 
         new HeadLight(camera, this);
 
-        PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
-        playerObject.translate(new Vector3D(0,10,0));
-
-        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
-        addUpdatable(cameraController);
+        Object3D bug = loadFromFile("Resources/Models/Ladybug", "ladybug.obj");
+        bug.translate(new Vector3D(5,2,5));
 
         String stone = "Resources/Textures/Stone Floor.png";
         String metal = "Resources/Textures/Metal Wall Top.png";

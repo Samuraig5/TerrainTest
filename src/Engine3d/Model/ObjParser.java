@@ -49,6 +49,7 @@ public class ObjParser
                     List<String[]> triangles = new ArrayList<>();
                     if (data.length > 4) {
                         triangles = triangulateFace(data);
+                        //System.err.println("Model contains quads");
                     }
                     else{
                         triangles.add(data);
@@ -82,7 +83,7 @@ public class ObjParser
     }
     private Vector2D generateTextureVertex(String[] data) {
         return new Vector2D(Double.parseDouble(data[1]),
-                Double.parseDouble(data[2]));
+                1-Double.parseDouble(data[2]));
     }
     private MeshTriangle generateFace(String[] data, MTL mtl, List<Vector3D> vertices, List<Vector2D> texturePoints) {
         String[] token0 = data[3].split("/+");

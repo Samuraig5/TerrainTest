@@ -15,13 +15,14 @@ import Engine3d.Translatable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 public class Mesh implements Translatable, Rotatable
 {
     private Object3D object3D;
     protected Vector3D[] points;
-    protected List<MeshTriangle> faces = new ArrayList<>();
+    protected List<MeshTriangle> faces = new CopyOnWriteArrayList<>();
     protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
     protected Vector3D meshOffset = new Vector3D(0,0,0,1);
     protected boolean showWireFrame = false;
