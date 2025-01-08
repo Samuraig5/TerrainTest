@@ -3,7 +3,7 @@ package Engine3d.Model;
 import Engine3d.Math.MeshTriangle;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Physics.Object3D;
+import Physics.Object3D;
 import Engine3d.Rendering.Material;
 import Engine3d.Rendering.ResourceManager.SpriteManager;
 

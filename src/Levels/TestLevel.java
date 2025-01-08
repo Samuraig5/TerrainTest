@@ -6,12 +6,12 @@ import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
-import Engine3d.Physics.AABBCollisions.StaticAABBObject;
-import Engine3d.Physics.Object3D;
+import Engine3d.Time.RotatingObject;
+import Physics.AABBCollisions.StaticAABBObject;
+import Physics.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
-import Engine3d.Testing.RotatingObject;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -38,8 +38,20 @@ public class TestLevel extends Scene
 
         new HeadLight(camera, this);
 
-        Object3D bug = loadFromFile("Resources/Models/Ladybug", "ladybug.obj");
+
+        RotatingObject bug = new RotatingObject(loadFromFile("Resources/Models/Ladybug", "ladybug.obj"));
         bug.translate(new Vector3D(5,2,5));
+        bug.setRotationSpeed(new Vector3D(0,2,0));
+
+        RotatingObject newBug;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                newBug = new RotatingObject(bug);
+                newBug.translate(new Vector3D(i*2,0,j*2));
+                newBug.rotate(new Vector3D(3,i+1*j,0));
+            }
+        }
+        bug.translate(new Vector3D(0,-2,0));
 
         String stone = "Resources/Textures/SmoothStoneWall.png";
         String lightMoss = "Resources/Textures/StoneBrickWallLightlyMossy.png";

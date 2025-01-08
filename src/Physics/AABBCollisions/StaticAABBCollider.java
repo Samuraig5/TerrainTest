@@ -1,7 +1,6 @@
-package Engine3d.Physics.AABBCollisions;
+package Physics.AABBCollisions;
 
 import Engine3d.Model.Mesh;
-import Engine3d.Physics.Object3D;
 
 public class StaticAABBCollider extends AABBCollider
 {

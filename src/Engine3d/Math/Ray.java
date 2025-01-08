@@ -1,7 +1,7 @@
 package Engine3d.Math;
 
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Physics.Object3D;
+import Physics.Object3D;
 
 public class Ray extends Line
 {

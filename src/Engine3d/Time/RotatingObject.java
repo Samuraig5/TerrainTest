@@ -1,6 +1,6 @@
-package Engine3d.Testing;
+package Engine3d.Time;
 
-import Engine3d.Physics.Object3D;
+import Physics.Object3D;
 import Engine3d.Rendering.Scene;
 import Engine3d.Time.Updatable;
 import Engine3d.Math.Vector.Vector3D;
@@ -11,6 +11,15 @@ public class RotatingObject extends Object3D implements Updatable
 
     public RotatingObject(Scene scene) {
         super(scene);
+    }
+
+    public RotatingObject(Object3D source) {
+        super(source);
+    }
+
+    public RotatingObject(RotatingObject source) {
+        super(source);
+        rotationSpeed = new Vector3D(source.rotationSpeed);
     }
 
     public void setRotationSpeed(Vector3D rotationSpeed) {

@@ -82,15 +82,16 @@ public class SceneRenderer extends JPanel
         g.drawString(timeMeasurer.getMsPrintOut("buildScreenBuffer"), 20, 90);
         long buildScreenBuffer = timeMeasurer.getMeasurement("buildScreenBuffer");
         g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", buildScreenBuffer), 30, 110);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", buildScreenBuffer), 30, 130);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", buildScreenBuffer),30, 150);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", buildScreenBuffer),30, 170);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Lighting", buildScreenBuffer), 30, 130);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", buildScreenBuffer), 30, 150);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", buildScreenBuffer),30, 170);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", buildScreenBuffer),30, 190);
 
-        g.drawString("Updates/s: " + timeMeasurer.getCyclesPerSecond("update"), 20, 200);
+        g.drawString("Updates/s: " + timeMeasurer.getCyclesPerSecond("update"), 20, 220);
         long updateTime = timeMeasurer.getMeasurement("update");
-        g.drawString(timeMeasurer.getMsPrintOut("updateTime", updateTime), 20, 220);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("applyGravity", updateTime), 30, 240);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("handleCollision", updateTime), 30, 260);
+        g.drawString(timeMeasurer.getMsPrintOut("updateTime", updateTime), 20, 240);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("applyGravity", updateTime), 30, 260);
+        g.drawString(timeMeasurer.getPercentAndMsPrintOut("handleCollision", updateTime), 30, 280);
 
 
         g.setColor(Color.red);

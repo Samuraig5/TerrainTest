@@ -1,17 +1,15 @@
 package Engine3d.Rendering;
 
-import Engine3d.Controls.PlayerObject;
 import Engine3d.Math.Ray;
-import Engine3d.Physics.AABBCollisions.AABBObject;
-import Engine3d.Physics.AABBCollisions.DynamicAABBObject;
-import Engine3d.Physics.AABBCollisions.StaticAABBObject;
-import Engine3d.Physics.Gravitational;
+import Physics.AABBCollisions.AABBObject;
+import Physics.AABBCollisions.DynamicAABBObject;
+import Physics.AABBCollisions.StaticAABBObject;
+import Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
-import Engine3d.Physics.Object3D;
-import Engine3d.Testing.RotatingObject;
+import Physics.Object3D;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
@@ -84,6 +82,7 @@ public class Scene implements Updatable
     public void buildScreenBuffer()
     {
         camera.getScreenBuffer().clear(backgroundColour);
+
         objects.sort((o1, o2) -> {
             // Calculate distances to the camera
             double distance1 = o1.getPosition().distanceTo(camera.getPosition());

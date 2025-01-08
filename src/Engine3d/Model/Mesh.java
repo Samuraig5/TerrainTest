@@ -4,8 +4,8 @@ import Engine3d.Lighting.LightSource;
 import Engine3d.Math.*;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Physics.AABBCollisions.AABB;
-import Engine3d.Physics.Object3D;
+import Physics.AABBCollisions.AABB;
+import Physics.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Material;
 import Engine3d.Rotatable;
@@ -78,6 +78,7 @@ public class Mesh implements Translatable, Rotatable
                 continue;
             }
 
+            tm.startMeasurement("Lighting");
             for (LightSource ls : lightSources) {
                 double lightIntensity = ls.getLightIntensity(triTransformed.getMidPoint().distanceTo(ls.getPosition()));
                 if (lightIntensity == 0) {continue;}
@@ -89,6 +90,7 @@ public class Mesh implements Translatable, Rotatable
                     triTransformed.getMaterial().setLuminance(lightDotProduct);
                 }
             }
+            tm.pauseAndEndMeasurement("Lighting");
 
             //if (triTransformed.getMaterial().getLuminance() == 0) {continue;}
 
@@ -341,5 +343,20 @@ public class Mesh implements Translatable, Rotatable
     }
     public void showWireFrame(boolean showWireFrame) {
         this.showWireFrame = showWireFrame;
+    }
+
+    public void copy(Mesh source) {
+        points = new Vector3D[source.points.length];
+        for (int i = 0; i < points.length; i++) {
+            points[i] = new Vector3D(source.points[i]);
+        }
+
+        for (int i = 0; i < source.faces.size(); i++) {
+            faces.add(new MeshTriangle(source.faces.get(i)));
+        }
+
+        meshOffrot = new Vector3D(source.meshOffrot);
+        meshOffset = new Vector3D(source.meshOffset);
+        showWireFrame = source.showWireFrame;
     }
 }

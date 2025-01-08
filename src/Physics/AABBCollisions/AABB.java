@@ -1,11 +1,8 @@
-package Engine3d.Physics.AABBCollisions;
+package Physics.AABBCollisions;
 
 import Engine3d.Math.Box;
-import Engine3d.Math.Plane;
 import Engine3d.Math.Ray;
 import Engine3d.Math.Vector.Vector3D;
-
-import java.util.List;
 
 public class AABB extends Box
 {

@@ -1,4 +1,4 @@
-package Engine3d.Physics;
+package Physics;
 
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
@@ -17,6 +17,18 @@ public class Object3D implements Translatable, Rotatable
 
     public Object3D(Scene scene) {
         this.scene = scene;
+        scene.addObject(this);
+        setUpDebugging();
+    }
+
+    public Object3D(Object3D source) {
+        this.scene = source.getScene();
+
+        this.mesh = new Mesh(this);
+        mesh.copy(source.getMesh());
+        this.position = new Vector3D(source.getPosition());
+        this.rotation = new Vector3D(source.getRotation());
+
         scene.addObject(this);
         setUpDebugging();
     }

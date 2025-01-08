@@ -1,4 +1,4 @@
-package Engine3d.Physics.Octree;
+package Physics.Octree;
 
 import Engine3d.Math.Cube;
 import Engine3d.Math.Vector.Vector3D;

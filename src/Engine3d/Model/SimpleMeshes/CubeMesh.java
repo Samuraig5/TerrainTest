@@ -1,6 +1,6 @@
 package Engine3d.Model.SimpleMeshes;
 
-import Engine3d.Physics.Object3D;
+import Physics.Object3D;
 import Engine3d.Math.Vector.Vector3D;
 
 public class CubeMesh extends BoxMesh
