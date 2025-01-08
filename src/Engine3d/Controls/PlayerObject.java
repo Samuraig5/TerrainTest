@@ -60,7 +60,18 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     @Override
     public void rotate(Vector3D delta) {
-        rotation.translate(delta);
+        Vector3D newRot = rotation.translated(delta);
+
+        double maxPitch = Math.toRadians(89);
+        double minPitch = Math.toRadians(-89);
+
+        newRot = new Vector3D(
+                Math.max(minPitch, Math.min(maxPitch, newRot.x())),
+                newRot.y(),
+                newRot.z()
+        );
+
+        rotation = newRot;
     }
 
     @Override
@@ -68,6 +79,15 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         return rotation;
     }
 
+    /**
+     * Returns the world direction based on the local space direction vector.
+     * Eg is base = Vector3D.FORWARD() the function returns the direction in which the payerObject is facing.
+     * @param base Local space direction.
+     * @return World space direction.
+     */
+    public Vector3D getDirection(Vector3D base) {
+        return Matrix4x4.get3dRotationMatrix(rotation).matrixVectorMultiplication(base);
+    }
     @Override
     public Vector3D getDirection() {
         return Matrix4x4.get3dRotationMatrix(rotation).matrixVectorMultiplication(Vector3D.FORWARD());
@@ -79,8 +99,13 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     }
 
     public void localTranslate(Vector3D delta) {
-        Vector3D forwardMovement = getDirection().scaled(delta.z());
-        Vector3D movement = forwardMovement.translated(new Vector3D(0,delta.y(),0));
+        Vector3D forwardMovement = getDirection();
+        forwardMovement.y(0);
+        forwardMovement.normalize();
+        forwardMovement.scale(delta.z());
+        Vector3D sidewardMovement = getDirection(Vector3D.LEFT()).scaled(delta.x());
+        Vector3D movement = forwardMovement.translated(sidewardMovement);
+        movement.translate(new Vector3D(0,delta.y(),0));
         translate(movement);
     }
 

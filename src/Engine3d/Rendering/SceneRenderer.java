@@ -5,6 +5,8 @@ import Engine3d.Time.TimeMeasurer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,15 @@ public class SceneRenderer extends JPanel
     {
         setFocusable(true);
         requestFocusInWindow();
+
+        // Optional: Hide the cursor
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Cursor hiddenCursor = toolkit.createCustomCursor(
+                toolkit.getImage(""), // An empty image
+                new Point(0, 0),
+                "hiddenCursor"
+        );
+        setCursor(hiddenCursor);
     }
 
     public void setActiveScene(Scene activeScene) {

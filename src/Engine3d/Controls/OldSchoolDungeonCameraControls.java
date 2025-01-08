@@ -4,13 +4,18 @@ import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Time.Updatable;
 import Engine3d.Math.Vector.Vector3D;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 public class OldSchoolDungeonCameraControls extends Controller implements Updatable
 {
     private float stepSize = 5f;
     private float turnStep = 4f;
     private float jumpStrength = 0.35f;
+    private float mouseSensitivity = 0.5f; // Adjust for desired sensitivity
 
     private PlayerObject playerObject;
 
@@ -22,12 +27,39 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
     private boolean shiftDown = false;
     private boolean ctrlDown = false;
 
+    private int lastMouseX = -1;
+    private int lastMouseY = -1;
+
+    private SceneRenderer renderer;
+    private Robot robot;
+    private boolean recentering = false;
+
     public OldSchoolDungeonCameraControls(SceneRenderer renderer, PlayerObject playerObject) {
         super(renderer);
 
         this.playerObject = playerObject;
         attachTranslatable(playerObject);
         attachRotatable(playerObject);
+
+
+        this.renderer = renderer;
+        try {
+            robot = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+
+        renderer.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                handleMouseMoved(e);
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                handleMouseMoved(e);
+            }
+        });
     }
 
     @Override
@@ -44,8 +76,8 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         if (sDown) {transDelta.translate(new Vector3D(0, 0, -adjStepSize));}
         //if (spaceDown) {transDelta.translate(new Vector3D(0, adjStepSize, 0));}
         if (shiftDown) {transDelta.translate(new Vector3D(0, -adjStepSize, 0));}
-        if (aDown) {rotDelta.translate(new Vector3D(0, adjTurnStep, 0));}
-        if (dDown) {rotDelta.translate(new Vector3D(0, -adjTurnStep, 0));}
+        if (aDown) {transDelta.translate(new Vector3D(adjStepSize, 0, 0));}
+        if (dDown) {transDelta.translate(new Vector3D(-adjStepSize, 0, 0));}
 
         playerObject.localTranslate(transDelta);
         playerObject.rotate(rotDelta);
@@ -83,5 +115,38 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
             case KeyEvent.VK_SHIFT -> shiftDown = true;
             case KeyEvent.VK_CONTROL -> ctrlDown = true;
         }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+    }
+
+    private void handleMouseMoved(MouseEvent e) {
+        if (recentering) {
+            return; // Ignore events caused by the robot repositioning the cursor
+        }
+
+        // Calculate the center of the JFrame
+        Point center = new Point(renderer.getWidth() / 2, renderer.getHeight() / 2);
+        SwingUtilities.convertPointToScreen(center, renderer);
+
+        // Calculate mouse movement deltas (optional, for game mechanics)
+        int deltaX = e.getXOnScreen() - center.x;
+        int deltaY = e.getYOnScreen() - center.y;
+
+        Vector3D rotDelta = new Vector3D(Math.toRadians(deltaY) * mouseSensitivity, Math.toRadians(-deltaX) * mouseSensitivity, 0);
+        playerObject.rotate(rotDelta);
+
+        lastMouseX = e.getX();
+        lastMouseY = e.getY();
+
+        // Recenter the mouse cursor
+        recentering = true;
+        robot.mouseMove(center.x, center.y);
+        recentering = false;
     }
 }
