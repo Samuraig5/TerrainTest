@@ -1,6 +1,7 @@
 package Engine3d.Rendering;
 
 import Engine3d.Math.Ray;
+import Engine3d.Model.DrawInstructions;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
@@ -13,6 +14,7 @@ import Physics.Object3D;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
+import Physics.PlayerObject;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -114,10 +116,13 @@ public class Scene implements Updatable
         objects.parallelStream().forEach(o -> {
             o.getMesh().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
             if (camera.debugging) {
+
                 o.getSource().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
-                if (o instanceof AABBObject) {
+                if (o instanceof AABBObject && !(o instanceof PlayerObject)) {
                     Mesh collision = ((AABBObject) o).getAABBCollider().getAABBMesh();
-                    collision.showWireFrame(true);
+                    DrawInstructions di = new DrawInstructions(true,false,false,false);
+                    di.wireFrameColour = Color.ORANGE;
+                    collision.setDrawInstructions(di);
                     collision.drawMesh(camera,constCamPos,viewMatrix,lightSources,timeMeasurer);
                 }
             }

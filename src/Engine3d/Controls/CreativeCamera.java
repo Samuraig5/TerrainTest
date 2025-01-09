@@ -1,9 +1,8 @@
 package Engine3d.Controls;
 
-import Engine3d.Math.Ray;
-import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
+import Physics.PlayerObject;
 
 public class CreativeCamera extends PlayerObject
 {

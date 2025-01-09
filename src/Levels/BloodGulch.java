@@ -55,17 +55,17 @@ public class BloodGulch extends Scene
 
         Object3D map = loadFromFile("Resources/Models/BloodGulch", "bloodgulch.obj");
         map.translate(new Vector3D(0, -90, 5));
-        map.getMesh().showWireFrame(false);
+        map.getMesh().getDrawInstructions().drawWireFrame = false;
 
         Object3D rockGolem = loadFromFile("Resources/Models/RockGolem", "Stone.obj");
         rockGolem.translate(new Vector3D(0, 0, 7));
         rockGolem.rotate(new Vector3D(0,Math.toRadians(180),0));
-        rockGolem.getMesh().showWireFrame(false);
+        map.getMesh().getDrawInstructions().drawWireFrame = false;
 
         Object3D rockGolem2 = loadFromFile( "Resources/Models/RockGolem", "Stone.obj");
         rockGolem2.translate(new Vector3D(-114.5, 0.7, 142));
         rockGolem2.rotate(new Vector3D(0,Math.toRadians(180),0));
-        rockGolem2.getMesh().showWireFrame(false);
+        map.getMesh().getDrawInstructions().drawWireFrame = false;
 
         //Object3D axis = new Object3D();
         //objParser.loadFromObjFile("src/Engine3d.Testing/axis.obj", axis, true);

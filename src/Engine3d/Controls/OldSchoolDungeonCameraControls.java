@@ -3,6 +3,7 @@ package Engine3d.Controls;
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Time.Updatable;
 import Engine3d.Math.Vector.Vector3D;
+import Physics.PlayerObject;
 
 import javax.swing.*;
 import java.awt.*;

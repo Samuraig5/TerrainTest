@@ -2,11 +2,15 @@ package Physics;
 
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
+import Engine3d.Model.DrawInstructions;
 import Engine3d.Model.Mesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
+import Engine3d.Model.UnrotatableBox;
 import Engine3d.Rendering.Scene;
 import Engine3d.Rotatable;
 import Engine3d.Translatable;
+
+import java.awt.*;
 
 public class Object3D implements Translatable, Rotatable
 {
@@ -70,14 +74,16 @@ public class Object3D implements Translatable, Rotatable
     // === DEBUGGING ===
 
     double sourceBoxSize = 0.25d;
-    CubeMesh source = new CubeMesh(this, sourceBoxSize);
+    UnrotatableBox source = new UnrotatableBox(this, new Vector3D(sourceBoxSize,sourceBoxSize,sourceBoxSize));
     private void setUpDebugging() {
         //Centers the box on the source of the object
         source.translate(new Vector3D(-sourceBoxSize/2,-sourceBoxSize/2,-sourceBoxSize/2));
         source.centreToMiddleBottom();
-        source.showWireFrame(true);
+        DrawInstructions di = new DrawInstructions(true,false,false,false);
+        di.wireFrameColour = new Color(84, 178, 255);
+        source.setDrawInstructions(di);
     }
-    public Mesh getSource() {
+    public UnrotatableBox getSource() {
         return source;
     }
 }

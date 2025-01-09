@@ -1,14 +1,12 @@
 package Levels;
 
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
-import Engine3d.Controls.PlayerObject;
+import Physics.PlayerObject;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
-import Engine3d.Time.RotatingObject;
 import Physics.AABBCollisions.StaticAABBObject;
-import Physics.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
@@ -112,7 +110,7 @@ public class TestLevel extends Scene
         wall.setMesh(boxMesh);
         boxMesh.setTexture(sprite);
         boxMesh.setDiffuseColour(Color.white);
-        boxMesh.showWireFrame(false);
+        boxMesh.getDrawInstructions().drawWireFrame = false;
         boxMesh.centreToMiddleBottom();
         return wall;
     }

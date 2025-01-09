@@ -27,12 +27,12 @@ public class Mesh implements Translatable, Rotatable
     protected List<MeshTriangle> faces = new CopyOnWriteArrayList<>();
     protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
     protected Vector3D meshOffset = new Vector3D(0,0,0,1);
-    protected boolean showWireFrame = false;
     private TimeMeasurer tm;
-    private record copyPnF(List<Vector3D> copiedPoints, List<MeshTriangle> copiedFaces) {
-    }
+    private record copyPnF(List<Vector3D> copiedPoints, List<MeshTriangle> copiedFaces) { }
+    private DrawInstructions drawInstructions;
     public Mesh(Object3D object3D) {
         this.object3D = object3D;
+        drawInstructions = new DrawInstructions(false,false,true,true);
         //object3D.setMesh(this);
     }
     @Override
@@ -52,32 +52,68 @@ public class Mesh implements Translatable, Rotatable
         return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(Vector3D.FORWARD());
     }
     public Vector3D getPosition() {return meshOffset.translated(object3D.getPosition());}
-    
+    public DrawInstructions getDrawInstructions() {
+        return drawInstructions;
+    }
+    public void setDrawInstructions(DrawInstructions drawInstructions) {
+        this.drawInstructions = drawInstructions;
+    }
+
     public void drawMesh(Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
     {
         this.tm = tm;
 
-        copyPnF result = getCopyPnF();
-
-        localToWorld(result.copiedPoints());
-
         try {
-            calculateLuminance(cameraPos, lightSources, result.copiedFaces());
+            copyPnF result = getCopyPnF();
+
+            localToWorld(result.copiedPoints());
+
+            if (drawInstructions.doShading) {
+                calculateLuminance(cameraPos, lightSources, result.copiedFaces());
+            }
+
+            tm.startMeasurement("ObjWorldToScreen");
+            viewMatrix.matrixVectorManipulation(result.copiedPoints());
+            tm.pauseMeasurement("ObjWorldToScreen");
+
+            List<MeshTriangle> trianglesToRaster = clipAgainstNearPlane(camera, result.copiedFaces());
+
+            trianglesToRaster = projectTriangles(camera, trianglesToRaster);
+
+            trianglesToRaster = clipAgainstFrustum(camera, trianglesToRaster);
+
+            drawTriangles(camera, trianglesToRaster);
+
         } catch (NullPointerException e) {
-            return; //If a point is null, then the mesh is not drawable
+            System.err.println("Mesh has a null point and is not drawable");
+            //If a point is null, then the mesh is not drawable
         }
+    }
 
-        tm.startMeasurement("ObjWorldToScreen");
-        viewMatrix.matrixVectorManipulation(result.copiedPoints());
-        tm.pauseMeasurement("ObjWorldToScreen");
-
-        List<MeshTriangle> trianglesToRaster = clipAgainstNearPlane(camera, result.copiedFaces());
-
-        trianglesToRaster = projectTriangles(camera, trianglesToRaster);
-
-        trianglesToRaster = clipAgainstFrustum(camera, trianglesToRaster);
-
-        drawTriangles(camera, trianglesToRaster);
+    /**
+     * Draws the triangles to the screen.
+     * @param camera the camera to which the triangle is drawn.
+     * @param triangles the list of triangles to be drawn.
+     */
+    private void drawTriangles(Camera camera, List<MeshTriangle> triangles) {
+        for (MeshTriangle triToDraw : triangles)
+        {
+            if (drawInstructions.drawWireFrame) {
+                camera.drawer.drawDebugTriangle(drawInstructions.wireFrameColour, triToDraw);
+            }
+            if (drawInstructions.drawFlatColour) {
+                if (triToDraw.getMaterial().getBaseColour().getAlpha() > 0) {
+                    camera.drawer.fillTriangle(triToDraw);
+                }
+            }
+            else if (drawInstructions.drawTexture) {
+                if ((triToDraw.getMaterial().getTexture() != null)) {
+                    tm.startMeasurement("Texturizer");
+                    camera.drawer.textureTriangle(triToDraw);
+                    tm.pauseMeasurement("Texturizer");
+                }
+            }
+        }
     }
 
     /**
@@ -174,26 +210,6 @@ public class Mesh implements Translatable, Rotatable
         }
         return clippedTriangles;
     }
-
-    /**
-     * Draws the triangles to the screen.
-     * @param camera the camera to which the triangle is drawn.
-     * @param triangles the list of triangles to be drawn.
-     */
-    private void drawTriangles(Camera camera, List<MeshTriangle> triangles) {
-        for (MeshTriangle triToDraw : triangles) {
-            if (showWireFrame) { camera.drawer.drawDebugTriangle(Color.white, triToDraw); }
-            if (!(triToDraw.getMaterial().getTexture() == null)) {
-                tm.startMeasurement("Texturizer");
-                camera.drawer.textureTriangle(triToDraw);
-                tm.pauseMeasurement("Texturizer");
-            }
-            else if (triToDraw.getMaterial().getBaseColour().getAlpha() > 0) {
-                camera.drawer.fillTriangle(triToDraw);
-            }
-        }
-    }
-
 
     /**
      * Calculates the projection of the triangles.
@@ -422,9 +438,6 @@ public class Mesh implements Translatable, Rotatable
         Vector3D max = new Vector3D(maxX, maxY, maxZ).translated(getPosition());
         return new AABB(min, max);
     }
-    public void showWireFrame(boolean showWireFrame) {
-        this.showWireFrame = showWireFrame;
-    }
 
     public void copy(Mesh source) {
         points = new ArrayList<>(source.points.size());
@@ -441,7 +454,8 @@ public class Mesh implements Translatable, Rotatable
 
         meshOffrot = new Vector3D(source.meshOffrot);
         meshOffset = new Vector3D(source.meshOffset);
-        showWireFrame = source.showWireFrame;
+        DrawInstructions diSoruce = source.drawInstructions;
+        drawInstructions = new DrawInstructions(diSoruce.drawWireFrame, diSoruce.drawFlatColour, diSoruce.drawTexture, diSoruce.doShading);
     }
 
     /**

@@ -1,6 +1,6 @@
 package Engine3d.Rendering;
 
-import Engine3d.Controls.PlayerObject;
+import Physics.PlayerObject;
 import Engine3d.Math.Vector.Vector3D;
 import javax.swing.*;
 
