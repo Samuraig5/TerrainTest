@@ -1,5 +1,6 @@
 package Physics;
 
+import Engine3d.Math.Box;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Ray;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
@@ -20,8 +21,9 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         super(scene);
         camera.setPlayerObject(this);
         double size = 0.5;
-        BoxMesh playerMesh = new BoxMesh(this, new Vector3D(size,1.8,size));
-        playerMesh.centreToMiddleBottom();
+        Vector3D min = new Vector3D(-size, 0, -size);
+        Vector3D max = new Vector3D(size, 1.8, size);
+        BoxMesh playerMesh = new BoxMesh(this, new Box(min, max));
         setMesh(playerMesh);
     }
 
