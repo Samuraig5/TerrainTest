@@ -55,6 +55,9 @@ public class Vector3D extends VectorW
     public Vector3D scaled(double scalar){
         return (Vector3D) super.scaled(scalar);
     }
+    public Vector3D scaled(Vector scalars){
+        return (Vector3D) super.scaled(scalars);
+    }
 
     @Override
     public Vector3D inverted() {

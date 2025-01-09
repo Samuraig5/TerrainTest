@@ -1,5 +1,6 @@
 package Engine3d;
 
+import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 
 public interface Rotatable
@@ -21,4 +22,12 @@ public interface Rotatable
      * @return current view direction.
      */
     Vector3D getDirection();
+
+    /**
+     * Returns the world direction based on the local space direction vector.
+     * Eg is base = Vector3D.FORWARD() the function returns the direction in which the payerObject is facing.
+     * @param base Local space direction.
+     * @return World space direction.
+     */
+    Vector3D getDirection(Vector3D base);
 }

@@ -34,7 +34,7 @@ public class PixelDrawer
         }
     }
 
-    public void drawLine(ScreenBuffer screenBuffer, Color c, Vector3D v1, Vector3D v2) {
+    public void drawLine(ScreenBuffer screenBuffer, Color c, Vector3D v1, Vector3D v2, boolean ignorePixelDepth) {
         // Extract coordinates and depths from the input vectors
         int x1 = (int) v1.x();
         int y1 = (int) v1.y();
@@ -69,7 +69,12 @@ public class PixelDrawer
             double depth = w2 * (1 - t) + w1 * t;;
 
             // Draw the current pixel
-            checkAndDrawPixel(screenBuffer, c, x1, y1, depth);
+            if (ignorePixelDepth) {
+                drawPixel(screenBuffer, c, x1, y1);
+            }
+            else {
+                checkAndDrawPixel(screenBuffer, c, x1, y1, depth);
+            }
 
             // Break when the line is complete
             if (x1 == x2 && y1 == y2) break;

@@ -11,7 +11,9 @@ public class Box
     Vector3D max;
 
     public Vector3D min() {return min;}
+    public void min(Vector3D min) { this.min = min; }
     public Vector3D max() {return max;}
+    public void max(Vector3D max) { this.max = max; }
 
 
     public Box(Vector3D min, Vector3D max) {
@@ -31,7 +33,7 @@ public class Box
     }
 
     public Vector3D getCenterPoint() {
-        return (min.translated(max)).scaled(0.5f);
+        return (min.translated(max.scaled(0.5f)));
     }
 
     public List<Plane> getPlanes() {

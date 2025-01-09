@@ -2,9 +2,8 @@ package Physics;
 
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
-import Engine3d.Model.DrawInstructions;
+import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Model.Mesh;
-import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Model.UnrotatableBox;
 import Engine3d.Rendering.Scene;
 import Engine3d.Rotatable;
@@ -60,6 +59,11 @@ public class Object3D implements Translatable, Rotatable
     }
 
     @Override
+    public Vector3D getDirection(Vector3D base) {
+        return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(base);
+    }
+
+    @Override
     public void translate(Vector3D delta) {
         position.translate(delta);
     }
@@ -81,9 +85,12 @@ public class Object3D implements Translatable, Rotatable
         source.centreToMiddleBottom();
         DrawInstructions di = new DrawInstructions(true,false,false,false);
         di.wireFrameColour = new Color(84, 178, 255);
+        di.ignorePixelDepth = true;
         source.setDrawInstructions(di);
     }
     public UnrotatableBox getSource() {
+        source.translate(source.getPosition().inverted());
+        source.translate(getPosition());
         return source;
     }
 }

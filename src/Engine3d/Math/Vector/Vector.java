@@ -131,6 +131,12 @@ public abstract class Vector implements Translatable
         return clone;
     }
 
+    public Vector scaled(Vector scalars) {
+        Vector clone = clone();
+        clone.scale(scalars);
+        return clone;
+    }
+
     /**
      * Inverts the components of this vector by multiplying them by -1.
      */

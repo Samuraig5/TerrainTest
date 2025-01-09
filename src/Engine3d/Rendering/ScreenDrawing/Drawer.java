@@ -34,11 +34,11 @@ public class Drawer
                                 null);
     }
 
-    public void drawLine(Color c, Vector3D v1, Vector3D v2) {
-        p.drawLine(camera.getScreenBuffer(), c, v1, v2);
+    public void drawLine(Color c, Vector3D v1, Vector3D v2, boolean checkPixelDepth) {
+        p.drawLine(camera.getScreenBuffer(), c, v1, v2, checkPixelDepth);
     }
 
-    public void drawTriangle(Color c, MeshTriangle t)
+    public void drawTriangle(Color c, MeshTriangle t, boolean checkDepth)
     {
         Vector3D[] points = t.getPoints();
         Vector2D[] texPoints = t.getMaterial().getTextureCoords();
@@ -50,9 +50,9 @@ public class Drawer
             depthPoints[i] = new Vector3D(x,y,0,w);
         }
 
-        drawLine(c,depthPoints[0],depthPoints[1]);
-        drawLine(c,depthPoints[1],depthPoints[2]);
-        drawLine(c,depthPoints[2],depthPoints[0]);
+        drawLine(c,depthPoints[0],depthPoints[1], checkDepth);
+        drawLine(c,depthPoints[1],depthPoints[2], checkDepth);
+        drawLine(c,depthPoints[2],depthPoints[0], checkDepth);
     }
 
     public void fillTriangle(MeshTriangle t)
@@ -121,23 +121,6 @@ public class Drawer
         int alphaResultInt = Math.round(alphaResult * 255);
 
         return new Color(redResult, greenResult, blueResult, alphaResultInt);
-    }
-
-    public void drawDebugTriangle(Color c, MeshTriangle t)
-    {
-        Vector3D[] points = t.getPoints();
-        Vector2D[] texPoints = t.getMaterial().getTextureCoords();
-        Vector3D[] depthPoints = new Vector3D[3];
-        for (int i = 0; i < 3; i++) {
-            double x = points[i].x();
-            double y = points[i].y();
-            double w = texPoints[i].w() * 1f; //Make these pixels be drawn with a slight preference
-            depthPoints[i] = new Vector3D(x,y,0,w);
-        }
-
-        drawLine(c,depthPoints[0],depthPoints[1]);
-        drawLine(c,depthPoints[1],depthPoints[2]);
-        drawLine(c,depthPoints[2],depthPoints[0]);
     }
 
     public static boolean colourEmpty(Color c, float tolerance)

@@ -3,9 +3,7 @@ package Physics;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Ray;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
-import Engine3d.Model.UnrotatableBox;
 import Physics.AABBCollisions.DynamicAABBObject;
-import Physics.Gravitational;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
@@ -21,8 +19,9 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     {
         super(scene);
         camera.setPlayerObject(this);
-        BoxMesh playerMesh = new BoxMesh(this, new Vector3D(1,1.8,1));
-        playerMesh.centreOn(new Vector3D(0,0,0));
+        double size = 0.5;
+        BoxMesh playerMesh = new BoxMesh(this, new Vector3D(size,1.8,size));
+        playerMesh.centreToMiddleBottom();
         setMesh(playerMesh);
     }
 
@@ -80,15 +79,6 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         return rotation;
     }
 
-    /**
-     * Returns the world direction based on the local space direction vector.
-     * Eg is base = Vector3D.FORWARD() the function returns the direction in which the payerObject is facing.
-     * @param base Local space direction.
-     * @return World space direction.
-     */
-    public Vector3D getDirection(Vector3D base) {
-        return Matrix4x4.get3dRotationMatrix(rotation).matrixVectorMultiplication(base);
-    }
     @Override
     public Vector3D getDirection() {
         return Matrix4x4.get3dRotationMatrix(rotation).matrixVectorMultiplication(Vector3D.FORWARD());

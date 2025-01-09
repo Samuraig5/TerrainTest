@@ -32,9 +32,8 @@ public class BoxMesh extends Mesh
         double y = max.y() - min.y();
         double z = max.z() - min.z();
         this.size = new Vector3D(x,y,z);
-        buildPoints(size);
+        buildPoints(min, max);
         buildFaces(size);
-
         setDiffuseColour(new Color(0,0,0,0));
     }
 
@@ -44,17 +43,21 @@ public class BoxMesh extends Mesh
         size.scale(delta);
     }
 
-    private void buildPoints(Vector3D size) {
+    private void buildPoints(Vector3D min, Vector3D max) {
         points = List.of(new Vector3D[]{
-                new Vector3D(0, 0, 0),
-                new Vector3D(0, size.y(), 0),
-                new Vector3D(size.x(), size.y(), 0),
-                new Vector3D(size.x(), 0, 0),
-                new Vector3D(0, 0, size.z()),
-                new Vector3D(0, size.y(), size.z()),
-                new Vector3D(size.x(), size.y(), size.z()),
-                new Vector3D(size.x(), 0, size.z()),
+                new Vector3D(min.x(), min.y(), min.z()),
+                new Vector3D(min.x(), max.y(), min.z()),
+                new Vector3D(max.x(), max.y(), min.z()),
+                new Vector3D(max.x(), min.y(), min.z()),
+                new Vector3D(min.x(), min.y(), max.z()),
+                new Vector3D(min.x(), max.y(), max.z()),
+                new Vector3D(max.x(), max.y(), max.z()),
+                new Vector3D(max.x(), min.y(), max.z()),
         });
+    }
+
+    private void buildPoints(Vector3D size) {
+        buildPoints(new Vector3D(0,0,0), new Vector3D(size));
     }
 
     private void buildFaces(Vector3D size) {
@@ -135,5 +138,9 @@ public class BoxMesh extends Mesh
     public void centreToMiddleBottom() {
         centreOn(new Vector3D());
         translate(new Vector3D(0, -meshOffset.y(), 0));
+    }
+
+    public Vector3D getSize() {
+        return size;
     }
 }

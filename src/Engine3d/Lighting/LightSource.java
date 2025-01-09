@@ -10,7 +10,6 @@ import java.awt.*;
 
 public class LightSource implements Translatable, Rotatable
 {
-    public static final Vector3D BASE_LOOK_DIRECTION = new Vector3D(0,0,1);
     private double lightIntensity = 1;
     private double lightRange = Double.MAX_VALUE;
     private Color lightColour = new Color(255, 255, 255);
@@ -61,6 +60,10 @@ public class LightSource implements Translatable, Rotatable
     }
     @Override
     public Vector3D getDirection() {
-        return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(BASE_LOOK_DIRECTION);
+        return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(Vector3D.FORWARD());
+    }
+    @Override
+    public Vector3D getDirection(Vector3D base) {
+        return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(base);
     }
 }

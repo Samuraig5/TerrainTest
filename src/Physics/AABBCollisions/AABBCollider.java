@@ -22,15 +22,13 @@ public abstract class AABBCollider implements Translatable
     }
 
     public AABB getAABB() {
-        //This is a potential optimazation if we can make sure aabb is updated when the mesh changes.
-        //if (aabb != null) { return aabb; }
-        //return colliderMesh.getAABB();
-        return colliderMesh.getAABB();
+        AABB aabb = colliderMesh.getAABB();
+        return aabb;
     }
 
     public UnrotatableBox getAABBMesh() {
         UnrotatableBox res = new UnrotatableBox(obj, colliderMesh.getAABB());
-        res.centreToMiddleBottom();
+        res.translate(obj.getPosition().inverted());
         return res;
     }
 

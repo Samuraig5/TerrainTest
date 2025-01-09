@@ -1,6 +1,8 @@
 package Levels;
 
+import Engine3d.Controls.CreativeCamera;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
+import Engine3d.Controls.OldSchoolFlyingControls;
 import Physics.PlayerObject;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
@@ -24,10 +26,14 @@ public class TestLevel extends Scene
 
         backgroundColour = new Color(0, 128, 134);
 
-        PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
-        playerObject.translate(new Vector3D(0,20,0));
+        //PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
+        //playerObject.translate(new Vector3D(0,20,0));
 
-        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
+        CreativeCamera playerObject = new CreativeCamera(this, (PlayerCamera) camera);
+        playerObject.translate(new Vector3D(0,5,0));
+
+        //OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
+        OldSchoolFlyingControls cameraController = new OldSchoolFlyingControls(getSceneRenderer(), playerObject);
         addUpdatable(cameraController);
 
         LightSource sun = new LightSource(this);
@@ -70,6 +76,7 @@ public class TestLevel extends Scene
             StaticAABBObject ground = spawnWall(stoneImg, new Vector3D(roomSize*2,1,roomSize*2));
             ground.translate(Vector3D.DOWN().scaled(0.5));
 
+
             StaticAABBObject wall1 = spawnWall(lightMossImg, new Vector3D(roomSize,wallHeight,1));
             wall1.translate(Vector3D.FORWARD().scaled(roomSize/2));
             StaticAABBObject wall2 = spawnWall(lightMossImg, new Vector3D(roomSize,wallHeight,1));
@@ -81,6 +88,7 @@ public class TestLevel extends Scene
 
             StaticAABBObject box = spawnWall(grimeImg, new Vector3D(5,5,5));
             box.translate(Vector3D.UP());
+
             StaticAABBObject box2 = spawnWall(heavyMossImg, new Vector3D(7,2.5,7));
             box2.translate(Vector3D.UP());
 
@@ -88,15 +96,16 @@ public class TestLevel extends Scene
             wa.translate(new Vector3D(5,2,5));
             wa.rotate(new Vector3D(Math.toRadians(45),0,0));
 
-
             /*
+            StaticAABBObject box = spawnWall(grimeImg, new Vector3D(5,5,5));
+            box.translate(new Vector3D(5,0,0));
+
             for (int i = 0; i < 20; i++) {
                 for (int j = 0; j < 20; j++) {
                     StaticAABBObject wa = spawnWall(grimeImg, new Vector3D(1,1,1));
                     wa.translate(new Vector3D(i*2,1,j*2));
                 }
             }
-
              */
         }
         catch (IOException e1) {

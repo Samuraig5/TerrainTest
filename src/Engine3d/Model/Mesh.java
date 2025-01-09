@@ -4,6 +4,7 @@ import Engine3d.Lighting.LightSource;
 import Engine3d.Math.*;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
+import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Scalable;
 import Physics.AABBCollisions.AABB;
 import Physics.Object3D;
@@ -13,7 +14,6 @@ import Engine3d.Rotatable;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Translatable;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +28,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
     protected List<MeshTriangle> faces = new CopyOnWriteArrayList<>();
     protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
     protected Vector3D meshOffset = new Vector3D(0,0,0,1);
-    private TimeMeasurer tm;
+    private TimeMeasurer tm = new TimeMeasurer();
     private record copyPnF(List<Vector3D> copiedPoints, List<MeshTriangle> copiedFaces) { }
     private DrawInstructions drawInstructions;
     public Mesh(Object3D object3D) {
@@ -52,6 +52,11 @@ public class Mesh implements Translatable, Rotatable, Scalable
     public Vector3D getDirection() {
         return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(Vector3D.FORWARD());
     }
+    @Override
+    public Vector3D getDirection(Vector3D base) {
+        return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(base);
+    }
+
     @Override
     public void scale(Vector3D delta) {
         for (int i = 0; i < points.size(); i++) {
@@ -106,7 +111,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
         for (MeshTriangle triToDraw : triangles)
         {
             if (drawInstructions.drawWireFrame) {
-                camera.drawer.drawDebugTriangle(drawInstructions.wireFrameColour, triToDraw);
+                camera.drawer.drawTriangle(drawInstructions.wireFrameColour, triToDraw, drawInstructions.ignorePixelDepth);
             }
             if (drawInstructions.drawFlatColour) {
                 if (triToDraw.getMaterial().getBaseColour().getAlpha() > 0) {
@@ -416,36 +421,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
         return out;
     }
 
-    public AABB getAABB() {
-        if (points == null || points.isEmpty()) {
-            throw new IllegalStateException("Mesh contains no points");
-        }
-
-        // Initialize min and max with the coordinates of the first point
-        double minX = Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        double minZ = Double.MAX_VALUE;
-        double maxX = 0;
-        double maxY = 0;
-        double maxZ = 0;
-
-        // Iterate through the points to find the min and max coordinates
-        for (Vector3D point : points) {
-            if (point.x() < minX) { minX = point.x(); }
-            if (point.y() < minY) { minY = point.y(); }
-            if (point.z() < minZ) { minZ = point.z(); }
-
-            if (point.x() > maxX) { maxX = point.x(); }
-            if (point.y() > maxY) { maxY = point.y(); }
-            if (point.z() > maxZ) { maxZ = point.z(); }
-        }
-
-        // Create and return the AABB
-        Vector3D min = new Vector3D(minX, minY, minZ).translated(getPosition());
-        Vector3D max = new Vector3D(maxX, maxY, maxZ).translated(getPosition());
-        return new AABB(min, max);
-    }
-
     public void copy(Mesh source) {
         points = new ArrayList<>(source.points.size());
 
@@ -486,5 +461,38 @@ public class Mesh implements Translatable, Rotatable, Scalable
             copiedFaces.add(newTri);
         }
         return copiedFaces;
+    }
+
+    public AABB getAABB() {
+        if (points == null || points.isEmpty()) {
+            throw new IllegalStateException("Mesh contains no points");
+        }
+
+        // Initialize min and max with the coordinates of the first point
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double minZ = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        double maxZ = -Double.MAX_VALUE;
+
+        copyPnF result = getCopyPnF();
+        localToWorld(result.copiedPoints());
+
+        // Iterate through the points to find the min and max coordinates
+        for (Vector3D point : result.copiedPoints) {
+            if (point.x() < minX) { minX = point.x(); }
+            if (point.y() < minY) { minY = point.y(); }
+            if (point.z() < minZ) { minZ = point.z(); }
+
+            if (point.x() > maxX) { maxX = point.x(); }
+            if (point.y() > maxY) { maxY = point.y(); }
+            if (point.z() > maxZ) { maxZ = point.z(); }
+        }
+
+        Vector3D min = new Vector3D(minX, minY, minZ);
+        Vector3D max = new Vector3D(maxX, maxY, maxZ);
+
+        return new AABB(min, max);
     }
 }

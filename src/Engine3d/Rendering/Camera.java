@@ -79,4 +79,8 @@ public abstract class Camera implements Rotatable, Translatable {
     public Vector3D getDirection() {
         return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(Vector3D.FORWARD());
     }
+    @Override
+    public Vector3D getDirection(Vector3D base) {
+        return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(base);
+    }
 }
