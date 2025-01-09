@@ -1,8 +1,8 @@
 package Physics;
 
-import Engine3d.Math.Box;
-import Engine3d.Math.Matrix4x4;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Box;
+import Math.Matrix4x4;
+import Math.Vector.Vector3D;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Model.Mesh;
 import Engine3d.Model.UnrotatableBox;

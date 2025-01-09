@@ -1,7 +1,6 @@
 package Engine3d;
 
-import Engine3d.Math.Matrix4x4;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 
 public interface Rotatable
 {

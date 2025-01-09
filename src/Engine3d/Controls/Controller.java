@@ -3,7 +3,7 @@ package Engine3d.Controls;
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Rotatable;
 import Engine3d.Translatable;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 
 import java.awt.event.*;
 import java.util.ArrayList;

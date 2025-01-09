@@ -1,4 +1,4 @@
-package Engine3d.Math.Vector;
+package Math.Vector;
 
 public class Vector2D extends VectorW {
     @Override
@@ -37,5 +37,10 @@ public class Vector2D extends VectorW {
     @Override
     public Vector3D getPosition() {
         return new Vector3D(u(), v(), 0);
+    }
+
+    @Override
+    public Vector2D scaled(double scalar) {
+        return (Vector2D) super.scaled(scalar);
     }
 }

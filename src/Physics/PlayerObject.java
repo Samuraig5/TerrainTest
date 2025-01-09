@@ -1,12 +1,11 @@
 package Physics;
 
-import Engine3d.Math.Box;
-import Engine3d.Math.Matrix4x4;
-import Engine3d.Math.Ray;
-import Engine3d.Model.SimpleMeshes.BoxMesh;
+import Math.Box;
+import Math.Matrix4x4;
+import Math.Ray;
 import Engine3d.Model.UnrotatableBox;
 import Physics.AABBCollisions.DynamicAABBObject;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
 

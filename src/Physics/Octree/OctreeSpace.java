@@ -1,7 +1,7 @@
 package Physics.Octree;
 
-import Engine3d.Math.Cube;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Cube;
+import Math.Vector.Vector3D;
 
 public class OctreeSpace extends Cube {
 

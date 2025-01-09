@@ -1,7 +1,7 @@
 package Engine3d.Rendering;
 
 import Physics.PlayerObject;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 import javax.swing.*;
 
 public class PlayerCamera extends Camera {

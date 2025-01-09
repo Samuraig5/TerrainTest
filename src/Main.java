@@ -1,7 +1,5 @@
-import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
-import Levels.BloodGulch;
-import Levels.TestLevel;
+import Levels.TerrainLevel;
 
 import javax.swing.*;
 
@@ -19,7 +17,8 @@ public class Main {
         PlayerCamera camera = new PlayerCamera(frame);
 
         //new BloodGulch(camera);
-        new TestLevel(camera);
+        //new TestLevel(camera);
+        new TerrainLevel(camera);
 
         frame.setVisible(true);
     }

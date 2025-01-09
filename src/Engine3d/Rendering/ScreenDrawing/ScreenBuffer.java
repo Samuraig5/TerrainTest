@@ -1,6 +1,6 @@
 package Engine3d.Rendering.ScreenDrawing;
 
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

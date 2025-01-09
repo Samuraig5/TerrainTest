@@ -1,9 +1,9 @@
 package Engine3d.Model;
 
 import Engine3d.Lighting.LightSource;
-import Engine3d.Math.*;
-import Engine3d.Math.Vector.Vector2D;
-import Engine3d.Math.Vector.Vector3D;
+import Math.*;
+import Math.Vector.Vector2D;
+import Math.Vector.Vector3D;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Scalable;
 import Physics.AABBCollisions.AABB;
@@ -282,6 +282,8 @@ public class Mesh implements Translatable, Rotatable, Scalable
     private void calculateLuminance(Vector3D cameraPos, List<LightSource> lightSources, List<MeshTriangle> copiedFaces) {
         tm.startMeasurement("Lighting");
         for (MeshTriangle tri : copiedFaces) {
+            tri.getMaterial().setLuminance(0);
+
             //= Check if triangle normal is facing the camera =
             Vector3D triNormal = tri.getNormal();
             //All three points lie on the same plane, so we can choose any

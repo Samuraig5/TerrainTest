@@ -1,12 +1,10 @@
 package Engine3d.Rendering;
 
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 import Engine3d.Time.TimeMeasurer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 

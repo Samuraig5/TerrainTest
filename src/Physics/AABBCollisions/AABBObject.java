@@ -1,6 +1,6 @@
 package Physics.AABBCollisions;
 
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 import Physics.Object3D;
 import Engine3d.Rendering.Scene;
 

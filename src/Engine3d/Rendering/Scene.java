@@ -1,15 +1,14 @@
 package Engine3d.Rendering;
 
-import Engine3d.Math.Ray;
+import Math.Ray;
 import Engine3d.Model.UnrotatableBox;
-import Physics.AABBCollisions.AABB;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
 import Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
-import Engine3d.Math.Matrix4x4;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Matrix4x4;
+import Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
 import Physics.Object3D;
 import Engine3d.Time.TimeMeasurer;
@@ -29,7 +28,7 @@ public class Scene implements Updatable
     final SceneRenderer sceneRenderer = new SceneRenderer();
     protected Color backgroundColour = Color.BLACK;
     private TimeMeasurer timeMeasurer;
-    List<Object3D> objects = new CopyOnWriteArrayList<>();
+    protected List<Object3D> objects = new CopyOnWriteArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 1d;
     protected List<Updatable> updatables = new CopyOnWriteArrayList<>();

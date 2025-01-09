@@ -1,8 +1,8 @@
 package Engine3d.Rendering;
 
-import Engine3d.Math.Matrix4x4;
-import Engine3d.Math.MeshTriangle;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Matrix4x4;
+import Math.MeshTriangle;
+import Math.Vector.Vector3D;
 import Engine3d.Rendering.ScreenDrawing.Drawer;
 import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
 import Engine3d.Rotatable;
@@ -18,7 +18,7 @@ public abstract class Camera implements Rotatable, Translatable {
     double fov = 90;
     double zNear = 0.25d;
     double zFar = 1000;
-    public boolean debugging = true;
+    public boolean debugging = false;
 
     JFrame window;
     public Drawer drawer;

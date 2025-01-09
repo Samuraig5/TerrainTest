@@ -1,6 +1,6 @@
-package Engine3d.Math;
+package Math;
 
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 
 public class Plane
 {

@@ -1,8 +1,7 @@
 package Physics.AABBCollisions;
 
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
-import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Model.UnrotatableBox;
 import Engine3d.Translatable;
 

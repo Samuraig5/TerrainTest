@@ -1,8 +1,8 @@
 package Physics.AABBCollisions;
 
-import Engine3d.Math.Box;
-import Engine3d.Math.Ray;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Box;
+import Math.Ray;
+import Math.Vector.Vector3D;
 
 public class AABB extends Box
 {

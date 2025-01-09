@@ -1,6 +1,6 @@
 package Engine3d.Lighting;
 
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Scene;
 

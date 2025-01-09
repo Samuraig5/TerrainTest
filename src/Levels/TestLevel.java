@@ -1,12 +1,10 @@
 package Levels;
 
-import Engine3d.Controls.CreativeCamera;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
-import Engine3d.Controls.OldSchoolFlyingControls;
 import Physics.PlayerObject;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Physics.AABBCollisions.StaticAABBObject;
 import Engine3d.Rendering.Camera;

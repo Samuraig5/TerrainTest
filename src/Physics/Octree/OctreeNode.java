@@ -1,6 +1,6 @@
 package Physics.Octree;
 
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 
 import java.util.ArrayList;
 import java.util.List;

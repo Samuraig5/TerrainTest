@@ -2,14 +2,14 @@ package Engine3d.Rendering;
 
 import Engine3d.Model.MTL;
 import Engine3d.Rendering.ScreenDrawing.Drawer;
-import Engine3d.Math.Vector.Vector2D;
+import Math.Vector.Vector2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Material
 {
-    private double luminance = 0;
+    private double luminance = 1;
     private final Vector2D[] textureCoords = new Vector2D[3];
     private BufferedImage texture;
     private MTL mtl = new MTL("Empty");

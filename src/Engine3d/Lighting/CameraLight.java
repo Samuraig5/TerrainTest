@@ -1,9 +1,7 @@
 package Engine3d.Lighting;
 
-import Engine3d.Math.Matrix4x4;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
-import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Rendering.Scene;
 
 public class CameraLight extends LightSource {

@@ -1,4 +1,4 @@
-package Engine3d.Math.Vector;
+package Math.Vector;
 
 public class Vector3D extends VectorW
 {

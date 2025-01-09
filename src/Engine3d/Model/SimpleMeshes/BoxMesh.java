@@ -1,9 +1,9 @@
 package Engine3d.Model.SimpleMeshes;
 
-import Engine3d.Math.Box;
-import Engine3d.Math.MeshTriangle;
-import Engine3d.Math.Vector.Vector2D;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Box;
+import Math.MeshTriangle;
+import Math.Vector.Vector2D;
+import Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
 import Physics.Object3D;
 import Engine3d.Rendering.Material;

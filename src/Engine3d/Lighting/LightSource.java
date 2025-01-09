@@ -1,7 +1,7 @@
 package Engine3d.Lighting;
 
-import Engine3d.Math.Matrix4x4;
-import Engine3d.Math.Vector.Vector3D;
+import Math.Matrix4x4;
+import Math.Vector.Vector3D;
 import Engine3d.Rendering.Scene;
 import Engine3d.Rotatable;
 import Engine3d.Translatable;
