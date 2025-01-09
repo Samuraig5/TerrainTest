@@ -26,14 +26,13 @@ public class TestLevel extends Scene
 
         backgroundColour = new Color(0, 128, 134);
 
-        //PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
-        //playerObject.translate(new Vector3D(0,20,0));
+        PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
+        playerObject.translate(new Vector3D(0,20,0));
+        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
 
-        CreativeCamera playerObject = new CreativeCamera(this, (PlayerCamera) camera);
-        playerObject.translate(new Vector3D(0,5,0));
-
-        //OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
-        OldSchoolFlyingControls cameraController = new OldSchoolFlyingControls(getSceneRenderer(), playerObject);
+        //CreativeCamera playerObject = new CreativeCamera(this, (PlayerCamera) camera);
+        //playerObject.translate(new Vector3D(0,5,0));
+        //OldSchoolFlyingControls cameraController = new OldSchoolFlyingControls(getSceneRenderer(), playerObject);
         addUpdatable(cameraController);
 
         LightSource sun = new LightSource(this);

@@ -15,6 +15,8 @@ import java.util.List;
 public class BoxMesh extends Mesh
 {
     Vector3D size;
+    Vector3D min;
+    Vector3D max;
     public BoxMesh(Object3D object3D, Vector3D size) {
         super(object3D);
         this.size = size;
@@ -41,9 +43,20 @@ public class BoxMesh extends Mesh
     public void scale(Vector3D delta) {
         super.scale(delta);
         size.scale(delta);
+        min.scale(delta);
+        max.scale(delta);
+    }
+
+    @Override
+    public void translate(Vector3D delta) {
+        super.translate(delta);
+        min.translate(delta);
+        max.translate(delta);
     }
 
     private void buildPoints(Vector3D min, Vector3D max) {
+        this.min = min;
+        this.max = max;
         points = List.of(new Vector3D[]{
                 new Vector3D(min.x(), min.y(), min.z()),
                 new Vector3D(min.x(), max.y(), min.z()),
@@ -142,5 +155,13 @@ public class BoxMesh extends Mesh
 
     public Vector3D getSize() {
         return size;
+    }
+
+    public Vector3D getMin() {
+        return min;
+    }
+
+    public Vector3D getMax() {
+        return max;
     }
 }

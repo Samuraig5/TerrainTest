@@ -110,7 +110,8 @@ public class Scene implements Updatable
                 o.getSource().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
                 if (o instanceof AABBObject && !(o instanceof PlayerObject)) {
                     UnrotatableBox collision = ((AABBObject) o).getAABBCollider().getAABBMesh();
-                    collision.scale(new Vector3D(1.01f,1.01f,1.01f));
+                    double scalingFactor = 1f;
+                    collision.scale(new Vector3D(scalingFactor,scalingFactor,scalingFactor));
                     DrawInstructions di = new DrawInstructions(true,false,false,false);
                     di.wireFrameColour = Color.ORANGE;
                     collision.setDrawInstructions(di);

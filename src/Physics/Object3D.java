@@ -1,5 +1,6 @@
 package Physics;
 
+import Engine3d.Math.Box;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.DrawInstructions;
@@ -77,8 +78,12 @@ public class Object3D implements Translatable, Rotatable
 
     // === DEBUGGING ===
 
-    double sourceBoxSize = 0.25d;
-    UnrotatableBox source = new UnrotatableBox(this, new Vector3D(sourceBoxSize,sourceBoxSize,sourceBoxSize));
+    double sourceBoxSize = 0.1d;
+    UnrotatableBox source = new UnrotatableBox(this,
+            new Box(
+            new Vector3D(-sourceBoxSize,-sourceBoxSize,-sourceBoxSize),
+            new Vector3D(sourceBoxSize,sourceBoxSize,sourceBoxSize))
+    );
     private void setUpDebugging() {
         //Centers the box on the source of the object
         source.translate(new Vector3D(-sourceBoxSize/2,-sourceBoxSize/2,-sourceBoxSize/2));

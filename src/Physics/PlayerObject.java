@@ -4,6 +4,7 @@ import Engine3d.Math.Box;
 import Engine3d.Math.Matrix4x4;
 import Engine3d.Math.Ray;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
+import Engine3d.Model.UnrotatableBox;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
@@ -23,7 +24,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         double size = 0.5;
         Vector3D min = new Vector3D(-size, 0, -size);
         Vector3D max = new Vector3D(size, 1.8, size);
-        BoxMesh playerMesh = new BoxMesh(this, new Box(min, max));
+        UnrotatableBox playerMesh = new UnrotatableBox(this, new Box(min, max));
         setMesh(playerMesh);
     }
 
