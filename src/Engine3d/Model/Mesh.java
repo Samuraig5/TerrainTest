@@ -28,6 +28,9 @@ public class Mesh implements Translatable, Rotatable
     protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
     protected Vector3D meshOffset = new Vector3D(0,0,0,1);
     protected boolean showWireFrame = false;
+    private TimeMeasurer tm;
+    private record copyPnF(List<Vector3D> copiedPoints, List<MeshTriangle> copiedFaces) {
+    }
     public Mesh(Object3D object3D) {
         this.object3D = object3D;
         //object3D.setMesh(this);
@@ -48,15 +51,58 @@ public class Mesh implements Translatable, Rotatable
     public Vector3D getDirection() {
         return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(Vector3D.FORWARD());
     }
-
     public Vector3D getPosition() {return meshOffset.translated(object3D.getPosition());}
-
-    public void drawObject(Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
+    
+    public void drawMesh(Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
     {
-        tm.startMeasurement("Get Matrices");
-        List<MeshTriangle> trianglesToRaster = new ArrayList<>();
+        this.tm = tm;
 
-        // Step 1: Create a copy of the points
+        copyPnF result = getCopyPnF();
+
+        localToWorld(result.copiedPoints());
+
+        try {
+            calculateLuminance(cameraPos, lightSources, result.copiedFaces());
+        } catch (NullPointerException e) {
+            return; //If a point is null, then the mesh is not drawable
+        }
+
+        tm.startMeasurement("ObjWorldToScreen");
+        viewMatrix.matrixVectorManipulation(result.copiedPoints());
+        tm.pauseMeasurement("ObjWorldToScreen");
+
+        List<MeshTriangle> trianglesToRaster = clipAgainstNearPlane(camera, result.copiedFaces());
+
+        trianglesToRaster = projectTriangles(camera, trianglesToRaster);
+
+        trianglesToRaster = clipAgainstFrustum(camera, trianglesToRaster);
+
+        drawTriangles(camera, trianglesToRaster);
+    }
+
+    /**
+     * Clips the triangles against the near plane of the camera.
+     * @param camera the camera against which the triangles are to be clipped.
+     * @param triangles the triangles to be clipped.
+     * @return the clipped triangles.
+     */
+    private List<MeshTriangle> clipAgainstNearPlane(Camera camera, List<MeshTriangle> triangles) {
+        List<MeshTriangle> clippedTriangles = new ArrayList<>();
+        for (MeshTriangle tri : triangles) {
+            Vector3D planePosition = camera.getNearPlane();
+            Vector3D planeNormal = new Vector3D(0,0,1);
+            List<MeshTriangle> newTrigs = clipTriangleAgainstPlane(planePosition, planeNormal, tri, tm);
+
+            clippedTriangles.addAll(newTrigs);
+        }
+        return clippedTriangles;
+    }
+
+    /**
+     * Generates copies of the points and faces. The copied faces reference the copied points.
+     * @return a copyPnF result. The points can be accessed with result.copiedPoints() and the faces with result.copiedFaces()
+     */
+    private copyPnF getCopyPnF() {
         Map<Vector3D, Vector3D> pointMap = new HashMap<>();
         List<Vector3D> copiedPoints = new ArrayList<>();
         for (int i = 0; i < points.size(); i++) {
@@ -65,114 +111,36 @@ public class Mesh implements Translatable, Rotatable
         }
 
         List<MeshTriangle> copiedFaces = generateCopyFaces(pointMap, faces);
+        copyPnF result = new copyPnF(copiedPoints, copiedFaces);
+        return result;
+    }
 
+    /**
+     * Translates the points from local space to world space.
+     * @param copiedPoints the points to be translated.
+     */
+    private void localToWorld(List<Vector3D> copiedPoints) {
+        tm.startMeasurement("localToWorld");
         Matrix4x4 trans = Matrix4x4.getTranslationMatrix(getPosition());
         Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(getRotation()), trans);
-        tm.pauseMeasurement("Get Matrices");
-
-        tm.startMeasurement("ObjWorldToScreen");
 
         worldTransform.matrixVectorManipulation(copiedPoints);
+        tm.pauseMeasurement("localToWorld");
+    }
 
-
-        for (MeshTriangle tri : copiedFaces) {
-            //= Check if triangle normal is facing the camera =
-            Vector3D triNormal = new Vector3D();
-            try {
-                triNormal = tri.getNormal();
-            }
-            catch (NullPointerException e) {
-                //System.err.println(e.getMessage());
-                return;
-            }
-            //All three points lie on the same plane, so we can choose any
-            Vector3D cameraRay = new Vector3D(tri.getPoints()[0]);
-            cameraRay.translate(cameraPos.inverted());
-
-            //If the camera can't see the triangle, don't draw it
-            if (triNormal.dotProduct(cameraRay) >= 0) {
-                tm.pauseMeasurement("ObjWorldToScreen");
-                continue;
-            }
-            tm.pauseMeasurement("ObjWorldToScreen");
-
-            tm.startMeasurement("Lighting");
-            for (LightSource ls : lightSources) {
-                double lightIntensity = ls.getLightIntensity(tri.getMidPoint().distanceTo(ls.getPosition()));
-                if (lightIntensity == 0) {continue;}
-
-                Vector3D lightDirection = ls.getDirection().normalized().inverted();
-
-                double lightDotProduct = (triNormal.dotProduct(lightDirection)*lightIntensity);
-                if (tri.getMaterial().getLuminance() < lightDotProduct) {
-                    tri.getMaterial().setLuminance(lightDotProduct);
-                }
-            }
-            tm.pauseMeasurement("Lighting");
-        }
-
-        tm.startMeasurement("ObjWorldToScreen");
-        viewMatrix.matrixVectorManipulation(copiedPoints);
-        tm.pauseMeasurement("ObjWorldToScreen");
-
-        for (MeshTriangle tri : copiedFaces) {
-            tm.startMeasurement("TriangleClipping");
-            // = Clip Viewed Triangle =
-            Vector3D planePosition = camera.getNearPlane();
-            Vector3D planeNormal = new Vector3D(0,0,1);
-            List<MeshTriangle> clippedTriangles = clipTriangleAgainstPlane(planePosition, planeNormal, tri);
-            tm.pauseMeasurement("TriangleClipping");
-
-            tm.startMeasurement("ObjWorldToScreen");
-            for (MeshTriangle triClipped : clippedTriangles)
-            {
-                //= Apply Projection (3D -> 2D) =
-                MeshTriangle triProj = camera.projectTriangle(triClipped);
-
-                Vector3D[] points = triProj.getPoints();
-                Vector2D[] texPoints = triClipped.getMaterial().getTextureCoords();
-                double u1 = texPoints[0].u() / points[0].w();
-                double u2 = texPoints[1].u() / points[1].w();
-                double u3 = texPoints[2].u() / points[2].w();
-                double v1 = texPoints[0].v() / points[0].w();
-                double v2 = texPoints[1].v() / points[1].w();
-                double v3 = texPoints[2].v() / points[2].w();
-                double w1 = 1f / points[0].w();
-                double w2 = 1f / points[1].w();
-                double w3 = 1f / points[2].w();
-                Vector2D tex1 = new Vector2D(u1, v1, w1);
-                Vector2D tex2 = new Vector2D(u2, v2, w2);
-                Vector2D tex3 = new Vector2D(u3, v3, w3);
-
-                Material newMat = new Material(triClipped.getMaterial());
-                newMat.setTextureCoords(tex1, tex2, tex3);
-                triProj.setMaterial(newMat);
-
-                triProj.dividePointsByW();
-
-                //= Move projection into view =
-                triProj.translate(new Vector3D(1f, 1f, 0));
-
-                //= Scale projection to screen =
-                double centreX = 0.5f * camera.getResolution().x();
-                double centreY = 0.5f * camera.getResolution().y();
-                triProj.scale(new Vector3D(centreX, centreY, 1));
-
-                //= Add triangle to list=
-                trianglesToRaster.add(triProj);
-            }
-            tm.pauseMeasurement("ObjWorldToScreen");
-        }
-
-        //Sorting no longer needed due to depth buffer
-        //trianglesToRaster.sort(Comparator.comparingDouble(Triangle::getMidPoint).reversed());
-
-        for (MeshTriangle triangle : trianglesToRaster) {
+    /**
+     * Clips the triangles against the sides of the camera's frustum.
+     * @param camera The camera to which the triangles should be clipped.
+     * @param triangles The triangles to be clipped.
+     * @return The list of clipped triangles.
+     */
+    private List<MeshTriangle> clipAgainstFrustum(Camera camera, List<MeshTriangle> triangles) {
+        List<MeshTriangle> clippedTriangles = new ArrayList<>();
+        for (MeshTriangle triangle : triangles) {
             List<MeshTriangle> triangleQueue = new ArrayList<>();
             triangleQueue.add(triangle);
             int numNewTriangles = 1;
 
-            tm.startMeasurement("TriangleClipping");
             for (int p = 0; p < 4; p++) {
                 List<MeshTriangle> triToAdd = new ArrayList<>();
                 while (numNewTriangles > 0)
@@ -184,42 +152,138 @@ public class Mesh implements Translatable, Rotatable
                         case 0 -> triToAdd = clipTriangleAgainstPlane(
                                 new Vector3D(0, 0, 0),
                                 new Vector3D(0, 1, 0),
-                                curr);
+                                curr, tm);
                         case 1 -> triToAdd = clipTriangleAgainstPlane(
                                 new Vector3D(0, camera.getResolution().y() - 1, 0),
                                 new Vector3D(0, -1, 0),
-                                curr);
+                                curr, tm);
                         case 2 -> triToAdd = clipTriangleAgainstPlane(
                                 new Vector3D(0, 0, 0),
                                 new Vector3D(1, 0, 0),
-                                curr);
+                                curr, tm);
                         case 3 -> triToAdd = clipTriangleAgainstPlane(
                                 new Vector3D(camera.getResolution().x() - 1, 0, 0),
                                 new Vector3D(-1, 0, 0),
-                                curr);
+                                curr, tm);
                     }
                     triangleQueue.addAll(triToAdd);
                 }
                 numNewTriangles = triangleQueue.size();
             }
-            tm.pauseMeasurement("TriangleClipping");
+            clippedTriangles.addAll(triangleQueue);
+        }
+        return clippedTriangles;
+    }
 
-            for (MeshTriangle triToDraw : triangleQueue) {
-                if (showWireFrame) { camera.drawer.drawDebugTriangle(Color.white, triToDraw); }
-                if (!(triToDraw.getMaterial().getTexture() == null)) {
-                    tm.startMeasurement("Texturizer");
-                    camera.drawer.textureTriangle(triToDraw);
-                    tm.pauseMeasurement("Texturizer");
-                }
-                else if (triToDraw.getMaterial().getBaseColour().getAlpha() > 0) {
-                    camera.drawer.fillTriangle(triToDraw);
-                }
+    /**
+     * Draws the triangles to the screen.
+     * @param camera the camera to which the triangle is drawn.
+     * @param triangles the list of triangles to be drawn.
+     */
+    private void drawTriangles(Camera camera, List<MeshTriangle> triangles) {
+        for (MeshTriangle triToDraw : triangles) {
+            if (showWireFrame) { camera.drawer.drawDebugTriangle(Color.white, triToDraw); }
+            if (!(triToDraw.getMaterial().getTexture() == null)) {
+                tm.startMeasurement("Texturizer");
+                camera.drawer.textureTriangle(triToDraw);
+                tm.pauseMeasurement("Texturizer");
+            }
+            else if (triToDraw.getMaterial().getBaseColour().getAlpha() > 0) {
+                camera.drawer.fillTriangle(triToDraw);
             }
         }
     }
 
-    private List<MeshTriangle> clipTriangleAgainstPlane(Vector3D planePosition, Vector3D planeNormal, MeshTriangle in)
+
+    /**
+     * Calculates the projection of the triangles.
+     * @param camera camera to which the triangles are projected.
+     * @param triangles triangles to be projected.
+     * @return projection of the triangles.
+     */
+    private List<MeshTriangle> projectTriangles(Camera camera, List<MeshTriangle> triangles) {
+        tm.startMeasurement("ObjWorldToScreen");
+        List<MeshTriangle> projected = new ArrayList<>();
+        for (MeshTriangle triClipped : triangles)
+        {
+            //= Apply Projection (3D -> 2D) =
+            MeshTriangle triProj = camera.projectTriangle(triClipped);
+
+            Vector3D[] points = triProj.getPoints();
+            Vector2D[] texPoints = triClipped.getMaterial().getTextureCoords();
+            double u1 = texPoints[0].u() / points[0].w();
+            double u2 = texPoints[1].u() / points[1].w();
+            double u3 = texPoints[2].u() / points[2].w();
+            double v1 = texPoints[0].v() / points[0].w();
+            double v2 = texPoints[1].v() / points[1].w();
+            double v3 = texPoints[2].v() / points[2].w();
+            double w1 = 1f / points[0].w();
+            double w2 = 1f / points[1].w();
+            double w3 = 1f / points[2].w();
+            Vector2D tex1 = new Vector2D(u1, v1, w1);
+            Vector2D tex2 = new Vector2D(u2, v2, w2);
+            Vector2D tex3 = new Vector2D(u3, v3, w3);
+
+            Material newMat = new Material(triClipped.getMaterial());
+            newMat.setTextureCoords(tex1, tex2, tex3);
+            triProj.setMaterial(newMat);
+
+            triProj.dividePointsByW();
+
+            //= Move projection into view =
+            triProj.translate(new Vector3D(1f, 1f, 0));
+
+            //= Scale projection to screen =
+            double centreX = 0.5f * camera.getResolution().x();
+            double centreY = 0.5f * camera.getResolution().y();
+            triProj.scale(new Vector3D(centreX, centreY, 1));
+
+            //= Add triangle to list=
+            projected.add(triProj);
+        }
+        tm.pauseMeasurement("ObjWorldToScreen");
+        return projected;
+    }
+
+    /**
+     * Calculates the luminance of each mesh triangle and writes the result to the triangle's material.
+     * @param cameraPos position of the camera
+     * @param lightSources list of lightSources
+     * @param copiedFaces the faces that should be illuminated
+     */
+    private void calculateLuminance(Vector3D cameraPos, List<LightSource> lightSources, List<MeshTriangle> copiedFaces) {
+        tm.startMeasurement("Lighting");
+        for (MeshTriangle tri : copiedFaces) {
+            //= Check if triangle normal is facing the camera =
+            Vector3D triNormal = tri.getNormal();
+            //All three points lie on the same plane, so we can choose any
+            Vector3D cameraRay = new Vector3D(tri.getPoints()[0]);
+            cameraRay.translate(cameraPos.inverted());
+
+            //If the camera can't see the triangle, don't draw it
+            if (triNormal.dotProduct(cameraRay) >= 0) {
+                continue;
+            }
+
+            for (LightSource ls : lightSources) {
+                double lightIntensity = ls.getLightIntensity(tri.getMidPoint().distanceTo(ls.getPosition()));
+                if (lightIntensity == 0) {continue;}
+
+                Vector3D lightDirection = ls.getDirection().normalized().inverted();
+
+                double lightDotProduct = (triNormal.dotProduct(lightDirection)*lightIntensity);
+                if (tri.getMaterial().getLuminance() < lightDotProduct) {
+                    tri.getMaterial().setLuminance(lightDotProduct);
+                }
+            }
+        }
+        tm.pauseMeasurement("Lighting");
+    }
+
+    private List<MeshTriangle> clipTriangleAgainstPlane(Vector3D planePosition, Vector3D planeNormal, MeshTriangle in, TimeMeasurer tm)
     {
+        tm.startMeasurement("TriangleClipping");
+
         planeNormal.normalize();
 
         Function<Vector3D, Double> dist = (Vector3D p) -> {
@@ -282,6 +346,7 @@ public class Mesh implements Translatable, Rotatable
             newTriangle.setMaterial(newMaterial);
             out.add(newTriangle);
 
+            tm.pauseMeasurement("TriangleClipping");
             return out;
         }
         if (numInPoints == 2) // Two point of the triangle was inside the clipping area
@@ -321,8 +386,10 @@ public class Mesh implements Translatable, Rotatable
             tri2.setMaterial(mat2);
             out.add(tri2);
 
+            tm.pauseMeasurement("TriangleClipping");
             return out;
         }
+        tm.pauseMeasurement("TriangleClipping");
         return out;
     }
 

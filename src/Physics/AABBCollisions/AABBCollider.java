@@ -2,6 +2,7 @@ package Physics.AABBCollisions;
 
 import Engine3d.Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
+import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Translatable;
 
 public abstract class AABBCollider implements Translatable
@@ -24,6 +25,12 @@ public abstract class AABBCollider implements Translatable
         //if (aabb != null) { return aabb; }
         //return colliderMesh.getAABB();
         return colliderMesh.getAABB();
+    }
+
+    public BoxMesh getAABBMesh() {
+        BoxMesh res = new BoxMesh(obj, colliderMesh.getAABB());
+        res.centreToMiddleBottom();
+        return res;
     }
 
     public boolean handleCollision(AABBCollider other) {

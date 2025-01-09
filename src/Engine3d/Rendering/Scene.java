@@ -112,9 +112,14 @@ public class Scene implements Updatable
          */
 
         objects.parallelStream().forEach(o -> {
-            o.getMesh().drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+            o.getMesh().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
             if (camera.debugging) {
-                o.getSource().drawObject(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+                o.getSource().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+                if (o instanceof AABBObject) {
+                    Mesh collision = ((AABBObject) o).getAABBCollider().getAABBMesh();
+                    collision.showWireFrame(true);
+                    collision.drawMesh(camera,constCamPos,viewMatrix,lightSources,timeMeasurer);
+                }
             }
         });
     }

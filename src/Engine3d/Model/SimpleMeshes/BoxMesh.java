@@ -1,5 +1,6 @@
 package Engine3d.Model.SimpleMeshes;
 
+import Engine3d.Math.Box;
 import Engine3d.Math.MeshTriangle;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
@@ -17,6 +18,20 @@ public class BoxMesh extends Mesh
     public BoxMesh(Object3D object3D, Vector3D size) {
         super(object3D);
         this.size = size;
+        buildPoints(size);
+        buildFaces(size);
+
+        setDiffuseColour(new Color(0,0,0,0));
+    }
+
+    public BoxMesh(Object3D object3D, Box box) {
+        super(object3D);
+        Vector3D min = box.min();
+        Vector3D max = box.max();
+        double x = max.x() - min.x();
+        double y = max.y() - min.y();
+        double z = max.z() - min.z();
+        this.size = new Vector3D(x,y,z);
         buildPoints(size);
         buildFaces(size);
 

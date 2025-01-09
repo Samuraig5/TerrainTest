@@ -70,10 +70,11 @@ public class Object3D implements Translatable, Rotatable
     // === DEBUGGING ===
 
     double sourceBoxSize = 0.25d;
-    Mesh source = new CubeMesh(this, sourceBoxSize);
+    CubeMesh source = new CubeMesh(this, sourceBoxSize);
     private void setUpDebugging() {
         //Centers the box on the source of the object
         source.translate(new Vector3D(-sourceBoxSize/2,-sourceBoxSize/2,-sourceBoxSize/2));
+        source.centreToMiddleBottom();
         source.showWireFrame(true);
     }
     public Mesh getSource() {
