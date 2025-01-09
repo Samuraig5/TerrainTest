@@ -131,7 +131,7 @@ public class Drawer
         for (int i = 0; i < 3; i++) {
             double x = points[i].x();
             double y = points[i].y();
-            double w = texPoints[i].w() * 1.2f; //Make these pixels be drawn with a slight preference
+            double w = texPoints[i].w() * 1f; //Make these pixels be drawn with a slight preference
             depthPoints[i] = new Vector3D(x,y,0,w);
         }
 

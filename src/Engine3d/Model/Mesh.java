@@ -4,6 +4,7 @@ import Engine3d.Lighting.LightSource;
 import Engine3d.Math.*;
 import Engine3d.Math.Vector.Vector2D;
 import Engine3d.Math.Vector.Vector3D;
+import Engine3d.Scalable;
 import Physics.AABBCollisions.AABB;
 import Physics.Object3D;
 import Engine3d.Rendering.Camera;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
-public class Mesh implements Translatable, Rotatable
+public class Mesh implements Translatable, Rotatable, Scalable
 {
     private Object3D object3D;
     protected List<Vector3D> points = new ArrayList<>();
@@ -50,6 +51,12 @@ public class Mesh implements Translatable, Rotatable
     @Override
     public Vector3D getDirection() {
         return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(Vector3D.FORWARD());
+    }
+    @Override
+    public void scale(Vector3D delta) {
+        for (int i = 0; i < points.size(); i++) {
+            points.get(i).scale(delta);
+        }
     }
     public Vector3D getPosition() {return meshOffset.translated(object3D.getPosition());}
     public DrawInstructions getDrawInstructions() {

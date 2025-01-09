@@ -2,6 +2,7 @@ package Engine3d.Rendering;
 
 import Engine3d.Math.Ray;
 import Engine3d.Model.DrawInstructions;
+import Engine3d.Model.UnrotatableBox;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
@@ -119,7 +120,10 @@ public class Scene implements Updatable
 
                 o.getSource().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
                 if (o instanceof AABBObject && !(o instanceof PlayerObject)) {
-                    Mesh collision = ((AABBObject) o).getAABBCollider().getAABBMesh();
+                    UnrotatableBox collision = ((AABBObject) o).getAABBCollider().getAABBMesh();
+                    collision.scale(new Vector3D(1.01f,1.01f,1.01f));
+                    collision.centreToMiddleBottom();
+
                     DrawInstructions di = new DrawInstructions(true,false,false,false);
                     di.wireFrameColour = Color.ORANGE;
                     collision.setDrawInstructions(di);

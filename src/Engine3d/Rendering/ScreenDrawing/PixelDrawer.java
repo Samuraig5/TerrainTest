@@ -47,18 +47,26 @@ public class PixelDrawer
         // Calculate the differences and the direction of the line
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
+        double dw = Math.abs(w2 - w1);
 
-        int sx = x1 < x2 ? 1 : -1; // Step direction in x
-        int sy = y1 < y2 ? 1 : -1; // Step direction in y
+        int stepX = x1 < x2 ? 1 : -1; // Step direction in x
+        int stepY = y1 < y2 ? 1 : -1; // Step direction in y
+        double stepW = w1 < w2 ? 1 : -1; // Step direction in w
+
 
         // Bresenham's algorithm variables
         int err = dx - dy;
 
         while (true) {
             // Interpolate the depth based on the line's progress
-            double t = (dx + dy == 0) ? 0 : Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
-                    / (float) Math.sqrt((dx * dx) + (dy * dy));
-            double depth = w1 * (1 - t) + w2 * t;
+            double t = 0;
+            if (dx + dy != 0) {
+                t = Math.sqrt(
+                        (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) /
+                        (float) Math.sqrt((dx * dx) + (dy * dy)
+                );
+            }
+            double depth = w2 * (1 - t) + w1 * t;;
 
             // Draw the current pixel
             checkAndDrawPixel(screenBuffer, c, x1, y1, depth);
@@ -70,11 +78,11 @@ public class PixelDrawer
             int e2 = 2 * err;
             if (e2 > -dy) {
                 err -= dy;
-                x1 += sx;
+                x1 += stepX;
             }
             if (e2 < dx) {
                 err += dx;
-                y1 += sy;
+                y1 += stepY;
             }
         }
     }

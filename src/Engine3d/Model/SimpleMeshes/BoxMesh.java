@@ -38,6 +38,12 @@ public class BoxMesh extends Mesh
         setDiffuseColour(new Color(0,0,0,0));
     }
 
+    @Override
+    public void scale(Vector3D delta) {
+        super.scale(delta);
+        size.scale(delta);
+    }
+
     private void buildPoints(Vector3D size) {
         points = List.of(new Vector3D[]{
                 new Vector3D(0, 0, 0),
