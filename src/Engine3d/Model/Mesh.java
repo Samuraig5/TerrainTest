@@ -70,6 +70,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
     public void setDrawInstructions(DrawInstructions drawInstructions) {
         this.drawInstructions = drawInstructions;
     }
+    public List<Vector3D> getPoints() { return points; }
 
     public void drawMesh(Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
     {

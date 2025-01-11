@@ -227,6 +227,15 @@ public abstract class Vector implements Translatable
         return result;
     }
 
+    /**
+     * Returns true if the dot product with the other vector is greater than 0.
+     * @param other other vector to be tested against.
+     * @return true if this.dotProduct(other) > 0.
+     */
+    public boolean sameDirection (Vector other) {
+    return dotProduct(other) > 0;
+}
+
     public boolean isEmpty() {
         for (double val : components) {
             if (val != 0) { return false; }
