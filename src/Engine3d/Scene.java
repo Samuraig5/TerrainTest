@@ -1,5 +1,8 @@
-package Engine3d.Rendering;
+package Engine3d;
 
+import Engine3d.Rendering.Camera;
+import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Rendering.SceneRenderer;
 import Math.Ray;
 import Engine3d.Model.UnrotatableBox;
 import Physics.AABBCollisions.AABBObject;

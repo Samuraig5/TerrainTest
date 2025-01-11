@@ -2,7 +2,7 @@ package Engine3d.Lighting;
 
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
-import Engine3d.Rendering.Scene;
+import Engine3d.Scene;
 
 public class HeadLight
 {

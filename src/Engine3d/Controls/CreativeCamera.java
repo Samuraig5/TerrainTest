@@ -1,7 +1,7 @@
 package Engine3d.Controls;
 
 import Engine3d.Rendering.PlayerCamera;
-import Engine3d.Rendering.Scene;
+import Engine3d.Scene;
 import Physics.PlayerObject;
 
 public class CreativeCamera extends PlayerObject

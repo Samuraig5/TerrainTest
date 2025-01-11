@@ -7,7 +7,7 @@ import Math.Vector.Vector3D;
 import Physics.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
-import Engine3d.Rendering.Scene;
+import Engine3d.Scene;
 
 public class BloodGulch extends Scene
 {

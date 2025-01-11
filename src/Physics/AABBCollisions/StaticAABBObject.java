@@ -2,7 +2,7 @@ package Physics.AABBCollisions;
 
 import Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
-import Engine3d.Rendering.Scene;
+import Engine3d.Scene;
 
 public class StaticAABBObject extends AABBObject
 {

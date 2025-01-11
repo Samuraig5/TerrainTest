@@ -9,7 +9,7 @@ import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Physics.AABBCollisions.StaticAABBObject;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
-import Engine3d.Rendering.Scene;
+import Engine3d.Scene;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

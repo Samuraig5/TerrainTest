@@ -7,7 +7,7 @@ import Engine3d.Model.UnrotatableBox;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
-import Engine3d.Rendering.Scene;
+import Engine3d.Scene;
 
 public class PlayerObject extends DynamicAABBObject implements Gravitational
 {

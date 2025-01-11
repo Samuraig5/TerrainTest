@@ -1,5 +1,6 @@
 package Engine3d.Rendering;
 
+import Engine3d.Scene;
 import Math.Vector.Vector3D;
 import Engine3d.Time.TimeMeasurer;
 
@@ -42,7 +43,7 @@ public class SceneRenderer extends JPanel
         this.activeScene = activeScene;
         activeScene.addTimeMeasurer(timeMeasurer);
 
-        errorMessagePos = new Vector3D(20, activeScene.camera.getScreenDimensions().y()/2,0);
+        errorMessagePos = new Vector3D(20, activeScene.getCamera().getScreenDimensions().y()/2,0);
 
         startBuildThread();
         startUpdateThread();
@@ -75,12 +76,12 @@ public class SceneRenderer extends JPanel
         activeScene.getCamera().drawScreenBuffer(g); //This is the only non-UI call :helenaPepe:
 
         g.setColor(Color.white);
-        int screenWidth = (int) activeScene.camera.getScreenDimensions().x() - 20;
-        String s = "Cam Pos: " + activeScene.camera.getPosition().toStringRounded();
+        int screenWidth = (int) activeScene.getCamera().getScreenDimensions().x() - 20;
+        String s = "Cam Pos: " + activeScene.getCamera().getPosition().toStringRounded();
         int sWidth = g.getFontMetrics().stringWidth(s);
         g.drawString(s,screenWidth-sWidth,20 );
 
-        s = "Cam Rot: " + activeScene.camera.getRotation().toStringRounded();
+        s = "Cam Rot: " + activeScene.getCamera().getRotation().toStringRounded();
         sWidth = g.getFontMetrics().stringWidth(s);
         g.drawString(s,screenWidth-sWidth,40 );
 
