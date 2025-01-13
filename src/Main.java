@@ -1,4 +1,5 @@
 import Engine3d.Rendering.PlayerCamera;
+import Levels.GJKTest;
 import Levels.TerrainLevel;
 
 import javax.swing.*;
@@ -18,7 +19,8 @@ public class Main {
 
         //new BloodGulch(camera);
         //new TestLevel(camera);
-        new TerrainLevel(camera);
+        //new TerrainLevel(camera);
+        new GJKTest(camera);
 
         frame.setVisible(true);
     }

@@ -71,6 +71,13 @@ public class Mesh implements Translatable, Rotatable, Scalable
         this.drawInstructions = drawInstructions;
     }
     public List<Vector3D> getPoints() { return points; }
+    public List<Vector3D> getPointsInWorld() {
+        copyPnF result = getCopyPnF();
+
+        localToWorld(result.copiedPoints());
+
+        return result.copiedPoints;
+    }
 
     public void drawMesh(Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
     {

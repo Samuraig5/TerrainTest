@@ -7,9 +7,9 @@ import java.util.List;
 
 public class GJK
 {
-    public boolean solveGJK(Object3D o1, Object3D o2) {
-        List<Vector3D> ver1 = o1.getMesh().getPoints();
-        List<Vector3D> ver2 = o2.getMesh().getPoints();
+    public static boolean solveGJK(Object3D o1, Object3D o2) {
+        List<Vector3D> ver1 = o1.getMesh().getPointsInWorld();
+        List<Vector3D> ver2 = o2.getMesh().getPointsInWorld();
 
         Simplex simplex = new Simplex();
 
@@ -25,6 +25,11 @@ public class GJK
             simplex.a(calculateNewVertex(ver1, ver2, dir));
             simplex.incrementCount();
 
+            //If new support point isn't on opposite side of origin, its impossible for the simplex to enclose the origin.
+            if (simplex.a().dotProduct(dir) < 0) {
+                return false;
+            }
+
             switch (simplex.count()) {
                 case 2:
                     dir = solveSimplex2(simplex, dir);
@@ -33,7 +38,10 @@ public class GJK
                     dir = solveSimplex3(simplex, dir);
                     break;
                 case 4:
-                    //https://www.youtube.com/watch?v=DGVZYdlw_uo (10 min mark)
+                    dir = solveSimplex4(simplex, dir);
+                    if (dir == null) {
+                        return true;
+                    }
                     break;
             }
         }
@@ -45,7 +53,7 @@ public class GJK
      * @param direction direction to be checked.
      * @return the most extreme vertex in the direction.
      */
-    private Vector3D supportFunction(List<Vector3D> vertices, Vector3D direction) {
+    private static Vector3D supportFunction(List<Vector3D> vertices, Vector3D direction) {
         Vector3D largestVertex = vertices.get(0);
         double largestDot = largestVertex.dotProduct(direction);
         for (int i = 1; i < vertices.size(); i++) {
@@ -67,7 +75,7 @@ public class GJK
      * @param dir Direction to be checked.
      * @return the difference of the most extreme vertices.
      */
-    private Vector3D calculateNewVertex(List<Vector3D> ver1, List<Vector3D> ver2, Vector3D dir) {
+    private static Vector3D calculateNewVertex(List<Vector3D> ver1, List<Vector3D> ver2, Vector3D dir) {
         Vector3D exrm1 = supportFunction(ver1, dir);
         Vector3D exrm2 = supportFunction(ver2, dir.inverted());
         return exrm1.translated(exrm2.inverted());
@@ -79,7 +87,7 @@ public class GJK
      * @param dir the previous direction.
      * @return the new direction.
      */
-    private Vector3D solveSimplex2(Simplex simplex, Vector3D dir) {
+    private static Vector3D solveSimplex2(Simplex simplex, Vector3D dir) {
         Vector3D ab = simplex.b().translated(simplex.a().inverted()); //b - a
         Vector3D ao = simplex.a().inverted(); // -a
 
@@ -102,7 +110,7 @@ public class GJK
      * @param dir the previous direction.
      * @return the new direction.
      */
-    private Vector3D solveSimplex3(Simplex simplex, Vector3D dir) {
+    private static Vector3D solveSimplex3(Simplex simplex, Vector3D dir) {
         Vector3D ab = simplex.b().translated(simplex.a().inverted()); //b - a
         Vector3D ac = simplex.c().translated(simplex.a().inverted()); //c - a
         Vector3D abc = ab.crossProduct(ac);
@@ -156,5 +164,45 @@ public class GJK
                 }
             }
         }
+    }
+
+    /**
+     * Finds the next point for the 3D (tetrahedron) simplex to expand to.
+     * @param simplex the simplex.
+     * @param dir the previous direction.
+     * @return the new direction.
+     */
+    private static Vector3D solveSimplex4(Simplex simplex, Vector3D dir) {
+        Vector3D vec1 = simplex.b().translated(simplex.a().inverted());
+        Vector3D vec2 = simplex.c().translated(simplex.a().inverted());
+        Vector3D vec3 = simplex.d().translated(simplex.a().inverted());
+
+        Vector3D ao = simplex.a().inverted();
+        Vector3D abc = vec1.crossProduct(vec2);
+        Vector3D acd = vec2.crossProduct(vec3);
+        Vector3D adb = vec3.crossProduct(vec1);
+
+        if (abc.sameDirection(ao)) {
+            //Origin is closest to triangle abc
+            simplex.count(3);
+            return solveSimplex3(simplex, dir);
+        }
+
+        if (acd.sameDirection(ao)) {
+            //Origin is closest to triangle acd
+            simplex.b(simplex.c());
+            simplex.c(simplex.d());
+            simplex.count(3);
+            return solveSimplex3(simplex, dir);
+        }
+
+        if (adb.sameDirection(ao)) {
+            //Origin is closest to triangle adb
+            simplex.c(simplex.b());
+            simplex.b(simplex.d());
+            simplex.count(3);
+            return solveSimplex3(simplex, dir);
+        }
+        return null;
     }
 }
