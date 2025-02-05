@@ -1,4 +1,4 @@
-package Physics.GJK;
+package Physics.GJK_EPA;
 
 import Math.Vector.Vector3D;
 import Physics.Object3D;
@@ -7,7 +7,12 @@ import java.util.List;
 
 public class GJK
 {
-    public static boolean solveGJK(Object3D o1, Object3D o2) {
+    public static boolean boolSolveGJK(Object3D o1, Object3D o2) {
+        Simplex sim = solveGJK(o1, o2);
+        return sim != null;
+    }
+
+    public static Simplex solveGJK(Object3D o1, Object3D o2) {
         List<Vector3D> ver1 = o1.getMesh().getPointsInWorld();
         List<Vector3D> ver2 = o2.getMesh().getPointsInWorld();
 
@@ -27,7 +32,7 @@ public class GJK
 
             //If new support point isn't on opposite side of origin, its impossible for the simplex to enclose the origin.
             if (simplex.a().dotProduct(dir) < 0) {
-                return false;
+                return null;
             }
 
             switch (simplex.count()) {
@@ -40,7 +45,7 @@ public class GJK
                 case 4:
                     dir = solveSimplex4(simplex, dir);
                     if (dir == null) {
-                        return true;
+                        return simplex;
                     }
                     break;
             }

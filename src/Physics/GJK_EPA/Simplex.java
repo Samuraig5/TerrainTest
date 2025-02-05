@@ -1,8 +1,6 @@
-package Physics.GJK;
+package Physics.GJK_EPA;
 
 import Math.Vector.Vector3D;
-
-import java.util.List;
 
 public class Simplex {
 
