@@ -11,6 +11,10 @@ public class EPA
         Simplex solGJK = solveGJK(o1, o2);
         if (solGJK == null) { return new Vector3D(); }
 
+        Polytope polytope = new Polytope(solGJK);
+
+        //EPA HERE
+
         return new Vector3D(1,1,1);
     }
 }

@@ -58,7 +58,7 @@ public class GJK
      * @param direction direction to be checked.
      * @return the most extreme vertex in the direction.
      */
-    private static Vector3D supportFunction(List<Vector3D> vertices, Vector3D direction) {
+    protected static Vector3D supportFunction(List<Vector3D> vertices, Vector3D direction) {
         Vector3D largestVertex = vertices.get(0);
         double largestDot = largestVertex.dotProduct(direction);
         for (int i = 1; i < vertices.size(); i++) {
