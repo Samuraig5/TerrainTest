@@ -33,6 +33,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
     private SceneRenderer renderer;
     private Robot robot;
+    private boolean centerCursor = true;
     private boolean recentering = false;
 
     public OldSchoolDungeonCameraControls(SceneRenderer renderer, PlayerObject playerObject) {
@@ -115,6 +116,12 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
             }
             case KeyEvent.VK_SHIFT -> shiftDown = true;
             case KeyEvent.VK_CONTROL -> ctrlDown = true;
+            case KeyEvent.VK_ESCAPE -> {
+                Point center = new Point(renderer.getWidth() / 2, renderer.getHeight() / 2);
+                SwingUtilities.convertPointToScreen(center, renderer);
+                if(!centerCursor) { centerCursor(center); }
+                centerCursor = !centerCursor;
+            }
         }
     }
 
@@ -139,12 +146,20 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         int deltaX = e.getXOnScreen() - center.x;
         int deltaY = e.getYOnScreen() - center.y;
 
-        Vector3D rotDelta = new Vector3D(Math.toRadians(deltaY) * mouseSensitivity, Math.toRadians(-deltaX) * mouseSensitivity, 0);
-        playerObject.rotate(rotDelta);
+        if (centerCursor) {
+            Vector3D rotDelta = new Vector3D(Math.toRadians(deltaY) * mouseSensitivity, Math.toRadians(-deltaX) * mouseSensitivity, 0);
+            playerObject.rotate(rotDelta);
+        }
 
         lastMouseX = e.getX();
         lastMouseY = e.getY();
 
+        if (centerCursor) {
+            centerCursor(center);
+        }
+    }
+
+    private void centerCursor(Point center) {
         // Recenter the mouse cursor
         recentering = true;
         robot.mouseMove(center.x, center.y);
