@@ -58,7 +58,7 @@ public class GJK
      * @param direction direction to be checked.
      * @return the most extreme vertex in the direction.
      */
-    protected static Vector3D supportFunction(List<Vector3D> vertices, Vector3D direction) {
+    private static Vector3D supportFunction(List<Vector3D> vertices, Vector3D direction) {
         Vector3D largestVertex = vertices.get(0);
         double largestDot = largestVertex.dotProduct(direction);
         for (int i = 1; i < vertices.size(); i++) {
@@ -80,7 +80,7 @@ public class GJK
      * @param dir Direction to be checked.
      * @return the difference of the most extreme vertices.
      */
-    private static Vector3D calculateNewVertex(List<Vector3D> ver1, List<Vector3D> ver2, Vector3D dir) {
+    protected static Vector3D calculateNewVertex(List<Vector3D> ver1, List<Vector3D> ver2, Vector3D dir) {
         Vector3D exrm1 = supportFunction(ver1, dir);
         Vector3D exrm2 = supportFunction(ver2, dir.inverted());
         return exrm1.translated(exrm2.inverted());

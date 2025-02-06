@@ -17,8 +17,12 @@ public class Face {
         this.normal = ab.crossProduct(ac).normalized();  // Normalized normal vector
     }
 
+    public Vector3D a() {return a;}
+    public Vector3D b() {return b;}
+    public Vector3D c() {return c;}
+
     // Get the normal vector of the face
-    public Vector3D getNormal() {
+    public Vector3D normal() {
         return normal;
     }
 

@@ -11,52 +11,30 @@ public class Polytope
     List<Face> faces = new ArrayList<>();
 
     public Polytope(Simplex source) {
-        if (source.a() != null) {
-            vertices.add(source.a());
+        if (source.a() == null || source.b() == null || source.c() == null || source.d() == null) {
+            System.err.println("Polytope: Input simplex is not a tetrahedron!");
         }
-        if (source.b() != null) {
-            vertices.add(source.b());
+        try {
+            Vector3D a = source.a();
+            Vector3D b = source.b();
+            Vector3D c = source.c();
+            Vector3D d = source.d();
+
+            vertices.add(a);
+            vertices.add(b);
+            vertices.add(c);
+            vertices.add(d);
+
+            faces.add(new Face(a,b,c));
+            faces.add(new Face(a,d,b));
+            faces.add(new Face(a,c,d));
+            faces.add(new Face(b,d,c));
         }
-        if (source.c() != null) {
-            vertices.add(source.c());
-        }
-        if (source.d() != null) {
-            vertices.add(source.d());
+        catch (NullPointerException e) {
+            System.err.println("Polytope: Unable to generate polytope!");
         }
     }
 
-    public void addVertex(Vector3D newVert) {
-        vertices.add(newVert);
-    }
-
-    private void constructFacesFromSimplex(Simplex simplex) {
-        // Simplex will have faces in 3D space. In a 3D simplex, we have 4 vertices and 4 faces.
-        // Each face is a triangle, defined by 3 vertices.
-
-        if (simplex.count() == 4) {
-            // For a 3D simplex (tetrahedron), create faces with 3 vertices each
-            faces.add(new Face(simplex.a(), simplex.b(), simplex.c()));
-            faces.add(new Face(simplex.a(), simplex.c(), simplex.d()));
-            faces.add(new Face(simplex.a(), simplex.d(), simplex.b()));
-            faces.add(new Face(simplex.b(), simplex.c(), simplex.d()));
-        }
-        // Add logic for other dimensional cases if needed
-    }
-
-    // Step 3: Find the closest face to the origin
-    public Face findClosestFace() {
-        Face closestFace = null;
-        double closestDistance = Double.MAX_VALUE;
-
-        // Iterate through all faces
-        for (Face face : faces) {
-            double distance = face.getDistanceToOrigin();
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestFace = face;
-            }
-        }
-
-        return closestFace;
+    public void splice(double minIndex, int i, Vector3D support) {
     }
 }
