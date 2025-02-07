@@ -1,6 +1,7 @@
 package Levels;
 
 import Engine3d.Controls.CreativeCamera;
+import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.Controls.OldSchoolFlyingControls;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
@@ -9,7 +10,9 @@ import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
 import Math.Vector.Vector5D;
+import Physics.AABBCollisions.StaticAABBObject;
 import Physics.Object3D;
+import Physics.PlayerObject;
 import Terrain.TerrainTileMesh;
 
 import java.awt.*;
@@ -22,9 +25,13 @@ public class TerrainLevel extends Scene {
 
         backgroundColour = new Color(51, 153, 255);
 
-        CreativeCamera playerObject = new CreativeCamera(this, (PlayerCamera) camera);
-        playerObject.translate(new Vector3D(0,5,0));
-        OldSchoolFlyingControls cameraController = new OldSchoolFlyingControls(getSceneRenderer(), playerObject);
+        PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
+        playerObject.translate(new Vector3D(5,5,5));
+        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
+
+        //CreativeCamera playerObject = new CreativeCamera(this, (PlayerCamera) camera);
+        //playerObject.translate(new Vector3D(0,5,0));
+        //OldSchoolFlyingControls cameraController = new OldSchoolFlyingControls(getSceneRenderer(), playerObject);
         addUpdatable(cameraController);
 
         LightSource sun = new LightSource(this);
@@ -49,7 +56,7 @@ public class TerrainLevel extends Scene {
                         Math.round( Math.random())
                 );
 
-                Object3D object3D = new Object3D(this);
+                StaticAABBObject object3D = new StaticAABBObject(this);
                 object3D.translate(coords.scaled(GRID_SIZE));
                 TerrainTileMesh tm = new TerrainTileMesh(object3D, coords, height, meshes);
                 object3D.setMesh(tm);

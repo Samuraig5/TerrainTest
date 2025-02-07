@@ -1,6 +1,8 @@
 package Math;
 
+import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Math.Vector.Vector3D;
+import Physics.AABBCollisions.StaticAABBObject;
 import Physics.Object3D;
 
 public class Ray extends Line
@@ -28,5 +30,13 @@ public class Ray extends Line
 
     public Vector3D next() {
         return getOrigin().translated(getDirection());
+    }
+
+    public Object3D getPointObject() {
+        double BOX_SIZE = 0.001;
+        Object3D pointObject = new StaticAABBObject(source.getScene());
+        pointObject.setMesh(new BoxMesh(pointObject, new Vector3D(BOX_SIZE,BOX_SIZE,BOX_SIZE)));
+        pointObject.translate(getDirection());
+        return pointObject;
     }
 }

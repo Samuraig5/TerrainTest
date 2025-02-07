@@ -4,6 +4,7 @@ import Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
 import Engine3d.Model.UnrotatableBox;
 import Engine3d.Translatable;
+import Physics.GJK_EPA.EPA;
 
 public abstract class AABBCollider implements Translatable
 {
@@ -33,9 +34,9 @@ public abstract class AABBCollider implements Translatable
 
     public boolean handleCollision(AABBCollider other) {
         try {
-            Vector3D move = getAABB().collision(other.getAABB());
+            //Vector3D move = getAABB().collision(other.getAABB());
+            Vector3D move = EPA.solveEPA(other.obj, this.obj);
             if (move.isEmpty()) {return false;}
-
             if (other.getWeight() <= 0 && getWeight() <= 0) { return false; }
 
             if (other.getWeight() <= 0 && getWeight() > 0) { translate(move); obj.onCollision(move);} //Other object is immovable but this isn't

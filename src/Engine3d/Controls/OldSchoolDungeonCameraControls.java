@@ -111,7 +111,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
             case KeyEvent.VK_SPACE -> {
                 spaceDown = true;
                 if (playerObject.isGrounded()) {
-                     playerObject.addMomentum(adjJump);
+                    playerObject.addMomentum(adjJump);
                 }
             }
             case KeyEvent.VK_SHIFT -> shiftDown = true;

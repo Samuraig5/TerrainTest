@@ -89,9 +89,9 @@ public class TestLevel extends Scene
             StaticAABBObject box2 = spawnWall(heavyMossImg, new Vector3D(7,2.5,7));
             box2.translate(Vector3D.UP());
 
-            StaticAABBObject wa = spawnWall(grimeImg, new Vector3D(2,2,2));
-            wa.translate(new Vector3D(5,2,5));
-            wa.rotate(new Vector3D(Math.toRadians(45),0,0));
+            StaticAABBObject wa = spawnWall(grimeImg, new Vector3D(25,2,25));
+            wa.translate(new Vector3D(10,0,10));
+            wa.rotate(new Vector3D(Math.toRadians(-25),0,0));
 
             /*
             StaticAABBObject box = spawnWall(grimeImg, new Vector3D(5,5,5));

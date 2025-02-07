@@ -8,6 +8,7 @@ import Engine3d.Model.UnrotatableBox;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
+import Physics.GJK_EPA.GJK;
 import Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Math.Matrix4x4;
@@ -180,11 +181,13 @@ public class Scene implements Updatable
                     AABBObject obj = AABBObjects.get(j);
                     if (obj == ray.getSource()) { continue; }
                     if (!obj.getAABBCollider().getAABB().collision(ray).isEmpty()) {
-                        return true;
+                        if (GJK.boolSolveGJK(obj, ray)) {
+                            return true;
+                        }
                     }
                 }
                 catch (NullPointerException e) {
-
+                    System.err.println(e.getMessage());
                 }
             }
             ray.advance();

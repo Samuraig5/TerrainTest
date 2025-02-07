@@ -20,9 +20,9 @@ public class Main {
         PlayerCamera camera = new PlayerCamera(frame);
 
         //new BloodGulch(camera);
-        //new TestLevel(camera);
+        new TestLevel(camera);
         //new TerrainLevel(camera);
-        new GJKTest(camera);
+        //new GJKTest(camera);
 
         frame.setVisible(true);
     }

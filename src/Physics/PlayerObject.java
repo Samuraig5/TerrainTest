@@ -54,9 +54,8 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     @Override
     public boolean isGrounded() {
-        Ray ray = new Ray(this, getPosition(), Vector3D.DOWN().scaled(0.5));
+        Ray ray = new Ray(this, getPosition(), Vector3D.DOWN().scaled(0.25));
         boolean res = getScene().checkForCollision(3, ray);
-        //System.out.println(res);
         return res;
     }
 

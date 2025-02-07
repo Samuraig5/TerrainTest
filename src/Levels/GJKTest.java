@@ -49,13 +49,16 @@ public class GJKTest extends Scene{
 
         // Test for collision
         try {
-            //boolean result = GJK.boolSolveGJK(object1, object2);
-            //System.out.println("Collision Detected: " + result);
+            boolean result = GJK.boolSolveGJK(object1, object2);
+            System.out.println("Collision Detected: " + result);
+            /*
             Vector3D separator = EPA.solveEPA(object1, object2);
             if (!separator.isEmpty()) {
                 System.out.println(separator);
             }
             object2.translate(separator);
+
+             */
 
         }
         catch (NullPointerException e) {

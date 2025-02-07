@@ -2,7 +2,9 @@ package Physics.GJK_EPA;
 
 import Math.Vector.Vector3D;
 import Physics.Object3D;
+import Math.Ray;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GJK
@@ -209,5 +211,52 @@ public class GJK
             return solveSimplex3(simplex, dir);
         }
         return null;
+    }
+
+    //TODO: Make GJK generic and remove this specific implementation
+    public static boolean boolSolveGJK(Object3D o1, Ray o2) {
+        Simplex sim = solveGJK(o1, o2);
+        return sim != null;
+    }
+
+    public static Simplex solveGJK(Object3D o1, Ray o2) {
+        List<Vector3D> ver2 = o1.getMesh().getPointsInWorld();
+        List<Vector3D> ver1 = new ArrayList<>();
+        ver1.add(o2.getOrigin().translated(o2.getDirection()));
+
+        Simplex simplex = new Simplex();
+
+        Vector3D dir = o1.getPosition().translated(o2.getDirection().inverted()); //o1.pos - o2.pos
+        simplex.a(calculateNewVertex(ver1, ver2, dir));
+        simplex.incrementCount();
+
+        dir = simplex.a().inverted();
+
+        while (true)
+        {
+            simplex.shiftBack();
+            simplex.a(calculateNewVertex(ver1, ver2, dir));
+            simplex.incrementCount();
+
+            //If new support point isn't on opposite side of origin, it's impossible for the simplex to enclose the origin.
+            if (simplex.a().dotProduct(dir) < 0) {
+                return null;
+            }
+
+            switch (simplex.count()) {
+                case 2:
+                    dir = solveSimplex2(simplex, dir);
+                    break;
+                case 3:
+                    dir = solveSimplex3(simplex, dir);
+                    break;
+                case 4:
+                    dir = solveSimplex4(simplex, dir);
+                    if (dir == null) {
+                        return simplex;
+                    }
+                    break;
+            }
+        }
     }
 }
