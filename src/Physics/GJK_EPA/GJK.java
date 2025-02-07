@@ -30,7 +30,7 @@ public class GJK
             simplex.a(calculateNewVertex(ver1, ver2, dir));
             simplex.incrementCount();
 
-            //If new support point isn't on opposite side of origin, its impossible for the simplex to enclose the origin.
+            //If new support point isn't on opposite side of origin, it's impossible for the simplex to enclose the origin.
             if (simplex.a().dotProduct(dir) < 0) {
                 return null;
             }
