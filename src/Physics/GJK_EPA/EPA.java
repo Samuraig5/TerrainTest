@@ -78,7 +78,7 @@ public class EPA
             double distance = face.normal().dotProduct(face.a());
 
             if (distance < 0) {
-                distance += -1;
+                distance *= -1;
                 face.normal().invert();
             }
 
