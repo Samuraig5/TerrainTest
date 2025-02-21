@@ -11,6 +11,7 @@ import Engine3d.Scene;
 
 public class PlayerObject extends DynamicAABBObject implements Gravitational
 {
+    private Vector3D SIZE = new Vector3D(1, 1.8, 1);
     private Vector3D position = new Vector3D();
     private Vector3D rotation = new Vector3D();
     private final Vector3D cameraOffset = new Vector3D(0,1.5,0);
@@ -20,9 +21,8 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     {
         super(scene);
         camera.setPlayerObject(this);
-        double size = 0.5;
-        Vector3D min = new Vector3D(-size, 0, -size);
-        Vector3D max = new Vector3D(size, 1.8, size);
+        Vector3D min = new Vector3D(-(SIZE.x()/2), 0, -(SIZE.z()/2));
+        Vector3D max = new Vector3D(SIZE.x()/2, SIZE.y(), SIZE.z()/2);
         UnrotatableBox playerMesh = new UnrotatableBox(this, new Box(min, max));
         setMesh(playerMesh);
     }
@@ -54,9 +54,38 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     @Override
     public boolean isGrounded() {
-        Ray ray = new Ray(this, getPosition(), Vector3D.DOWN().scaled(0.25));
-        boolean res = getScene().checkForCollision(3, ray);
-        return res;
+
+        float RAY_SIZE = 0.25f;
+
+        Vector3D corner1 = new Vector3D(-SIZE.x()/2, -0.1 , -SIZE.z()/2);
+        Vector3D corner2 = new Vector3D(SIZE.x()/2, -0.1 , SIZE.z()/2);
+        Vector3D corner3 = new Vector3D(SIZE.x()/2, -0.1 , -SIZE.z()/2);
+        Vector3D corner4 = new Vector3D(-SIZE.x()/2, -0.1 , SIZE.z()/2);
+
+        Vector3D pos = getPosition();
+
+        Ray ray0 = new Ray(this, pos , Vector3D.DOWN().scaled(0.25));
+        boolean res0 = getScene().checkForCollision(3, ray0);
+        if (res0) {return true;}
+
+        Ray ray1 = new Ray(this, pos.translated(corner1) , Vector3D.DOWN().scaled(RAY_SIZE));
+        boolean res1 = getScene().checkForCollision(3, ray1);
+        if (res1) {return true;}
+
+        Ray ray2 = new Ray(this, pos.translated(corner2) , Vector3D.DOWN().scaled(RAY_SIZE));
+        boolean res2 = getScene().checkForCollision(3, ray2);
+        if (res2) {return true;}
+
+        Ray ray3 = new Ray(this, pos.translated(corner3) , Vector3D.DOWN().scaled(RAY_SIZE));
+        boolean res3 = getScene().checkForCollision(3, ray3);
+        if (res3) {return true;}
+
+        Ray ray4 = new Ray(this, pos.translated(corner4) , Vector3D.DOWN().scaled(RAY_SIZE));
+        boolean res4 = getScene().checkForCollision(3, ray4);
+        if (res4) {return true;}
+
+        System.out.println(false);
+        return false;
     }
 
     @Override
