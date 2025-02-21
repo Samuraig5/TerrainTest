@@ -36,6 +36,7 @@ public abstract class AABBCollider implements Translatable
         try {
             //Vector3D move = getAABB().collision(other.getAABB());
             Vector3D move = EPA.solveEPA(other.obj, this.obj);
+            move.scaled(1.0001);
             if (move.isEmpty()) {return false;}
             if (other.getWeight() <= 0 && getWeight() <= 0) { return false; }
 

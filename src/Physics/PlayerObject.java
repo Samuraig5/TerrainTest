@@ -84,7 +84,6 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         boolean res4 = getScene().checkForCollision(3, ray4);
         if (res4) {return true;}
 
-        System.out.println(false);
         return false;
     }
 
