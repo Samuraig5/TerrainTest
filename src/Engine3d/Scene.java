@@ -46,9 +46,11 @@ public class Scene implements Updatable
         //if (camera instanceof PlayerCamera) {
         //    new PlayerObject(this, (PlayerCamera) camera);
         //}
-
         camera.getFrame().add(sceneRenderer);
         sceneRenderer.setActiveScene(this);
+        sceneRenderer.grabFocus();
+
+        camera.getFrame().repaint();
     }
     public SceneRenderer getSceneRenderer() {
         return sceneRenderer;
