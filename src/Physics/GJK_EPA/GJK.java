@@ -222,7 +222,8 @@ public class GJK
     public static Simplex solveGJK(Object3D o1, Ray o2) {
         List<Vector3D> ver2 = o1.getMesh().getPointsInWorld();
         List<Vector3D> ver1 = new ArrayList<>();
-        ver1.add(o2.getOrigin().translated(o2.getDirection()));
+        //ver1.add(o2.getOrigin().translated(o2.getDirection()));
+        ver1.add(o2.getOrigin());
 
         Simplex simplex = new Simplex();
 

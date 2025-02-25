@@ -11,7 +11,7 @@ import Physics.Object3D;
 import java.awt.*;
 
 public class TerrainTileMesh extends Mesh {
-    public static double GRID_SIZE = 3;
+    public static double GRID_SIZE = 10;
     private Vector3D gridPos;
 
     public TerrainTileMesh(Object3D object3D, Vector3D gridPos, Vector5D gridHeight, TerrainTileMesh[][] neighbours) {

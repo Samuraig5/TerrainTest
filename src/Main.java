@@ -6,6 +6,7 @@ import Levels.TestLevel;
 import Menus.MainMenu;
 
 import javax.swing.*;
+import java.util.Objects;
 
 public class Main {
 
@@ -19,7 +20,19 @@ public class Main {
         frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         frame.setLocationRelativeTo(null);
 
-        new MainMenu(frame);
+        if (Objects.equals(args[0], "MainMenu"))
+        {
+            new MainMenu(frame);
+        }
+        else if (Objects.equals(args[0], "TerrainTest"))
+        {
+            PlayerCamera camera = new PlayerCamera(frame);
+            //new BloodGulch(camera);
+            //new TestLevel(camera);
+            new TerrainLevel(camera);
+            //new GJKTest(camera);
+        }
+
 
         frame.setVisible(true);
     }

@@ -63,8 +63,9 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         Vector3D corner4 = new Vector3D(-SIZE.x()/2, -0.1 , SIZE.z()/2);
 
         Vector3D pos = getPosition();
+        //pos.translate(Vector3D.UP().scaled(RAY_SIZE)); //First ray will hit the bottom of the player hitbox
 
-        Ray ray0 = new Ray(this, pos , Vector3D.DOWN().scaled(0.25));
+        Ray ray0 = new Ray(this, pos , Vector3D.DOWN().scaled(RAY_SIZE));
         boolean res0 = getScene().checkForCollision(3, ray0);
         if (res0) {return true;}
 
@@ -84,6 +85,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         boolean res4 = getScene().checkForCollision(3, ray4);
         if (res4) {return true;}
 
+        //System.out.println(false);
         return false;
     }
 

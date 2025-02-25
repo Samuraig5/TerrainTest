@@ -55,6 +55,7 @@ public class TerrainLevel extends Scene {
                         Math.round( Math.random()),
                         Math.round( Math.random())
                 );
+                height.scale(2);
 
                 StaticAABBObject object3D = new StaticAABBObject(this);
                 object3D.translate(coords.scaled(GRID_SIZE));
