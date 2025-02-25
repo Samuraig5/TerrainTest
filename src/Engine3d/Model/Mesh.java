@@ -23,7 +23,7 @@ import java.util.function.Function;
 
 public class Mesh implements Translatable, Rotatable, Scalable
 {
-    private Object3D object3D;
+    protected Object3D object3D;
     protected List<Vector3D> points = new ArrayList<>();
     protected List<MeshTriangle> faces = new CopyOnWriteArrayList<>();
     protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
