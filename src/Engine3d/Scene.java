@@ -1,10 +1,13 @@
 package Engine3d;
 
+import Engine3d.Model.SimpleMeshes.BoxMesh;
+import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Rendering.SceneRenderer;
-import Math.Ray;
+import Math.Raycast.Ray;
 import Engine3d.Model.UnrotatableBox;
+import Math.Raycast.RayCollision;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
@@ -176,7 +179,7 @@ public class Scene implements Updatable
         timeMeasurer.pauseAndEndMeasurement("handleCollision");
     }
 
-    public boolean checkForCollision(int numSteps, Ray ray) {
+    public RayCollision checkAndGetCollision(int numSteps, Ray ray) {
         for (int i = 0; i < numSteps; i++) {
             for (int j = 0; j < AABBObjects.size(); j++) {
                 try {
@@ -184,7 +187,7 @@ public class Scene implements Updatable
                     if (obj == ray.getSource()) { continue; }
                     if (!obj.getAABBCollider().getAABB().collision(ray).isEmpty()) {
                         if (GJK.boolSolveGJK(obj, ray)) {
-                            return true;
+                            return new RayCollision(ray.getOrigin(), obj);
                         }
                     }
                 }
@@ -194,6 +197,23 @@ public class Scene implements Updatable
             }
             ray.advance();
         }
+        return null;
+    }
+    public boolean checkForCollision(int numSteps, Ray ray) {
+        if (checkAndGetCollision(numSteps, ray) != null) {
+            return true;
+        }
         return false;
+    }
+
+    public void createCollisionMarker(Vector3D pos) {
+        Object3D marker = new Object3D(this);
+        marker.translate(pos);
+        Mesh mesh = new CubeMesh(marker, 0.25);
+        marker.setMesh(mesh);
+
+        mesh.setDrawInstructions(new DrawInstructions(true,false,false,false));
+
+        objects.add(marker);
     }
 }

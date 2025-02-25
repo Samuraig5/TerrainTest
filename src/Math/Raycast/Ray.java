@@ -1,9 +1,10 @@
-package Math;
+package Math.Raycast;
 
 import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Math.Vector.Vector3D;
 import Physics.AABBCollisions.StaticAABBObject;
 import Physics.Object3D;
+import Math.Line;
 
 public class Ray extends Line
 {

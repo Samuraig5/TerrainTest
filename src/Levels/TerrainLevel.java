@@ -22,14 +22,14 @@ import java.awt.*;
 import static Terrain.TerrainTileMesh.GRID_SIZE;
 
 public class TerrainLevel extends Scene {
-    public static double GRID_SIZE = 5;
+    public static double GRID_SIZE = 10;
     public TerrainLevel(Camera camera) {
         super(camera);
 
         backgroundColour = new Color(51, 153, 255);
 
         PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
-        playerObject.translate(new Vector3D(0,5,0));
+        playerObject.translate(new Vector3D(0,10,0));
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
 
         //CreativeCamera playerObject = new CreativeCamera(this, (PlayerCamera) camera);
@@ -43,13 +43,13 @@ public class TerrainLevel extends Scene {
 
         new HeadLight(camera, this);
 
-        int maxX = 5;
-        int maxZ = 5;
+        int maxX = 3;
+        int maxZ = 3;
 
         TerrainTileMesh[][] meshes = new TerrainTileMesh[maxX][maxZ];
 
-        for (int z = 0; z < maxZ; z++) {
-            for (int x = 0; x < maxX; x++) {
+        for (int z = -maxZ; z < maxZ; z++) {
+            for (int x = -maxX; x < maxX; x++) {
                 Vector3D coords = new Vector3D(x,0,z);
                 Vector5D height = new Vector5D(
                         Math.round( Math.random()),

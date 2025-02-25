@@ -200,7 +200,7 @@ public abstract class Vector implements Translatable
         for (int i = 0; i < getDimension(); i++) {
             result += Math.pow(getValue(i) - other.getValue(i), 2);
         }
-        return Math.sqrt(result);
+        return Math.abs(Math.sqrt(result));
     }
 
     /**

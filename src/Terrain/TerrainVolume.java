@@ -40,7 +40,7 @@ public class TerrainVolume extends Mesh
         }
         generateVerticalFaces();
 
-        this.setDrawInstructions(new DrawInstructions(true,true,false,true));
+        this.setDrawInstructions(new DrawInstructions(false,true,false,true));
     }
 
 

@@ -2,6 +2,7 @@ package Engine3d.Controls;
 
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Time.Updatable;
+import Math.Raycast.RayCollision;
 import Math.Vector.Vector3D;
 import Physics.PlayerObject;
 
@@ -164,5 +165,17 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         recentering = true;
         robot.mouseMove(center.x, center.y);
         recentering = false;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        RayCollision res = playerObject.cursorRayCast(25, 0.5f);
+        Vector3D target = playerObject.findClosestPointToCollision(res);
+        if (e.getButton() == 1) {
+            target.translate(Vector3D.UP().scaled(1));
+        }
+        else {
+            target.translate(Vector3D.DOWN().scaled(1));
+        }
     }
 }

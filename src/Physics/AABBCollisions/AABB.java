@@ -1,9 +1,8 @@
 package Physics.AABBCollisions;
 
 import Math.Box;
-import Math.Ray;
+import Math.Raycast.Ray;
 import Math.Vector.Vector3D;
-import Physics.GJK_EPA.GJK;
 
 public class AABB extends Box
 {

@@ -2,7 +2,7 @@ package Physics.GJK_EPA;
 
 import Math.Vector.Vector3D;
 import Physics.Object3D;
-import Math.Ray;
+import Math.Raycast.Ray;
 
 import java.util.ArrayList;
 import java.util.List;

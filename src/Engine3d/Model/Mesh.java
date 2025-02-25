@@ -14,10 +14,7 @@ import Engine3d.Rotatable;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Translatable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
@@ -182,6 +179,16 @@ public class Mesh implements Translatable, Rotatable, Scalable
 
         worldTransform.matrixVectorManipulation(copiedPoints);
         tm.pauseMeasurement("localToWorld");
+    }
+
+    /**
+     * Translates a point from world space to local space.
+     * WARNING: TODO: Doesn't take rotation into account
+     * @param worldPoint to be translated
+     * @return the world point in local space
+     */
+    public Vector3D worldToLocal(Vector3D worldPoint) {
+        return worldPoint.translated(object3D.getPosition().inverted());
     }
 
     /**
