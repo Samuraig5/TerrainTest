@@ -188,7 +188,9 @@ public class Mesh implements Translatable, Rotatable, Scalable
      * @return the world point in local space
      */
     public Vector3D worldToLocal(Vector3D worldPoint) {
-        return worldPoint.translated(object3D.getPosition().inverted());
+        Matrix4x4 trans = Matrix4x4.getTranslationMatrix(getPosition()).quickMatrixInverse();
+        Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(getRotation()), trans);
+        return worldTransform.matrixVectorMultiplication(worldPoint);
     }
 
     /**
