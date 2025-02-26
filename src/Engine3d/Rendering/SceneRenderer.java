@@ -172,16 +172,22 @@ public class SceneRenderer extends JPanel
 
         updateThread = new Thread(() -> {
             while (running) {
-                if (activeScene != null) {
-                    timeMeasurer.startMeasurement("update");
-                    activeScene.update(deltaTime()); // Update game logic
-                    timeMeasurer.pauseAndEndMeasurement("update");
-                    timeMeasurer.addCycle("update");
+                try {
+                    if (activeScene != null) {
+                        timeMeasurer.startMeasurement("update");
+                        activeScene.update(deltaTime()); // Update game logic
+                        timeMeasurer.pauseAndEndMeasurement("update");
+                        timeMeasurer.addCycle("update");
+                    }
+                }
+                catch (Exception e) {
+                    System.err.println(e.getMessage());
                 }
 
                 try {
                     Thread.sleep(16); // ~60 FPS logic updates
                 } catch (InterruptedException ex) {
+                    System.err.println(ex.getMessage());
                     Thread.currentThread().interrupt();
                 }
             }

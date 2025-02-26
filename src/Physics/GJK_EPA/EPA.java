@@ -26,6 +26,7 @@ public class EPA
         double minDistance = Double.POSITIVE_INFINITY;
         Vector3D minNormal = new Vector3D();
 
+        int stopper = 0;
         while (minDistance == Double.POSITIVE_INFINITY) {
             Face minFace = getMinFace(polytope);
             minDistance = minFace.normal().dotProduct(minFace.a());
@@ -63,6 +64,12 @@ public class EPA
 
                 polytope.vertices.add(support);
                 polytope.faces.addAll(newFaces);
+            }
+            if (stopper == 100) {
+                return Vector3D.UP().scaled(0.01f);
+            }
+            else {
+                stopper++;
             }
         }
 
