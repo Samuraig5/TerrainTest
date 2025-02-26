@@ -1,5 +1,6 @@
 package Math;
 
+import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.Material;
 import Engine3d.Translatable;
@@ -58,6 +59,25 @@ public class MeshTriangle implements Translatable
     @Override
     public Vector3D getPosition() {
         return points[0];
+    }
+
+    public void translatePoint(Vector3D targetPoint, Vector3D delta) {
+        Vector2D[] texturePoints = material.getTextureCoords();
+        if (targetPoint == points[0]) {
+            points[0].translate(delta);
+            texturePoints[0].translate(new Vector3D(0, -delta.y()*4, 0));
+        }
+        else if (targetPoint == points[1]) {
+            points[1].translate(delta);
+            texturePoints[1].translate(new Vector3D(0, -delta.y()*4, 0));
+        }
+        else if (targetPoint == points[2]) {
+            points[2].translate(delta);
+            texturePoints[2].translate(new Vector3D(0, -delta.y()*4, 0));
+        }
+        else {
+            //System.err.println("WARNING: MeshTriangle: Trying to update mesh triangle with point but triangle does not contain that point.");
+        }
     }
 
     public void scale(Vector3D scalar) {

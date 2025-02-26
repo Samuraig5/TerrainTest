@@ -89,10 +89,12 @@ public class ObjParser
         String[] token1 = data[2].split("/+");
         String[] token2 = data[1].split("/+");
 
-        MeshTriangle face = new MeshTriangle(vertices.get(Integer.parseInt(token0[0]) - 1), //Because we invert x we have to invert the way the faces are loaded
+        MeshTriangle face = new MeshTriangle(
+                vertices.get(Integer.parseInt(token0[0]) - 1), //Because we invert x we have to invert the way the faces are loaded
                 vertices.get(Integer.parseInt(token1[0]) - 1),
                 vertices.get(Integer.parseInt(token2[0]) - 1));
-        Material mat = new Material(texturePoints.get(Integer.parseInt(token0[1]) - 1),
+        Material mat = new Material(
+                texturePoints.get(Integer.parseInt(token0[1]) - 1),
                 texturePoints.get(Integer.parseInt(token1[1]) - 1),
                 texturePoints.get(Integer.parseInt(token2[1]) - 1));
         mat.setMTL(mtl);

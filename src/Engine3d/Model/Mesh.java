@@ -76,6 +76,12 @@ public class Mesh implements Translatable, Rotatable, Scalable
         return result.copiedPoints;
     }
 
+    public void translatePoint(Vector3D targetPoint, Vector3D delta) {
+        for (int i = 0; i < faces.size(); i++) {
+            faces.get(i).translatePoint(targetPoint, delta);
+        }
+    }
+
     public void drawMesh(Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
     {
         this.tm = tm;
@@ -183,7 +189,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
 
     /**
      * Translates a point from world space to local space.
-     * WARNING: TODO: Doesn't take rotation into account
      * @param worldPoint to be translated
      * @return the world point in local space
      */
