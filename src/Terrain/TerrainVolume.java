@@ -2,6 +2,7 @@ package Terrain;
 
 import Engine3d.Model.Mesh;
 import Engine3d.Rendering.DrawInstructions;
+import Math.Vector.Vector;
 import Math.Vector.Vector3D;
 import Physics.Object3D;
 import Math.MeshTriangle;
@@ -122,6 +123,30 @@ public class TerrainVolume extends Mesh
         faces[1] = new MeshTriangle(points.get(j), points.get(l), points.get(k));
 
         return faces;
+    }
+
+    @Override
+    public void translatePoint(Vector3D targetPoint, Vector3D delta) {
+        for (int i = 5; i < 10; i++) {
+            if (targetPoint == points.get(i)) {return;} //If targeting a "bottom" point, don't do anything
+        }
+
+        super.translatePoint(targetPoint, delta);
+
+        double lowestAllowed =
+                Math.max(
+                (points.get(TOP_FRONT_LEFT.ordinal()).y() +
+                points.get(TOP_BACK_RIGHT.ordinal()).y()) / 2,
+
+                (points.get(TOP_FRONT_RIGHT.ordinal()).y() +
+                points.get(TOP_BACK_LEFT.ordinal()).y()) / 2
+                );
+
+
+        Vector3D topCentre = points.get(TOP_CENTRE.ordinal());
+        if (topCentre.y() < lowestAllowed) {
+            topCentre.y(lowestAllowed);
+        }
     }
 }
 
