@@ -20,19 +20,20 @@ public class Main {
         frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         frame.setLocationRelativeTo(null);
 
-        if (Objects.equals(args[0], "MainMenu"))
+        if (args.length == 0 || Objects.equals(args[0], "MainMenu"))
         {
             new MainMenu(frame);
         }
         else if (Objects.equals(args[0], "TerrainTest"))
         {
             PlayerCamera camera = new PlayerCamera(frame);
-            //new BloodGulch(camera);
-            //new TestLevel(camera);
             new TerrainLevel(camera);
-            //new GJKTest(camera);
         }
-
+        else if (Objects.equals(args[0], "TestLevel"))
+        {
+            PlayerCamera camera = new PlayerCamera(frame);
+            new TestLevel(camera);
+        }
 
         frame.setVisible(true);
     }
