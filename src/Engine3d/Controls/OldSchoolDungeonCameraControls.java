@@ -171,6 +171,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
     public void mouseClicked(MouseEvent e) {
         float SCALING_FACTOR = 0.25f;
         RayCollision res = playerObject.cursorRayCast(25, 0.5f);
+        if (res == null) { return; }
         Vector3D target = playerObject.findClosestPointToCollision(res);
         if (e.getButton() == 1) {
             res.collisionTarget.getMesh().translatePoint(target, Vector3D.UP().scaled(SCALING_FACTOR));
