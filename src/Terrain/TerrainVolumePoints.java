@@ -4,15 +4,15 @@ import Math.Vector.Vector3D;
 
 public enum TerrainVolumePoints
 {
-    TOP_FRONT_LEFT(new Vector3D(-1,1,-1)),
-    TOP_FRONT_RIGHT(new Vector3D(1,1,-1)),
-    TOP_BACK_RIGHT(new Vector3D(-1,1,1)),
-    TOP_BACK_LEFT(new Vector3D(1,1,1)),
-    TOP_CENTRE(new Vector3D(0,1.5,0)),
-    BOTTOM_FRONT_LEFT(new Vector3D(-1,0,-1)),
-    BOTTOM_FRONT_RIGHT(new Vector3D(1,0,-1)),
-    BOTTOM_BACK_RIGHT(new Vector3D(-1,0,1)),
-    BOTTOM_BACK_LEFT(new Vector3D(1,0,1)),
+    TOP_FRONT_LEFT(new Vector3D(-0.5,1,-0.5)),
+    TOP_FRONT_RIGHT(new Vector3D(0.5,1,-0.5)),
+    TOP_BACK_RIGHT(new Vector3D(-0.5,1,0.5)),
+    TOP_BACK_LEFT(new Vector3D(0.5,1,0.5)),
+    TOP_CENTRE(new Vector3D(0,1,0)),
+    BOTTOM_FRONT_LEFT(new Vector3D(-0.5,0,-0.5)),
+    BOTTOM_FRONT_RIGHT(new Vector3D(0.5,0,-0.5)),
+    BOTTOM_BACK_RIGHT(new Vector3D(-0.5,0,0.5)),
+    BOTTOM_BACK_LEFT(new Vector3D(0.5,0,0.5)),
     BOTTOM_CENTRE(new Vector3D(0,0,0)),
     ;
 

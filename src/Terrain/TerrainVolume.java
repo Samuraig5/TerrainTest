@@ -2,19 +2,25 @@ package Terrain;
 
 import Engine3d.Model.Mesh;
 import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Scene;
 import Math.Vector.Vector;
 import Math.Vector.Vector3D;
+import Physics.AABBCollisions.StaticAABBObject;
 import Physics.Object3D;
 import Math.MeshTriangle;
+
+import java.util.List;
 
 import static Terrain.TerrainVolumePoints.*;
 
 public class TerrainVolume extends Mesh
 {
+    private Scene scene;
     private double size;
 
-    public TerrainVolume(Object3D object3D, double size) {
+    public TerrainVolume(Scene scene, Object3D object3D, double size) {
         super(object3D);
+        this.scene = scene;
         this.size = size;
         initialize();
     }
@@ -44,9 +50,8 @@ public class TerrainVolume extends Mesh
         this.setDrawInstructions(new DrawInstructions(false,true,false,true));
     }
 
-
     private Vector3D generatePoint(TerrainVolumePoints index) {
-        return index.getVector().scaled(size/2);
+        return index.getVector().scaled(size);
     }
 
     private MeshTriangle generateHorizontalFace(int index) {
@@ -127,8 +132,6 @@ public class TerrainVolume extends Mesh
 
     @Override
     public void translatePoint(Vector3D targetPoint, Vector3D delta) {
-        double MIN_TICKNESS = 0.25f;
-
         int targetIndex = 0;
         for (int i = 0; i < 10; i++) {
             if (targetPoint == points.get(i)) { targetIndex = i; break;}
@@ -137,20 +140,60 @@ public class TerrainVolume extends Mesh
 
         super.translatePoint(targetPoint, delta);
 
-        double lowestAllowed = points.get(targetIndex + 5).y() + MIN_TICKNESS;
+        correctHeightAdjustment(targetPoint, targetIndex, delta);
+    }
+
+    private void correctHeightAdjustment(Vector3D targetPoint, int targetIndex, Vector3D delta) {
+
+        if (delta.y() > 0) {
+            correctHeightIncrease();
+        }
+        else {
+            correctHeightDecrease(targetPoint, targetIndex);
+        }
+        correctCentreHeight();
+    }
+
+    private void correctHeightDecrease(Vector3D targetPoint, int targetIndex) {
+        double MIN_THICKNESS = 0.25f;
+
+        double lowestAllowed = points.get(targetIndex + 5).y() + MIN_THICKNESS;
         if (targetPoint.y() < lowestAllowed) {
             targetPoint.y(lowestAllowed);
         }
+    }
 
+    private void correctHeightIncrease() {
+        double[] heights = new double[5];
+        for (int i = 0; i < 5; i++) {
+            double excess = points.get(i).y()-size;
+            if (excess <= 0) { return; } // If at least one corner is lower than the max, don't do anything
+            heights[i] = excess;
+        }
+
+        StaticAABBObject newObject = new StaticAABBObject(scene);
+        newObject.translate(getPosition().translated(new Vector3D(0, size, 0)));
+        TerrainVolume newVolume = new TerrainVolume(scene, newObject, size);
+        newObject.setMesh(newVolume);
+
+        List<Vector3D> newPoints = newVolume.getPoints();
+
+        for (int i = 0; i < 5; i++) {
+            points.get(i).y(size);
+            Vector3D p = newPoints.get(i);
+            p.y(heights[i]);
+        }
+    }
+
+    private void correctCentreHeight() {
         double centreLowestAllowed =
                 Math.max(
-                (points.get(TOP_FRONT_LEFT.ordinal()).y() +
-                points.get(TOP_BACK_RIGHT.ordinal()).y()) / 2,
+                        (points.get(TOP_FRONT_LEFT.ordinal()).y() +
+                         points.get(TOP_BACK_RIGHT.ordinal()).y()) / 2,
 
-                (points.get(TOP_FRONT_RIGHT.ordinal()).y() +
-                points.get(TOP_BACK_LEFT.ordinal()).y()) / 2
+                        (points.get(TOP_FRONT_RIGHT.ordinal()).y() +
+                         points.get(TOP_BACK_LEFT.ordinal()).y()) / 2
                 );
-
 
         Vector3D topCentre = points.get(TOP_CENTRE.ordinal());
         if (topCentre.y() < centreLowestAllowed) {

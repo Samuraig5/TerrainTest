@@ -29,7 +29,7 @@ public class TerrainLevel extends Scene {
         backgroundColour = new Color(51, 153, 255);
 
         PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
-        playerObject.translate(new Vector3D(0,10,0));
+        playerObject.translate(new Vector3D(0,25,0));
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
 
         //CreativeCamera playerObject = new CreativeCamera(this, (PlayerCamera) camera);
@@ -63,7 +63,7 @@ public class TerrainLevel extends Scene {
                 StaticAABBObject object3D = new StaticAABBObject(this);
                 object3D.translate(coords.scaled(GRID_SIZE));
                 //TerrainTileMesh tm = new TerrainTileMesh(object3D, coords, height, meshes);
-                TerrainVolume tm = new TerrainVolume(object3D, GRID_SIZE);
+                TerrainVolume tm = new TerrainVolume(this, object3D, GRID_SIZE);
                 object3D.setMesh(tm);
                 //meshes[x][z] = tm;
             }
