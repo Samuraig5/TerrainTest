@@ -127,13 +127,22 @@ public class TerrainVolume extends Mesh
 
     @Override
     public void translatePoint(Vector3D targetPoint, Vector3D delta) {
-        for (int i = 5; i < 10; i++) {
-            if (targetPoint == points.get(i)) {return;} //If targeting a "bottom" point, don't do anything
+        double MIN_TICKNESS = 0.25f;
+
+        int targetIndex = 0;
+        for (int i = 0; i < 10; i++) {
+            if (targetPoint == points.get(i)) { targetIndex = i; break;}
         }
+        if (targetIndex > 4) {return;} //If targeting a "bottom" point, don't do anything
 
         super.translatePoint(targetPoint, delta);
 
-        double lowestAllowed =
+        double lowestAllowed = points.get(targetIndex + 5).y() + MIN_TICKNESS;
+        if (targetPoint.y() < lowestAllowed) {
+            targetPoint.y(lowestAllowed);
+        }
+
+        double centreLowestAllowed =
                 Math.max(
                 (points.get(TOP_FRONT_LEFT.ordinal()).y() +
                 points.get(TOP_BACK_RIGHT.ordinal()).y()) / 2,
@@ -144,8 +153,8 @@ public class TerrainVolume extends Mesh
 
 
         Vector3D topCentre = points.get(TOP_CENTRE.ordinal());
-        if (topCentre.y() < lowestAllowed) {
-            topCentre.y(lowestAllowed);
+        if (topCentre.y() < centreLowestAllowed) {
+            topCentre.y(centreLowestAllowed);
         }
     }
 }
