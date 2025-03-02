@@ -15,6 +15,11 @@ public class TerrainScene extends Scene {
         super(camera);
     }
 
+    public void removeVolume(Vector3D location, StaticAABBObject object) {
+        terrainGrid.remove(location, object);
+        removeObject(object);
+    }
+
     public StaticAABBObject createNewTerrainVolume(Vector3D location) {
         StaticAABBObject newObject = new StaticAABBObject(this);
         newObject.translate(location);

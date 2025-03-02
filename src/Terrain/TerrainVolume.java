@@ -164,7 +164,7 @@ public class TerrainVolume extends Mesh
         }
 
         if (remove) {
-            scene.removeObject(object3D);
+            scene.removeVolume(getPosition(), (StaticAABBObject) object3D);
         }
         else {
             double lowestAllowed = points.get(targetIndex + 5).y() + MIN_THICKNESS;
