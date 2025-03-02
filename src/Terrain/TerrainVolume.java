@@ -14,6 +14,8 @@ import static Terrain.TerrainVolumePoints.*;
 
 public class TerrainVolume extends Mesh
 {
+    private static final double MIN_THICKNESS = 0.25f;
+
     private final TerrainScene scene;
     private double size;
 
@@ -137,9 +139,26 @@ public class TerrainVolume extends Mesh
         }
         if (targetIndex > 4) {return;} //If targeting a "bottom" point, don't do anything
 
+        if (checkForRemoval()) {return;}
+
         super.translatePoint(targetPoint, delta);
 
         correctHeightAdjustment(targetPoint, targetIndex, delta);
+    }
+
+    private boolean checkForRemoval() {
+
+        boolean remove = true;
+
+        for (int i = 0; i < 5; i++) {
+            double lowestAllowed = points.get(i + 5).y() + MIN_THICKNESS;
+            if (points.get(i).y() > lowestAllowed) { remove = false; break; } // If at least one corner is lower than the max, don't do anything
+        }
+
+        if (remove) {
+            scene.removeVolume(getPosition(), (StaticAABBObject) object3D);
+        }
+        return remove;
     }
 
     private void correctHeightAdjustment(Vector3D targetPoint, int targetIndex, Vector3D delta) {
@@ -154,23 +173,10 @@ public class TerrainVolume extends Mesh
     }
 
     private void correctHeightDecrease(Vector3D targetPoint, int targetIndex) {
-        double MIN_THICKNESS = 0.25f;
 
-        boolean remove = true;
-
-        for (int i = 0; i < 5; i++) {
-            double lowestAllowed = points.get(i + 5).y() + MIN_THICKNESS;
-            if (points.get(i).y() > lowestAllowed) { remove = false; break; } // If at least one corner is lower than the max, don't do anything
-        }
-
-        if (remove) {
-            scene.removeVolume(getPosition(), (StaticAABBObject) object3D);
-        }
-        else {
-            double lowestAllowed = points.get(targetIndex + 5).y() + MIN_THICKNESS;
-            if (targetPoint.y() < lowestAllowed) {
-                targetPoint.y(lowestAllowed);
-            }
+        double lowestAllowed = points.get(targetIndex + 5).y() + MIN_THICKNESS;
+        if (targetPoint.y() < lowestAllowed) {
+            targetPoint.y(lowestAllowed);
         }
     }
 
