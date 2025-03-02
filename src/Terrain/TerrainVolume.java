@@ -3,7 +3,6 @@ package Terrain;
 import Engine3d.Model.Mesh;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Scene;
-import Math.Vector.Vector;
 import Math.Vector.Vector3D;
 import Physics.AABBCollisions.StaticAABBObject;
 import Physics.Object3D;
@@ -15,10 +14,10 @@ import static Terrain.TerrainVolumePoints.*;
 
 public class TerrainVolume extends Mesh
 {
-    private Scene scene;
+    private final TerrainScene scene;
     private double size;
 
-    public TerrainVolume(Scene scene, Object3D object3D, double size) {
+    public TerrainVolume(TerrainScene scene, Object3D object3D, double size) {
         super(object3D);
         this.scene = scene;
         this.size = size;
@@ -157,13 +156,34 @@ public class TerrainVolume extends Mesh
     private void correctHeightDecrease(Vector3D targetPoint, int targetIndex) {
         double MIN_THICKNESS = 0.25f;
 
-        double lowestAllowed = points.get(targetIndex + 5).y() + MIN_THICKNESS;
-        if (targetPoint.y() < lowestAllowed) {
-            targetPoint.y(lowestAllowed);
+        boolean remove = true;
+
+        for (int i = 0; i < 5; i++) {
+            double lowestAllowed = points.get(i + 5).y() + MIN_THICKNESS;
+            if (points.get(i).y() > lowestAllowed) { remove = false; break; } // If at least one corner is lower than the max, don't do anything
+        }
+
+        if (remove) {
+            scene.removeObject(object3D);
+        }
+        else {
+            double lowestAllowed = points.get(targetIndex + 5).y() + MIN_THICKNESS;
+            if (targetPoint.y() < lowestAllowed) {
+                targetPoint.y(lowestAllowed);
+            }
         }
     }
 
     private void correctHeightIncrease() {
+        if (scene.isOccupied(getPosition().translated(new Vector3D(0,size,0)))) {
+            for (int i = 0; i < 5; i++) {
+                Vector3D p = points.get(i);
+                p.y(Math.min(p.y(), size));
+            }
+            return;
+        }
+
+
         double[] heights = new double[5];
         for (int i = 0; i < 5; i++) {
             double excess = points.get(i).y()-size;
@@ -171,12 +191,9 @@ public class TerrainVolume extends Mesh
             heights[i] = excess;
         }
 
-        StaticAABBObject newObject = new StaticAABBObject(scene);
-        newObject.translate(getPosition().translated(new Vector3D(0, size, 0)));
-        TerrainVolume newVolume = new TerrainVolume(scene, newObject, size);
-        newObject.setMesh(newVolume);
+        StaticAABBObject newTerrainBlock = scene.createNewTerrainVolume(getPosition().translated(new Vector3D(0,size,0)));
 
-        List<Vector3D> newPoints = newVolume.getPoints();
+        List<Vector3D> newPoints = newTerrainBlock.getMesh().getPoints();
 
         for (int i = 0; i < 5; i++) {
             points.get(i).y(size);

@@ -13,6 +13,7 @@ import Math.Vector.Vector5D;
 import Physics.AABBCollisions.StaticAABBObject;
 import Physics.Object3D;
 import Physics.PlayerObject;
+import Terrain.TerrainScene;
 import Terrain.TerrainTileMesh;
 import Terrain.TerrainVolume;
 import Terrain.TerrainVolumePoints;
@@ -21,8 +22,7 @@ import java.awt.*;
 
 import static Terrain.TerrainTileMesh.GRID_SIZE;
 
-public class TerrainLevel extends Scene {
-    public static double GRID_SIZE = 10;
+public class TerrainLevel extends TerrainScene {
     public TerrainLevel(Camera camera) {
         super(camera);
 
@@ -46,26 +46,11 @@ public class TerrainLevel extends Scene {
         int maxX = 3;
         int maxZ = 3;
 
-        TerrainTileMesh[][] meshes = new TerrainTileMesh[maxX][maxZ];
-
         for (int z = -maxZ; z < maxZ; z++) {
             for (int x = -maxX; x < maxX; x++) {
-                Vector3D coords = new Vector3D(x,0,z);
-                Vector5D height = new Vector5D(
-                        Math.round( Math.random()),
-                        Math.round( Math.random()),
-                        Math.round( Math.random()),
-                        Math.round( Math.random()),
-                        Math.round( Math.random())
-                );
-                height.scale(2);
+                Vector3D position = new Vector3D(x*VOLUME_SIZE,0,z*VOLUME_SIZE);
 
-                StaticAABBObject object3D = new StaticAABBObject(this);
-                object3D.translate(coords.scaled(GRID_SIZE));
-                //TerrainTileMesh tm = new TerrainTileMesh(object3D, coords, height, meshes);
-                TerrainVolume tm = new TerrainVolume(this, object3D, GRID_SIZE);
-                object3D.setMesh(tm);
-                //meshes[x][z] = tm;
+                createNewTerrainVolume(position);
             }
         }
     }

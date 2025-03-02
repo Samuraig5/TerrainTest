@@ -4,6 +4,7 @@ import Engine3d.Translatable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class Vector implements Translatable
 {
@@ -265,4 +266,19 @@ public abstract class Vector implements Translatable
      * @return copy of vector.
      */
     public abstract Vector clone();
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) { return true; }
+        if (obj == null || getClass() != obj.getClass()) { return false; }
+        if (getDimension() != ((Vector) obj).getDimension()) { return false; }
+
+        for (int i = 0; i < getDimension(); i++) {
+            if (getValue(i) != ((Vector) obj).getValue(i)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

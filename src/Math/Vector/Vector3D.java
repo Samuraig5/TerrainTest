@@ -1,5 +1,7 @@
 package Math.Vector;
 
+import java.util.Objects;
+
 public class Vector3D extends VectorW
 {
     @Override
@@ -101,5 +103,9 @@ public class Vector3D extends VectorW
     }
     public static Vector3D UP() {
         return new Vector3D(0,1,0);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(x(), y(), z(), w());
     }
 }

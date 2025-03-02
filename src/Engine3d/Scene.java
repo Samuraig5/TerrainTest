@@ -85,6 +85,31 @@ public class Scene implements Updatable
         }
     }
 
+    public void removeObject(Object3D object) {
+        objects.remove(object);
+        if (object instanceof Updatable)
+        {
+            updatables.remove(object);
+        }
+        if (object instanceof Gravitational)
+        {
+            gravitationals.remove((Gravitational) object);
+        }
+        if (object instanceof AABBObject)
+        {
+            AABBObjects.remove((AABBObject) object);
+
+            if (object instanceof DynamicAABBObject)
+            {
+                dynamicAABBObjects.remove((DynamicAABBObject) object);
+            }
+            else if (object instanceof StaticAABBObject)
+            {
+                staticAABBObjects.remove((StaticAABBObject) object);
+            }
+        }
+    }
+
     public void addUpdatable(Updatable updatable) {
         updatables.add(updatable);
     }
