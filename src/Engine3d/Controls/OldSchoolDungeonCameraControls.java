@@ -29,8 +29,8 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
     private boolean shiftDown = false;
     private boolean ctrlDown = false;
 
-    private int lastMouseX = -1;
-    private int lastMouseY = -1;
+    private boolean mouse1Down = false;
+    private boolean mouse2Down = false;
 
     private SceneRenderer renderer;
     private Robot robot;
@@ -84,6 +84,21 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
         playerObject.localTranslate(transDelta);
         playerObject.rotate(rotDelta);
+
+        float SCALING_FACTOR = 0.25f;
+        if (mouse1Down || mouse2Down) {
+            RayCollision res = playerObject.cursorRayCast(25, 0.5f);
+            if (res == null) { return; }
+            Vector3D target = playerObject.findClosestPointToCollision(res);
+            if (mouse1Down) {
+                res.collisionTarget.getMesh().translatePoint(target, Vector3D.UP().scaled(SCALING_FACTOR));
+                mouse1Down = false;
+            }
+            if (mouse2Down){
+                res.collisionTarget.getMesh().translatePoint(target, Vector3D.DOWN().scaled(SCALING_FACTOR));
+                mouse2Down = false;
+            }
+        }
     }
 
     @Override
@@ -152,9 +167,6 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
             playerObject.rotate(rotDelta);
         }
 
-        lastMouseX = e.getX();
-        lastMouseY = e.getY();
-
         if (centerCursor) {
             centerCursor(center);
         }
@@ -169,15 +181,11 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        float SCALING_FACTOR = 0.25f;
-        RayCollision res = playerObject.cursorRayCast(25, 0.5f);
-        if (res == null) { return; }
-        Vector3D target = playerObject.findClosestPointToCollision(res);
         if (e.getButton() == 1) {
-            res.collisionTarget.getMesh().translatePoint(target, Vector3D.UP().scaled(SCALING_FACTOR));
+            mouse1Down = true;
         }
         else {
-            res.collisionTarget.getMesh().translatePoint(target, Vector3D.DOWN().scaled(SCALING_FACTOR));
+            mouse2Down = true;
         }
     }
 }
