@@ -1,9 +1,13 @@
 package Engine3d.Controls;
 
+import Engine3d.Model.SimpleMeshes.BoxMesh;
+import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Time.Updatable;
 import Math.Raycast.RayCollision;
 import Math.Vector.Vector3D;
+import Math.Box;
+import Physics.Object3D;
 import Physics.PlayerObject;
 
 import javax.swing.*;
@@ -37,6 +41,8 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
     private boolean centerCursor = true;
     private boolean recentering = false;
 
+    private Object3D targeter;
+
     public OldSchoolDungeonCameraControls(SceneRenderer renderer, PlayerObject playerObject) {
         super(renderer);
 
@@ -63,6 +69,14 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
                 handleMouseMoved(e);
             }
         });
+
+        targeter = new Object3D(playerObject.getScene());
+        double scale = 0.25f;
+        BoxMesh boxMesh = new BoxMesh(targeter, new Box(new Vector3D(-scale,-scale,-scale), new Vector3D(scale,scale,scale)));
+        DrawInstructions di = new DrawInstructions(false,false,false,false);
+        di.wireFrameColour = Color.red;
+        boxMesh.setDrawInstructions(di);
+        targeter.setMesh(boxMesh);
     }
 
     @Override
@@ -86,10 +100,22 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         playerObject.rotate(rotDelta);
 
         float SCALING_FACTOR = 0.25f;
+        RayCollision res = playerObject.cursorRayCast(25, 0.5f);
+        if (res == null) {
+            targeter.getMesh().getDrawInstructions().drawWireFrame = false;
+            return;
+        }
+        else {
+            targeter.getMesh().getDrawInstructions().drawWireFrame = true;
+        }
+        Vector3D target = playerObject.findClosestPointToCollision(res);
+
+        Vector3D targetInWorld = res.collisionTarget.getMesh().localToWorld(target);
+
+        targeter.translate(targeter.getPosition().inverted());
+        targeter.translate(targetInWorld);
+
         if (mouse1Down || mouse2Down) {
-            RayCollision res = playerObject.cursorRayCast(25, 0.5f);
-            if (res == null) { return; }
-            Vector3D target = playerObject.findClosestPointToCollision(res);
             if (mouse1Down) {
                 res.collisionTarget.getMesh().translatePoint(target, Vector3D.UP().scaled(SCALING_FACTOR));
                 mouse1Down = false;
