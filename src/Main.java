@@ -1,6 +1,4 @@
 import Engine3d.Rendering.PlayerCamera;
-import Levels.BloodGulch;
-import Levels.GJKTest;
 import Levels.TerrainLevel;
 import Levels.TestLevel;
 import Menus.MainMenu;
