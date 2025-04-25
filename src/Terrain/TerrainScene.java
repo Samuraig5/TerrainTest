@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TerrainScene extends Scene {
     static public final double VOLUME_SIZE = 10;
+    static public final int RENDER_SIZE = 3;
 
     private final Map<Vector3D, StaticAABBObject> terrainGrid = new ConcurrentHashMap<>();
     public TerrainScene(Camera camera) {
@@ -48,7 +49,19 @@ public class TerrainScene extends Scene {
         Vector3D playerPosGrid = new Vector3D();
         for (int i = 0; i < 3; i++) {
             int pos = (int) (Math.round(playerPosReal.getValue(i) / VOLUME_SIZE) * VOLUME_SIZE);
-            playerPosGrid.setComponent(i, pos); 
+            playerPosGrid.setComponent(i, pos);
+        }
+
+        for (int x = (int) (playerPosGrid.x()-(RENDER_SIZE)*VOLUME_SIZE); x <= playerPosGrid.x()+(RENDER_SIZE)*VOLUME_SIZE ; x+=10) {
+            for (int z = (int) (playerPosGrid.z()-(RENDER_SIZE)*VOLUME_SIZE); z <= playerPosGrid.z()+(RENDER_SIZE)*VOLUME_SIZE ; z+=10) {
+                Vector3D key = new Vector3D(x,0,z); //Currently only Terrain volumes at y = 0 are regenerated
+                if (terrainGrid.containsKey(key)) {
+                    renderObject(terrainGrid.get(key), true);
+                }
+                else {
+                    createNewTerrainVolume(key);
+                }
+            }
         }
 
         for (Vector3D key : terrainGrid.keySet()) {
