@@ -7,10 +7,12 @@ import Physics.AABBCollisions.StaticAABBObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class TerrainScene extends Scene {
     static public final double VOLUME_SIZE = 10;
 
-    private final Map<Vector3D, StaticAABBObject> terrainGrid = new HashMap<>();
+    private final Map<Vector3D, StaticAABBObject> terrainGrid = new ConcurrentHashMap<>();
     public TerrainScene(Camera camera) {
         super(camera);
     }
@@ -37,5 +39,24 @@ public class TerrainScene extends Scene {
 
     public boolean isOccupied(Vector3D location) {
         return getVolume(location) != null;
+    }
+
+    @Override
+    public void buildScreenBuffer() {
+        if (terrainGrid == null) { return; }
+        Vector3D playerPosReal = getCamera().getPosition();
+        Vector3D playerPosGrid = new Vector3D();
+        for (int i = 0; i < 3; i++) {
+            int pos = (int) (Math.round(playerPosReal.getValue(i) / VOLUME_SIZE) * VOLUME_SIZE);
+            playerPosGrid.setComponent(i, pos); 
+        }
+
+        for (Vector3D key : terrainGrid.keySet()) {
+            renderObject(terrainGrid.get(key), false);
+            if (playerPosGrid.distanceTo(key) < VOLUME_SIZE*3) {
+                renderObject(terrainGrid.get(key), true);
+            }
+        }
+        super.buildScreenBuffer();
     }
 }

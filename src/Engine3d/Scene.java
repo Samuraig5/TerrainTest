@@ -35,9 +35,11 @@ public class Scene implements Updatable
     final SceneRenderer sceneRenderer = new SceneRenderer();
     protected Color backgroundColour = Color.BLACK;
     private TimeMeasurer timeMeasurer;
-    protected List<Object3D> objects = new CopyOnWriteArrayList<>();
-    List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 1d;
+
+    protected List<Object3D> objects = new CopyOnWriteArrayList<>();
+    protected List<Object3D> rederingObjects = new CopyOnWriteArrayList<>();
+    List<LightSource> lightSources = new ArrayList<>();
     protected List<Updatable> updatables = new CopyOnWriteArrayList<>();
     protected List<Gravitational> gravitationals = new ArrayList<>();
     protected List<AABBObject> AABBObjects = new ArrayList<>();
@@ -62,6 +64,7 @@ public class Scene implements Updatable
     public void addObject(Object3D object)
     {
         objects.add(object);
+        rederingObjects.add(object);
         if (object instanceof Updatable)
         {
             addUpdatable((Updatable) object);
@@ -87,6 +90,7 @@ public class Scene implements Updatable
 
     public void removeObject(Object3D object) {
         objects.remove(object);
+        rederingObjects.remove(object);
         if (object instanceof Updatable)
         {
             updatables.remove(object);
@@ -110,6 +114,17 @@ public class Scene implements Updatable
         }
     }
 
+    public void renderObject(Object3D obj, boolean render) {
+        if (render) {
+            if (!rederingObjects.contains(obj)) {
+                rederingObjects.add(obj);
+            }
+        }
+        else {
+            rederingObjects.remove(obj);
+        }
+    }
+
     public void addUpdatable(Updatable updatable) {
         updatables.add(updatable);
     }
@@ -118,7 +133,7 @@ public class Scene implements Updatable
     public void buildScreenBuffer()
     {
         camera.getScreenBuffer().clear(backgroundColour);
-        objects.sort((o1, o2) -> {
+        rederingObjects.sort((o1, o2) -> {
             // Calculate distances to the camera
             double distance1 = o1.getPosition().distanceTo(camera.getPosition());
             double distance2 = o2.getPosition().distanceTo(camera.getPosition());
@@ -136,7 +151,7 @@ public class Scene implements Updatable
         Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
 
 
-        objects.parallelStream().forEach(o -> {
+        rederingObjects.parallelStream().forEach(o -> {
             o.getMesh().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
             if (camera.debugging) {
 
