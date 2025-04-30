@@ -51,8 +51,8 @@ public class TerrainScene extends Scene {
             playerPosGrid.setComponent(i, pos);
         }
 
-        for (int x = (int) (playerPosGrid.x()-(RENDER_SIZE)*VOLUME_SIZE); x <= playerPosGrid.x()+(RENDER_SIZE)*VOLUME_SIZE ; x+=10) {
-            for (int z = (int) (playerPosGrid.z()-(RENDER_SIZE)*VOLUME_SIZE); z <= playerPosGrid.z()+(RENDER_SIZE)*VOLUME_SIZE ; z+=10) {
+        for (int x = (int) (playerPosGrid.x()-(RENDER_SIZE)*VOLUME_SIZE); x <= playerPosGrid.x()+(RENDER_SIZE)*VOLUME_SIZE ; x+=VOLUME_SIZE) {
+            for (int z = (int) (playerPosGrid.z()-(RENDER_SIZE)*VOLUME_SIZE); z <= playerPosGrid.z()+(RENDER_SIZE)*VOLUME_SIZE ; z+=VOLUME_SIZE) {
                 Vector3D key = new Vector3D(x,0,z); //Currently only Terrain volumes at y = 0 are regenerated
                 if (terrainGrid.containsKey(key)) {
                     setObjectState(terrainGrid.get(key), true);
@@ -65,7 +65,7 @@ public class TerrainScene extends Scene {
 
         for (Vector3D key : terrainGrid.keySet()) {
             setObjectState(terrainGrid.get(key), false);
-            if (playerPosGrid.distanceTo(key) < VOLUME_SIZE*3) {
+            if (playerPosGrid.distanceTo(key) < RENDER_SIZE*VOLUME_SIZE) {
                 setObjectState(terrainGrid.get(key), true);
             }
         }
