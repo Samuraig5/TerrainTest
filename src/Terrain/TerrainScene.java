@@ -5,7 +5,6 @@ import Engine3d.Scene;
 import Math.Vector.Vector3D;
 import Physics.AABBCollisions.StaticAABBObject;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,7 +55,7 @@ public class TerrainScene extends Scene {
             for (int z = (int) (playerPosGrid.z()-(RENDER_SIZE)*VOLUME_SIZE); z <= playerPosGrid.z()+(RENDER_SIZE)*VOLUME_SIZE ; z+=10) {
                 Vector3D key = new Vector3D(x,0,z); //Currently only Terrain volumes at y = 0 are regenerated
                 if (terrainGrid.containsKey(key)) {
-                    renderObject(terrainGrid.get(key), true);
+                    setObjectState(terrainGrid.get(key), true);
                 }
                 else {
                     createNewTerrainVolume(key);
@@ -65,9 +64,9 @@ public class TerrainScene extends Scene {
         }
 
         for (Vector3D key : terrainGrid.keySet()) {
-            renderObject(terrainGrid.get(key), false);
+            setObjectState(terrainGrid.get(key), false);
             if (playerPosGrid.distanceTo(key) < VOLUME_SIZE*3) {
-                renderObject(terrainGrid.get(key), true);
+                setObjectState(terrainGrid.get(key), true);
             }
         }
         super.buildScreenBuffer();

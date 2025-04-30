@@ -19,6 +19,7 @@ public class TerrainVolume extends Mesh
     private final TerrainScene scene;
     private double size;
 
+
     public TerrainVolume(TerrainScene scene, Object3D object3D, double size) {
         super(object3D);
         this.scene = scene;

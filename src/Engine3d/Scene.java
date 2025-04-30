@@ -1,6 +1,5 @@
 package Engine3d;
 
-import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
@@ -38,7 +37,7 @@ public class Scene implements Updatable
     private double gravity = 1d;
 
     protected List<Object3D> objects = new CopyOnWriteArrayList<>();
-    protected List<Object3D> rederingObjects = new CopyOnWriteArrayList<>();
+    protected List<Object3D> activeObjects = new CopyOnWriteArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
     protected List<Updatable> updatables = new CopyOnWriteArrayList<>();
     protected List<Gravitational> gravitationals = new ArrayList<>();
@@ -64,64 +63,60 @@ public class Scene implements Updatable
     public void addObject(Object3D object)
     {
         objects.add(object);
-        rederingObjects.add(object);
-        if (object instanceof Updatable)
-        {
-            addUpdatable((Updatable) object);
-        }
-        if (object instanceof Gravitational)
-        {
-            gravitationals.add((Gravitational) object);
-        }
-        if (object instanceof AABBObject)
-        {
-            AABBObjects.add((AABBObject) object);
-
-            if (object instanceof DynamicAABBObject)
-            {
-                dynamicAABBObjects.add((DynamicAABBObject) object);
-            }
-            else if (object instanceof StaticAABBObject)
-            {
-                staticAABBObjects.add((StaticAABBObject) object);
-            }
-        }
+        setObjectState(object, true);
     }
 
     public void removeObject(Object3D object) {
         objects.remove(object);
-        rederingObjects.remove(object);
-        if (object instanceof Updatable)
-        {
-            updatables.remove(object);
-        }
-        if (object instanceof Gravitational)
-        {
-            gravitationals.remove((Gravitational) object);
-        }
-        if (object instanceof AABBObject)
-        {
-            AABBObjects.remove((AABBObject) object);
-
-            if (object instanceof DynamicAABBObject)
-            {
-                dynamicAABBObjects.remove((DynamicAABBObject) object);
-            }
-            else if (object instanceof StaticAABBObject)
-            {
-                staticAABBObjects.remove((StaticAABBObject) object);
-            }
-        }
+        setObjectState(object, false);
     }
 
-    public void renderObject(Object3D obj, boolean render) {
-        if (render) {
-            if (!rederingObjects.contains(obj)) {
-                rederingObjects.add(obj);
+    /**
+     * Function to change an object's state.
+     * Influences things like rendering and collision detection.
+     * @param obj Object who's state should be changed
+     * @param state state true = active, false = inactive.
+     */
+    public void setObjectState(Object3D obj, boolean state) {
+        if (state) {
+            if (!activeObjects.contains(obj)) {
+                activeObjects.add(obj);
+                if (obj instanceof Updatable) {
+                    addUpdatable((Updatable) obj);
+                }
+                if (obj instanceof Gravitational) {
+                    gravitationals.add((Gravitational) obj);
+                }
+                if (obj instanceof AABBObject) {
+                    AABBObjects.add((AABBObject) obj);
+
+                    if (obj instanceof DynamicAABBObject) {
+                        dynamicAABBObjects.add((DynamicAABBObject) obj);
+                    }
+                    else if (obj instanceof StaticAABBObject) {
+                        staticAABBObjects.add((StaticAABBObject) obj);
+                    }
+                }
             }
+
         }
         else {
-            rederingObjects.remove(obj);
+            activeObjects.remove(obj);
+            if (obj instanceof Updatable) {
+                updatables.remove(obj);
+            }
+            if (obj instanceof Gravitational) {
+                gravitationals.remove((Gravitational) obj);
+            }
+            if (obj instanceof AABBObject) {
+                AABBObjects.remove((AABBObject) obj);
+                if (obj instanceof DynamicAABBObject) {
+                    dynamicAABBObjects.remove((DynamicAABBObject) obj);
+                }
+                else if (obj instanceof StaticAABBObject) {
+                    staticAABBObjects.remove((StaticAABBObject) obj);
+                }
+            }
         }
     }
 
@@ -133,7 +128,7 @@ public class Scene implements Updatable
     public void buildScreenBuffer()
     {
         camera.getScreenBuffer().clear(backgroundColour);
-        rederingObjects.sort((o1, o2) -> {
+        activeObjects.sort((o1, o2) -> {
             // Calculate distances to the camera
             double distance1 = o1.getPosition().distanceTo(camera.getPosition());
             double distance2 = o2.getPosition().distanceTo(camera.getPosition());
@@ -151,7 +146,7 @@ public class Scene implements Updatable
         Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
 
 
-        rederingObjects.parallelStream().forEach(o -> {
+        activeObjects.parallelStream().forEach(o -> {
             o.getMesh().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
             if (camera.debugging) {
 
