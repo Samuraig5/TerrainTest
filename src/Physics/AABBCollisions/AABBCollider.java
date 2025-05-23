@@ -10,7 +10,7 @@ public abstract class AABBCollider implements Translatable
 {
     private AABBObject obj;
     private Mesh colliderMesh;
-    //private AABB aabb;
+    private boolean doesCollisions = true;
 
     public AABBCollider(AABBObject object3D) {
         this.obj = object3D;
@@ -33,6 +33,7 @@ public abstract class AABBCollider implements Translatable
     }
 
     public boolean handleCollision(AABBCollider other) {
+        if (!isDoingCollisions() || !other.isDoingCollisions()) { return false; }
         try {
             //Vector3D move = getAABB().collision(other.getAABB());
             Vector3D move = EPA.solveEPA(other.obj, this.obj);
@@ -71,5 +72,13 @@ public abstract class AABBCollider implements Translatable
     @Override
     public Vector3D getPosition() {
         return obj.getPosition();
+    }
+
+    public boolean isDoingCollisions() {
+        return doesCollisions;
+    }
+
+    public void isDoingCollisions(boolean doesCollisions) {
+        this.doesCollisions = doesCollisions;
     }
 }

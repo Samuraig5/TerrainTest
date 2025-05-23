@@ -5,6 +5,7 @@ import Engine3d.Scene;
 import Math.Vector.Vector3D;
 import Physics.AABBCollisions.StaticAABBObject;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,10 +23,10 @@ public class TerrainScene extends Scene {
         removeObject(object);
     }
 
-    public StaticAABBObject createNewTerrainVolume(Vector3D location) {
+    public StaticAABBObject createNewTerrainVolume(Vector3D location, TerrainType type) {
         StaticAABBObject newObject = new StaticAABBObject(this);
         newObject.translate(location);
-        TerrainVolume newVolume = new TerrainVolume(this, newObject, VOLUME_SIZE);
+        TerrainVolume newVolume = new TerrainVolume(this, newObject, VOLUME_SIZE, type);
         newObject.setMesh(newVolume);
 
         terrainGrid.put(location, newObject);
@@ -52,13 +53,20 @@ public class TerrainScene extends Scene {
         }
 
         for (int x = (int) (playerPosGrid.x()-(RENDER_SIZE)*VOLUME_SIZE); x <= playerPosGrid.x()+(RENDER_SIZE)*VOLUME_SIZE ; x+=VOLUME_SIZE) {
-            for (int z = (int) (playerPosGrid.z()-(RENDER_SIZE)*VOLUME_SIZE); z <= playerPosGrid.z()+(RENDER_SIZE)*VOLUME_SIZE ; z+=VOLUME_SIZE) {
-                Vector3D key = new Vector3D(x,0,z); //Currently only Terrain volumes at y = 0 are regenerated
-                if (terrainGrid.containsKey(key)) {
-                    setObjectState(terrainGrid.get(key), true);
-                }
-                else {
-                    createNewTerrainVolume(key);
+            for (int y = (int) (playerPosGrid.y()-(RENDER_SIZE)*VOLUME_SIZE); y <= playerPosGrid.y()+(RENDER_SIZE)*VOLUME_SIZE ; y+=VOLUME_SIZE) {
+                for (int z = (int) (playerPosGrid.z()-(RENDER_SIZE)*VOLUME_SIZE); z <= playerPosGrid.z()+(RENDER_SIZE)*VOLUME_SIZE ; z+=VOLUME_SIZE) {
+                    Vector3D key = new Vector3D(x,y,z);
+                    if (terrainGrid.containsKey(key)) {
+                        setObjectState(terrainGrid.get(key), true);
+                    }
+                    else { //If object hasn't been generated yet, generate it
+                        TerrainType type = TerrainType.AIR;
+                        if (key.y() <= 0) {
+                            type = TerrainType.ROCK;
+                        }
+                        System.out.println(type);
+                        createNewTerrainVolume(key, type);
+                    }
                 }
             }
         }

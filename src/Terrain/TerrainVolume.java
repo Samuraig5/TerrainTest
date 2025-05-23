@@ -2,7 +2,6 @@ package Terrain;
 
 import Engine3d.Model.Mesh;
 import Engine3d.Rendering.DrawInstructions;
-import Engine3d.Scene;
 import Math.Vector.Vector3D;
 import Physics.AABBCollisions.StaticAABBObject;
 import Physics.Object3D;
@@ -18,16 +17,21 @@ public class TerrainVolume extends Mesh
 
     private final TerrainScene scene;
     private double size;
+    private TerrainType terrainType = TerrainType.AIR;
 
-
+    public TerrainVolume(TerrainScene scene, Object3D object3D, double size, TerrainType terrainType) {
+        super(object3D);
+        this.scene = scene;
+        this.size = size;
+        initialize(terrainType);
+    }
     public TerrainVolume(TerrainScene scene, Object3D object3D, double size) {
         super(object3D);
         this.scene = scene;
         this.size = size;
-        initialize();
+        initialize(TerrainType.ROCK);
     }
-
-    private void initialize() {
+    private void initialize(TerrainType terrainType) {
         points.add(generatePoint(TOP_FRONT_LEFT));
         points.add(generatePoint(TOP_FRONT_RIGHT));
         points.add(generatePoint(TOP_BACK_LEFT));
@@ -49,7 +53,7 @@ public class TerrainVolume extends Mesh
         }
         generateVerticalFaces();
 
-        this.setDrawInstructions(new DrawInstructions(false,true,false,true));
+        setTerrainType(terrainType);
     }
 
     private Vector3D generatePoint(TerrainVolumePoints index) {
@@ -198,7 +202,7 @@ public class TerrainVolume extends Mesh
             heights[i] = excess;
         }
 
-        StaticAABBObject newTerrainBlock = scene.createNewTerrainVolume(getPosition().translated(new Vector3D(0,size,0)));
+        StaticAABBObject newTerrainBlock = scene.createNewTerrainVolume(getPosition().translated(new Vector3D(0,size,0)), this.terrainType);
 
         List<Vector3D> newPoints = newTerrainBlock.getMesh().getPoints();
 
@@ -223,6 +227,15 @@ public class TerrainVolume extends Mesh
         if (topCentre.y() < centreLowestAllowed) {
             topCentre.y(centreLowestAllowed);
         }
+    }
+
+    public TerrainType getTerrainType() {
+        return terrainType;
+    }
+
+    public void setTerrainType(TerrainType terrainType) {
+        this.terrainType = terrainType;
+        this.setDrawInstructions(TerrainType.getDrawInstructions(terrainType));
     }
 }
 

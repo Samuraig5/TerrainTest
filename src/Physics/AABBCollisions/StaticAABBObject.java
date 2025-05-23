@@ -23,7 +23,9 @@ public class StaticAABBObject extends AABBObject
     }
 
     @Override
-    public void onCollision(Vector3D appliedMove) {
+    public void onCollision(Vector3D appliedMove) {}
 
+    public void setCollisionLogic(boolean doCollision) {
+        aabb.isDoingCollisions(doCollision);
     }
 }
