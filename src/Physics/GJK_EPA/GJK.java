@@ -1,5 +1,6 @@
 package Physics.GJK_EPA;
 
+import Engine3d.Model.Mesh;
 import Math.Vector.Vector3D;
 import Physics.Object3D;
 import Math.Raycast.Ray;
@@ -10,13 +11,19 @@ import java.util.List;
 public class GJK
 {
     public static boolean boolSolveGJK(Object3D o1, Object3D o2) {
+        return boolSolveGJK(o1.getMesh(), o2.getMesh());
+    }
+    public static boolean boolSolveGJK(Mesh o1, Mesh o2) {
         Simplex sim = solveGJK(o1, o2);
         return sim != null;
     }
 
     public static Simplex solveGJK(Object3D o1, Object3D o2) {
-        List<Vector3D> ver1 = o1.getMesh().getPointsInWorld();
-        List<Vector3D> ver2 = o2.getMesh().getPointsInWorld();
+        return solveGJK(o1.getMesh(), o2.getMesh());
+    }
+    public static Simplex solveGJK(Mesh o1, Mesh o2) {
+        List<Vector3D> ver1 = o1.getPointsInWorld();
+        List<Vector3D> ver2 = o2.getPointsInWorld();
 
         Simplex simplex = new Simplex();
 
@@ -215,19 +222,23 @@ public class GJK
 
     //TODO: Make GJK generic and remove this specific implementation
     public static boolean boolSolveGJK(Object3D o1, Ray o2) {
-        Simplex sim = solveGJK(o1, o2);
+        Simplex sim = solveGJK(o1.getMesh(), o2.getOrigin());
+        return sim != null;
+    }
+    public static boolean boolSolveGJK(Mesh o, Vector3D p) {
+        Simplex sim = solveGJK(o, p);
         return sim != null;
     }
 
-    public static Simplex solveGJK(Object3D o1, Ray o2) {
-        List<Vector3D> ver2 = o1.getMesh().getPointsInWorld();
+    public static Simplex solveGJK(Mesh o, Vector3D p) {
+        List<Vector3D> ver2 = o.getPointsInWorld();
         List<Vector3D> ver1 = new ArrayList<>();
         //ver1.add(o2.getOrigin().translated(o2.getDirection()));
-        ver1.add(o2.getOrigin());
+        ver1.add(p);
 
         Simplex simplex = new Simplex();
 
-        Vector3D dir = o1.getPosition().translated(o2.getDirection().inverted()); //o1.pos - o2.pos
+        Vector3D dir = o.getPosition().translated(p); //o.pos - p.pos
         simplex.a(calculateNewVertex(ver1, ver2, dir));
         simplex.incrementCount();
 
