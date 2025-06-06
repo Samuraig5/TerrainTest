@@ -1,5 +1,6 @@
 package Physics.GJK_EPA;
 
+import Engine3d.Model.Mesh;
 import Math.Vector.Vector3D;
 import Math.Line;
 import Physics.Object3D;
@@ -15,11 +16,15 @@ public class EPA
     private static final double THRESHOLD = 0.001;
 
     public static Vector3D solveEPA(Object3D o1, Object3D o2) {
-        Simplex solGJK = solveGJK(o1, o2);
+        return solveEPA(o1.getMesh(), o2.getMesh());
+    }
+
+    public static Vector3D solveEPA(Mesh mesh1, Mesh mesh2) {
+        Simplex solGJK = solveGJK(mesh1, mesh2);
         if (solGJK == null) { return new Vector3D(); }
 
-        List<Vector3D> ver1 = o1.getMesh().getPointsInWorld();
-        List<Vector3D> ver2 = o2.getMesh().getPointsInWorld();
+        List<Vector3D> ver1 = mesh1.getPointsInWorld();
+        List<Vector3D> ver2 = mesh2.getPointsInWorld();
 
         Polytope polytope = new Polytope(solGJK);
 
