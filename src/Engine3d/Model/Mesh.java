@@ -6,7 +6,6 @@ import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Scalable;
-import Physics.AABBCollisions.AABB;
 import Engine3d.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Material;
@@ -491,38 +490,5 @@ public class Mesh implements Translatable, Rotatable, Scalable
             copiedFaces.add(newTri);
         }
         return copiedFaces;
-    }
-
-    public AABB getAABB() {
-        if (points == null || points.isEmpty()) {
-            throw new IllegalStateException("Mesh contains no points");
-        }
-
-        // Initialize min and max with the coordinates of the first point
-        double minX = Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        double minZ = Double.MAX_VALUE;
-        double maxX = -Double.MAX_VALUE;
-        double maxY = -Double.MAX_VALUE;
-        double maxZ = -Double.MAX_VALUE;
-
-        copyPnF result = getCopyPnF();
-        localToWorld(result.copiedPoints());
-
-        // Iterate through the points to find the min and max coordinates
-        for (Vector3D point : result.copiedPoints) {
-            if (point.x() < minX) { minX = point.x(); }
-            if (point.y() < minY) { minY = point.y(); }
-            if (point.z() < minZ) { minZ = point.z(); }
-
-            if (point.x() > maxX) { maxX = point.x(); }
-            if (point.y() > maxY) { maxY = point.y(); }
-            if (point.z() > maxZ) { maxZ = point.z(); }
-        }
-
-        Vector3D min = new Vector3D(minX, minY, minZ);
-        Vector3D max = new Vector3D(maxX, maxY, maxZ);
-
-        return new AABB(min, max);
     }
 }

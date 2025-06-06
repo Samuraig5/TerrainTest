@@ -1,5 +1,6 @@
 package Physics;
 
+import Engine3d.Model.Mesh;
 import Engine3d.Object3D;
 import Engine3d.Scene;
 
@@ -9,6 +10,12 @@ public class CollidableObject extends Object3D implements Collidable {
     public CollidableObject(Scene scene) {
         super(scene);
         collider = new Collider(true, getMesh());
+    }
+
+    @Override
+    public void setMesh(Mesh mesh) {
+        super.setMesh(mesh);
+        collider.setColliderMesh(mesh);
     }
 
     @Override

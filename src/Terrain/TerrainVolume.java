@@ -2,9 +2,9 @@ package Terrain;
 
 import Engine3d.Model.Mesh;
 import Math.Vector.Vector3D;
-import Physics.AABBCollisions.StaticAABBObject;
 import Engine3d.Object3D;
 import Math.MeshTriangle;
+import Physics.CollidableObject;
 
 import java.util.List;
 
@@ -160,7 +160,7 @@ public class TerrainVolume extends Mesh
         }
 
         if (remove) {
-            scene.removeVolume(getPosition(), (StaticAABBObject) object3D);
+            scene.removeVolume(getPosition(), (CollidableObject) object3D);
         }
         return remove;
     }
@@ -201,7 +201,7 @@ public class TerrainVolume extends Mesh
             heights[i] = excess;
         }
 
-        StaticAABBObject newTerrainBlock = scene.createNewTerrainVolume(getPosition().translated(new Vector3D(0,size,0)), this.terrainType);
+        CollidableObject newTerrainBlock = scene.createNewTerrainVolume(getPosition().translated(new Vector3D(0,size,0)), this.terrainType);
 
         List<Vector3D> newPoints = newTerrainBlock.getMesh().getPoints();
 

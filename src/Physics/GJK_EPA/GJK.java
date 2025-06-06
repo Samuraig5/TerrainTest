@@ -227,7 +227,7 @@ public class GJK
     }
     public static boolean boolSolveGJK(Mesh o, Vector3D p) {
         Simplex sim = solveGJK(o, p);
-        return sim != null;
+        return (sim != null);
     }
 
     public static Simplex solveGJK(Mesh o, Vector3D p) {

@@ -7,15 +7,13 @@ import Math.Matrix4x4;
 import Math.Raycast.Ray;
 import Engine3d.Model.UnrotatableBox;
 import Math.Raycast.RayCollision;
-import Physics.AABBCollisions.AABBObject;
-import Physics.AABBCollisions.DynamicAABBObject;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
 
 import java.util.List;
 
-public class PlayerObject extends DynamicAABBObject implements Gravitational
+public class PlayerObject extends CollidableObject implements Gravitational
 {
     private Vector3D SIZE = new Vector3D(1, 1.8, 1);
     private Vector3D position = new Vector3D();
@@ -33,16 +31,13 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         Vector3D max = new Vector3D(SIZE.x()/2, SIZE.y(), SIZE.z()/2);
         UnrotatableBox playerMesh = new UnrotatableBox(this, new Box(min, max));
         setMesh(playerMesh);
+        setMass(100);
     }
 
     public void addMomentum(Vector3D delta) {
         momentum.translate(delta);
     }
 
-    @Override
-    public void onCollision(Vector3D appliedMove) {
-
-    }
     public Vector3D getCameraOffset() {
         return cameraOffset;
     }

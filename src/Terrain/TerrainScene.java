@@ -3,7 +3,7 @@ package Terrain;
 import Engine3d.Rendering.Camera;
 import Engine3d.Scene;
 import Math.Vector.Vector3D;
-import Physics.AABBCollisions.StaticAABBObject;
+import Physics.CollidableObject;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -13,18 +13,19 @@ public class TerrainScene extends Scene {
     static public final double VOLUME_SIZE = 10;
     static public final int RENDER_SIZE = 3;
 
-    private final Map<Vector3D, StaticAABBObject> terrainGrid = new ConcurrentHashMap<>();
+    private final Map<Vector3D, CollidableObject> terrainGrid = new ConcurrentHashMap<>();
     public TerrainScene(Camera camera) {
         super(camera);
     }
 
-    public void removeVolume(Vector3D location, StaticAABBObject object) {
+    public void removeVolume(Vector3D location, CollidableObject object) {
         terrainGrid.remove(location, object);
         removeObject(object);
     }
 
-    public StaticAABBObject createNewTerrainVolume(Vector3D location, TerrainType type) {
-        StaticAABBObject newObject = new StaticAABBObject(this);
+    public CollidableObject createNewTerrainVolume(Vector3D location, TerrainType type) {
+        CollidableObject newObject = new CollidableObject(this);
+        newObject.doesCollision(TerrainType.getCollisionLogic(type));
         newObject.translate(location);
         TerrainVolume newVolume = new TerrainVolume(this, newObject, VOLUME_SIZE, type);
         newObject.setMesh(newVolume);
@@ -34,7 +35,7 @@ public class TerrainScene extends Scene {
         return newObject;
     }
 
-    public StaticAABBObject getVolume(Vector3D location) {
+    public CollidableObject getVolume(Vector3D location) {
         return terrainGrid.get(location);
     }
 
@@ -64,7 +65,6 @@ public class TerrainScene extends Scene {
                         if (key.y() <= 0) {
                             type = TerrainType.ROCK;
                         }
-                        System.out.println(type);
                         createNewTerrainVolume(key, type);
                     }
                 }

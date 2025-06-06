@@ -7,9 +7,8 @@ import Engine3d.Rendering.SceneRenderer;
 import Math.Raycast.Ray;
 import Engine3d.Model.UnrotatableBox;
 import Math.Raycast.RayCollision;
-import Physics.AABBCollisions.AABBObject;
-import Physics.AABBCollisions.DynamicAABBObject;
-import Physics.AABBCollisions.StaticAABBObject;
+import Physics.CollidableObject;
+import Physics.CollisionHandler;
 import Physics.GJK_EPA.GJK;
 import Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
@@ -40,9 +39,7 @@ public class Scene implements Updatable
     List<LightSource> lightSources = new ArrayList<>();
     protected List<Updatable> updatables = new CopyOnWriteArrayList<>();
     protected List<Gravitational> gravitationals = new ArrayList<>();
-    protected List<AABBObject> AABBObjects = new ArrayList<>();
-    protected List<DynamicAABBObject> dynamicAABBObjects = new ArrayList<>();
-    protected List<StaticAABBObject> staticAABBObjects = new ArrayList<>();
+    protected List<CollidableObject> collidables = new ArrayList<>();
 
     public Scene(Camera camera) {
         this.camera = camera;
@@ -86,15 +83,8 @@ public class Scene implements Updatable
                 if (obj instanceof Gravitational) {
                     gravitationals.add((Gravitational) obj);
                 }
-                if (obj instanceof AABBObject) {
-                    AABBObjects.add((AABBObject) obj);
-
-                    if (obj instanceof DynamicAABBObject) {
-                        dynamicAABBObjects.add((DynamicAABBObject) obj);
-                    }
-                    else if (obj instanceof StaticAABBObject) {
-                        staticAABBObjects.add((StaticAABBObject) obj);
-                    }
+                if (obj instanceof CollidableObject) {
+                    collidables.add((CollidableObject) obj);
                 }
             }
 
@@ -107,14 +97,8 @@ public class Scene implements Updatable
             if (obj instanceof Gravitational) {
                 gravitationals.remove((Gravitational) obj);
             }
-            if (obj instanceof AABBObject) {
-                AABBObjects.remove((AABBObject) obj);
-                if (obj instanceof DynamicAABBObject) {
-                    dynamicAABBObjects.remove((DynamicAABBObject) obj);
-                }
-                else if (obj instanceof StaticAABBObject) {
-                    staticAABBObjects.remove((StaticAABBObject) obj);
-                }
+            if (obj instanceof CollidableObject) {
+                collidables.remove((CollidableObject) obj);
             }
         }
     }
@@ -150,15 +134,6 @@ public class Scene implements Updatable
             if (camera.debugging) {
 
                 o.getSource().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
-                if (o instanceof AABBObject && !(o instanceof PlayerObject)) {
-                    UnrotatableBox collision = ((AABBObject) o).getAABBCollider().getAABBMesh();
-                    double scalingFactor = 1f;
-                    collision.scale(new Vector3D(scalingFactor,scalingFactor,scalingFactor));
-                    DrawInstructions di = new DrawInstructions(true,false,false,false);
-                    di.wireFrameColour = Color.ORANGE;
-                    collision.setDrawInstructions(di);
-                    collision.drawMesh(camera,constCamPos,viewMatrix,lightSources,timeMeasurer);
-                }
             }
         });
     }
@@ -198,16 +173,11 @@ public class Scene implements Updatable
         timeMeasurer.pauseAndEndMeasurement("applyGravity");
 
         timeMeasurer.startMeasurement("handleCollision");
-        for (int i = 0; i < dynamicAABBObjects.size(); i++) {
-            for (int j = 0; j < staticAABBObjects.size(); j++) {
-                dynamicAABBObjects.get(i).
-                        getAABBCollider().handleCollision(
-                                staticAABBObjects.get(j).getAABBCollider());
-            }
-            for (int j = i+1; j < dynamicAABBObjects.size(); j++) {
-                dynamicAABBObjects.get(i).
-                        getAABBCollider().handleCollision(
-                                dynamicAABBObjects.get(j).getAABBCollider());
+        for (int i = 0; i < collidables.size(); i++) {
+            CollidableObject o1 = collidables.get(i);
+            for (int j = i+1; j < collidables.size(); j++) {
+                CollidableObject o2 = collidables.get(j);
+                CollisionHandler.handleCollision(o1, o2);
             }
         }
         timeMeasurer.pauseAndEndMeasurement("handleCollision");
@@ -215,24 +185,23 @@ public class Scene implements Updatable
 
     public RayCollision checkAndGetCollision(int numSteps, Ray ray) {
         for (int i = 0; i < numSteps; i++) {
-            for (int j = 0; j < AABBObjects.size(); j++) {
+            for (int j = 0; j < collidables.size(); j++) {
                 try {
-                    AABBObject obj = AABBObjects.get(j);
+                    CollidableObject obj = collidables.get(j);
                     if (obj == ray.getSource()) { continue; }
-                    if (!obj.getAABBCollider().getAABB().collision(ray).isEmpty()) {
-                        if (GJK.boolSolveGJK(obj, ray)) {
-                            return new RayCollision(ray.getOrigin(), obj);
-                        }
+                    if (obj.getCollider().contains(ray.getOrigin())) {
+                        return new RayCollision(ray.getOrigin(), obj);
                     }
                 }
                 catch (NullPointerException e) {
-                    System.err.println(e.getMessage());
+                    System.err.println("RayCollision ran into NullPointerException: " + e.getMessage());
                 }
             }
             ray.advance();
         }
         return null;
     }
+
     public boolean checkForCollision(int numSteps, Ray ray) {
         if (checkAndGetCollision(numSteps, ray) != null) {
             return true;

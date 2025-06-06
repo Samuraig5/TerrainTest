@@ -1,12 +1,12 @@
 package Levels;
 
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
+import Physics.CollidableObject;
 import Physics.PlayerObject;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
 import Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
-import Physics.AABBCollisions.StaticAABBObject;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
@@ -70,26 +70,26 @@ public class TestLevel extends Scene
             double roomSize = 50;
             double wallHeight = 4;
 
-            StaticAABBObject ground = spawnWall(stoneImg, new Vector3D(roomSize*2,1,roomSize*2));
+            CollidableObject ground = spawnWall(stoneImg, new Vector3D(roomSize*2,1,roomSize*2));
             ground.translate(Vector3D.DOWN().scaled(0.5));
 
 
-            StaticAABBObject wall1 = spawnWall(lightMossImg, new Vector3D(roomSize,wallHeight,1));
+            CollidableObject wall1 = spawnWall(lightMossImg, new Vector3D(roomSize,wallHeight,1));
             wall1.translate(Vector3D.FORWARD().scaled(roomSize/2));
-            StaticAABBObject wall2 = spawnWall(lightMossImg, new Vector3D(roomSize,wallHeight,1));
+            CollidableObject wall2 = spawnWall(lightMossImg, new Vector3D(roomSize,wallHeight,1));
             wall2.translate(Vector3D.BACK().scaled(roomSize/2));
-            StaticAABBObject wall3 = spawnWall(lightMossImg, new Vector3D(1,wallHeight,roomSize));
+            CollidableObject wall3 = spawnWall(lightMossImg, new Vector3D(1,wallHeight,roomSize));
             wall3.translate(Vector3D.RIGHT().scaled(roomSize/2));
-            StaticAABBObject wall4 = spawnWall(lightMossImg, new Vector3D(1,wallHeight,roomSize));
+            CollidableObject wall4 = spawnWall(lightMossImg, new Vector3D(1,wallHeight,roomSize));
             wall4.translate(Vector3D.LEFT().scaled(roomSize/2));
 
-            StaticAABBObject box = spawnWall(grimeImg, new Vector3D(5,5,5));
+            CollidableObject box = spawnWall(grimeImg, new Vector3D(5,5,5));
             box.translate(Vector3D.UP());
 
-            StaticAABBObject box2 = spawnWall(heavyMossImg, new Vector3D(7,2.5,7));
+            CollidableObject box2 = spawnWall(heavyMossImg, new Vector3D(7,2.5,7));
             box2.translate(Vector3D.UP());
 
-            StaticAABBObject wa = spawnWall(grimeImg, new Vector3D(25,2,25));
+            CollidableObject wa = spawnWall(grimeImg, new Vector3D(25,2,25));
             wa.translate(new Vector3D(10,0,10));
             wa.rotate(new Vector3D(Math.toRadians(-25),0,0));
 
@@ -110,8 +110,8 @@ public class TestLevel extends Scene
         }
     }
 
-    private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {
-        StaticAABBObject wall = new StaticAABBObject(this);
+    private CollidableObject spawnWall(BufferedImage sprite, Vector3D size) {
+        CollidableObject wall = new CollidableObject(this);
         BoxMesh boxMesh = new BoxMesh(wall, size);
         wall.setMesh(boxMesh);
         boxMesh.setTexture(sprite);
