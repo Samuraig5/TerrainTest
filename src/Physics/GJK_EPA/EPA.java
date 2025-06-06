@@ -3,7 +3,7 @@ package Physics.GJK_EPA;
 import Engine3d.Model.Mesh;
 import Math.Vector.Vector3D;
 import Math.Line;
-import Physics.Object3D;
+import Engine3d.Object3D;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -8,9 +8,8 @@ import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
 import Math.Vector.Vector3D;
-import Physics.GJK_EPA.EPA;
 import Physics.GJK_EPA.GJK;
-import Physics.Object3D;
+import Engine3d.Object3D;
 
 import java.awt.*;
 

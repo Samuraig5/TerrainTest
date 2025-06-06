@@ -7,7 +7,7 @@ import Math.Vector.Vector3D;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Scalable;
 import Physics.AABBCollisions.AABB;
-import Physics.Object3D;
+import Engine3d.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Material;
 import Engine3d.Rotatable;

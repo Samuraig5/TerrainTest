@@ -1,10 +1,9 @@
 package Terrain;
 
 import Engine3d.Model.Mesh;
-import Engine3d.Rendering.DrawInstructions;
 import Math.Vector.Vector3D;
 import Physics.AABBCollisions.StaticAABBObject;
-import Physics.Object3D;
+import Engine3d.Object3D;
 import Math.MeshTriangle;
 
 import java.util.List;

@@ -4,7 +4,7 @@ import Engine3d.Controls.CreativeCamera;
 import Engine3d.Controls.OldSchoolFlyingControls;
 import Engine3d.Lighting.CameraLight;
 import Math.Vector.Vector3D;
-import Physics.Object3D;
+import Engine3d.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;

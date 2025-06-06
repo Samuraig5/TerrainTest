@@ -1,26 +1,15 @@
 package Levels;
 
-import Engine3d.Controls.CreativeCamera;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
-import Engine3d.Controls.OldSchoolFlyingControls;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
-import Engine3d.Scene;
-import Math.Vector.Vector5D;
-import Physics.AABBCollisions.StaticAABBObject;
-import Physics.Object3D;
 import Physics.PlayerObject;
 import Terrain.TerrainScene;
-import Terrain.TerrainTileMesh;
-import Terrain.TerrainVolume;
-import Terrain.TerrainVolumePoints;
 
 import java.awt.*;
-
-import static Terrain.TerrainTileMesh.GRID_SIZE;
 
 public class TerrainLevel extends TerrainScene {
     public TerrainLevel(Camera camera) {

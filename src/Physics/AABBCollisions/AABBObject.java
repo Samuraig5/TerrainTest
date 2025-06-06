@@ -1,7 +1,7 @@
 package Physics.AABBCollisions;
 
 import Math.Vector.Vector3D;
-import Physics.Object3D;
+import Engine3d.Object3D;
 import Engine3d.Scene;
 
 public abstract class AABBObject extends Object3D

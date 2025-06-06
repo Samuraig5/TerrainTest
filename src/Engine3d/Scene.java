@@ -16,7 +16,6 @@ import Engine3d.Lighting.LightSource;
 import Math.Matrix4x4;
 import Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
-import Physics.Object3D;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;

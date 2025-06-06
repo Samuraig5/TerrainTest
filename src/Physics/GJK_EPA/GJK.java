@@ -2,7 +2,7 @@ package Physics.GJK_EPA;
 
 import Engine3d.Model.Mesh;
 import Math.Vector.Vector3D;
-import Physics.Object3D;
+import Engine3d.Object3D;
 import Math.Raycast.Ray;
 
 import java.util.ArrayList;

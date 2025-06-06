@@ -6,7 +6,7 @@ import Math.Vector.Vector3D;
 import Math.MeshTriangle;
 import Engine3d.Model.Mesh;
 import Math.Vector.Vector5D;
-import Physics.Object3D;
+import Engine3d.Object3D;
 
 import java.awt.*;
 

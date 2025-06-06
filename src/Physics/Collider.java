@@ -5,15 +5,23 @@ import Math.Vector.Vector3D;
 import Physics.GJK_EPA.EPA;
 import Physics.GJK_EPA.GJK;
 
-public abstract class Collider {
-    boolean isActive;
-    Mesh colliderMesh;
-    double mass;
+public class Collider {
+    private boolean isActive;
+    private Mesh colliderMesh;
+    private double mass;
 
     protected void __init__(boolean isActive, Mesh colliderMesh) {
         isActive(isActive);
         setColliderMesh(colliderMesh);
         mass = 0; //Mass of 0 or lower means the collider is static (can't be moved)
+    }
+
+    public Collider(boolean isActive, Mesh colliderMesh) {
+        __init__(isActive, colliderMesh);
+    }
+    public Collider(boolean isActive, Mesh colliderMesh, double mass) {
+        __init__(isActive, colliderMesh);
+        setMass(mass);
     }
 
     public void isActive(boolean isActive) {

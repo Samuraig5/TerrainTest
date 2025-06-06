@@ -1,4 +1,4 @@
-package Physics;
+package Engine3d;
 
 import Math.Box;
 import Math.Matrix4x4;
@@ -6,9 +6,6 @@ import Math.Vector.Vector3D;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Model.Mesh;
 import Engine3d.Model.UnrotatableBox;
-import Engine3d.Scene;
-import Engine3d.Rotatable;
-import Engine3d.Translatable;
 
 import java.awt.*;
 

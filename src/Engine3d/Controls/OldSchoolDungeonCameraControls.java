@@ -7,7 +7,7 @@ import Engine3d.Time.Updatable;
 import Math.Raycast.RayCollision;
 import Math.Vector.Vector3D;
 import Math.Box;
-import Physics.Object3D;
+import Engine3d.Object3D;
 import Physics.PlayerObject;
 
 import javax.swing.*;
