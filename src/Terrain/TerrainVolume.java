@@ -6,6 +6,7 @@ import Engine3d.Object3D;
 import Math.MeshTriangle;
 import Physics.CollidableObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static Terrain.TerrainVolumePoints.*;
@@ -31,6 +32,9 @@ public class TerrainVolume extends Mesh
         initialize(TerrainType.ROCK);
     }
     private void initialize(TerrainType terrainType) {
+        points = new ArrayList<>();
+        faces = new ArrayList<>();
+
         points.add(generatePoint(TOP_FRONT_LEFT));
         points.add(generatePoint(TOP_FRONT_RIGHT));
         points.add(generatePoint(TOP_BACK_LEFT));
@@ -160,7 +164,8 @@ public class TerrainVolume extends Mesh
         }
 
         if (remove) {
-            scene.removeVolume(getPosition(), (CollidableObject) object3D);
+            initialize(TerrainType.AIR);
+            //scene.removeVolume(getPosition(), (CollidableObject) object3D);
         }
         return remove;
     }
@@ -235,6 +240,10 @@ public class TerrainVolume extends Mesh
     public void setTerrainType(TerrainType terrainType) {
         this.terrainType = terrainType;
         this.setDrawInstructions(TerrainType.getDrawInstructions(terrainType));
+
+        if (object3D instanceof CollidableObject) {
+            ((CollidableObject) object3D).doesCollision(TerrainType.getCollisionLogic(terrainType));
+        }
     }
 }
 

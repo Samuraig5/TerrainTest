@@ -25,7 +25,6 @@ public class TerrainScene extends Scene {
 
     public CollidableObject createNewTerrainVolume(Vector3D location, TerrainType type) {
         CollidableObject newObject = new CollidableObject(this);
-        newObject.doesCollision(TerrainType.getCollisionLogic(type));
         newObject.translate(location);
         TerrainVolume newVolume = new TerrainVolume(this, newObject, VOLUME_SIZE, type);
         newObject.setMesh(newVolume);
