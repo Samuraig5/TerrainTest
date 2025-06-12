@@ -6,6 +6,7 @@ import Engine3d.Object3D;
 import Math.MeshTriangle;
 import Physics.CollidableObject;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,12 +26,25 @@ public class TerrainVolume extends Mesh
         this.size = size;
         initialize(terrainType);
     }
-    public TerrainVolume(TerrainScene scene, Object3D object3D, double size) {
+    public TerrainVolume(TerrainScene scene, Object3D object3D, double size, TerrainType terrainType, double[] heightOffset) {
         super(object3D);
         this.scene = scene;
         this.size = size;
-        initialize(TerrainType.ROCK);
+        initialize(terrainType);
+        if (heightOffset.length != points.size()) {
+            System.err.println("TerrainVolume: Array of heightOffsets has different length than list of points");
+        }
+        else {
+            for (int i = 0; i < points.size(); i++) {
+                Vector3D point = points.get(i);
+                Vector3D delta = new Vector3D(0, heightOffset[i], 0);
+                //translatePoint(point, delta);
+                point.y(point.y() + heightOffset[i]);
+                //correctHeightAdjustment(point, i,  delta);
+            }
+        }
     }
+
     private void initialize(TerrainType terrainType) {
         points = new ArrayList<>();
         faces = new ArrayList<>();
@@ -182,10 +196,11 @@ public class TerrainVolume extends Mesh
     }
 
     private void correctHeightDecrease(Vector3D targetPoint, int targetIndex) {
-
-        double lowestAllowed = points.get(targetIndex + 5).y() + MIN_THICKNESS;
-        if (targetPoint.y() < lowestAllowed) {
-            targetPoint.y(lowestAllowed);
+        if (targetIndex < 5) { //For points on top
+            double lowestAllowed = points.get(targetIndex + 5).y() + MIN_THICKNESS;
+            if (targetPoint.y() < lowestAllowed) {
+                targetPoint.y(lowestAllowed);
+            }
         }
     }
 

@@ -2,15 +2,19 @@ package Terrain;
 
 import Engine3d.Rendering.Camera;
 import Engine3d.Scene;
+import Math.OpenSimplex2S;
 import Math.Vector.Vector3D;
 import Physics.CollidableObject;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static Terrain.TerrainVolumePoints.*;
+
 public class TerrainScene extends Scene {
     static public final double VOLUME_SIZE = 10;
     static public final int RENDER_SIZE = 3;
+    static public final long SEED = 12345678;
 
     private final Map<Vector3D, CollidableObject> terrainGrid = new ConcurrentHashMap<>();
     public TerrainScene(Camera camera) {
@@ -22,15 +26,19 @@ public class TerrainScene extends Scene {
         removeObject(object);
     }
 
-    public CollidableObject createNewTerrainVolume(Vector3D location, TerrainType type) {
+    public CollidableObject createNewTerrainVolume(Vector3D location, TerrainType type, double[] heightOffset) {
         CollidableObject newObject = new CollidableObject(this);
         newObject.translate(location);
-        TerrainVolume newVolume = new TerrainVolume(this, newObject, VOLUME_SIZE, type);
+        TerrainVolume newVolume = new TerrainVolume(this, newObject, VOLUME_SIZE, type, heightOffset);
         newObject.setMesh(newVolume);
 
         terrainGrid.put(location, newObject);
 
         return newObject;
+    }
+
+    public CollidableObject createNewTerrainVolume(Vector3D location, TerrainType type) {
+        return createNewTerrainVolume(location, type, new double[10]);
     }
 
     public CollidableObject getVolume(Vector3D location) {
@@ -60,10 +68,14 @@ public class TerrainScene extends Scene {
                     }
                     else { //If object hasn't been generated yet, generate it
                         TerrainType type = TerrainType.AIR;
+                        double[] heightOffset = new double[10];
                         if (key.y() <= 0) {
                             type = TerrainType.ROCK;
+                            addHeightOffset(0.01f, (float) VOLUME_SIZE,new Vector3D(x, y, z), heightOffset);
+                            addHeightOffset(0.1f,1f,new Vector3D(x, y, z), heightOffset);
+
                         }
-                        createNewTerrainVolume(key, type);
+                        createNewTerrainVolume(key, type, heightOffset);
                     }
                 }
             }
@@ -76,5 +88,32 @@ public class TerrainScene extends Scene {
             }
         }
         super.buildScreenBuffer();
+    }
+
+    /**
+     * Adds to the heightOffset with random height offsets based on the OpenSimplex algorithm.
+     * @param frequency frequency of the offset. A higher frequency means a point's offset depends less on the neighbours.
+     * @param volume volume of the offset. A higher volume means a greater offset.
+     * @param volumeCoords coordinates of the volume this height offset is applied to.
+     * @param heightOffset the array the offset should be added to.
+     */
+    private static void addHeightOffset(float frequency, float volume, Vector3D volumeCoords, double[] heightOffset) {
+
+        Vector3D miniPos;
+
+        miniPos = TOP_FRONT_LEFT.getVector().scaled(VOLUME_SIZE).translated(volumeCoords).scaled(frequency);
+        heightOffset[0] += volume * OpenSimplex2S.noise2(SEED, miniPos.x(), miniPos.z());
+
+        miniPos = TOP_FRONT_RIGHT.getVector().scaled(VOLUME_SIZE).translated(volumeCoords).scaled(frequency);
+        heightOffset[1] += volume * OpenSimplex2S.noise2(SEED, miniPos.x(), miniPos.z());
+
+        miniPos = TOP_BACK_LEFT.getVector().scaled(VOLUME_SIZE).translated(volumeCoords).scaled(frequency);
+        heightOffset[2] += volume * OpenSimplex2S.noise2(SEED, miniPos.x(), miniPos.z());
+
+        miniPos = TOP_BACK_RIGHT.getVector().scaled(VOLUME_SIZE).translated(volumeCoords).scaled(frequency);
+        heightOffset[3] += volume * OpenSimplex2S.noise2(SEED, miniPos.x(), miniPos.z());
+
+        miniPos = TOP_CENTRE.getVector().scaled(VOLUME_SIZE).translated(volumeCoords).scaled(frequency);
+        heightOffset[4] += volume * OpenSimplex2S.noise2(SEED, miniPos.x(), miniPos.z());
     }
 }
