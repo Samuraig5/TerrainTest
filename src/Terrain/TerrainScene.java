@@ -5,7 +5,6 @@ import Engine3d.Scene;
 import Math.Vector.Vector3D;
 import Physics.CollidableObject;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,7 +38,7 @@ public class TerrainScene extends Scene {
     }
 
     public boolean isOccupied(Vector3D location) {
-        return getVolume(location) != null;
+        return TerrainType.getOccupationLogic(((TerrainVolume) getVolume(location).getMesh()).getTerrainType());
     }
 
     @Override

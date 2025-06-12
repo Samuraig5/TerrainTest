@@ -19,8 +19,25 @@ public enum TerrainType {
         }
     }
 
+    /**
+     * @param type the terran type
+     * @return true if that terrain type has collisions, false otherwise
+     */
     public static boolean getCollisionLogic(TerrainType type){
-        DrawInstructions dw;
+        switch (type.ordinal()) {
+            case 0:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    /**
+     * @param type the terran type
+     * @return true if that terrain type has is "solid" meaning other terrain types can not be extended into this terrain type.
+     *          If false, a neighbouring terrain volume will not be blocked from being extended into this volume.
+     */
+    public static boolean getOccupationLogic(TerrainType type){
         switch (type.ordinal()) {
             case 0:
                 return false;
