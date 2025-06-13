@@ -76,6 +76,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
     }
 
     public void translatePoint(Vector3D targetPoint, Vector3D delta) {
+        targetPoint.translate(delta);
         for (int i = 0; i < faces.size(); i++) {
             faces.get(i).translatePoint(targetPoint, delta);
         }

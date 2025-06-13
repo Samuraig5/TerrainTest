@@ -26,6 +26,7 @@ public class TerrainVolume extends Mesh
         this.size = size;
         initialize(terrainType);
     }
+
     public TerrainVolume(TerrainScene scene, Object3D object3D, double size, TerrainType terrainType, double[] heightOffset) {
         super(object3D);
         this.scene = scene;
@@ -38,8 +39,8 @@ public class TerrainVolume extends Mesh
             for (int i = 0; i < points.size(); i++) {
                 Vector3D point = points.get(i);
                 Vector3D delta = new Vector3D(0, heightOffset[i], 0);
-                //translatePoint(point, delta);
-                point.y(point.y() + heightOffset[i]);
+                translatePoint(point, delta);
+                //point.y(point.y() + heightOffset[i]);
                 //correctHeightAdjustment(point, i,  delta);
             }
         }

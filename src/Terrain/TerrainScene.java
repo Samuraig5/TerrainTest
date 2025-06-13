@@ -46,7 +46,13 @@ public class TerrainScene extends Scene {
     }
 
     public boolean isOccupied(Vector3D location) {
-        return TerrainType.getOccupationLogic(((TerrainVolume) getVolume(location).getMesh()).getTerrainType());
+        CollidableObject colObj = getVolume(location);
+        if (colObj == null) { return false; }
+        TerrainVolume tv = (TerrainVolume) colObj.getMesh();
+        if (tv == null) { return false; }
+        TerrainType tt = tv.getTerrainType();
+        if (tt == null) { return false; }
+        return TerrainType.getOccupationLogic(tt);
     }
 
     @Override

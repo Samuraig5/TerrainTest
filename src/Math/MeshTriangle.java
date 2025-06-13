@@ -64,15 +64,15 @@ public class MeshTriangle implements Translatable
     public void translatePoint(Vector3D targetPoint, Vector3D delta) {
         Vector2D[] texturePoints = material.getTextureCoords();
         if (targetPoint == points[0]) {
-            points[0].translate(delta);
+            //points[0].translate(delta);
             texturePoints[0].translate(new Vector3D(0, -delta.y()*4, 0));
         }
         else if (targetPoint == points[1]) {
-            points[1].translate(delta);
+            //points[1].translate(delta);
             texturePoints[1].translate(new Vector3D(0, -delta.y()*4, 0));
         }
         else if (targetPoint == points[2]) {
-            points[2].translate(delta);
+            //points[2].translate(delta);
             texturePoints[2].translate(new Vector3D(0, -delta.y()*4, 0));
         }
         else {
