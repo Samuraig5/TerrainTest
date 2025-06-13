@@ -4,6 +4,7 @@ import Engine3d.Rendering.Camera;
 import Engine3d.Scene;
 import Math.OpenSimplex2S;
 import Math.Vector.Vector3D;
+import Menus.Settings;
 import Physics.CollidableObject;
 
 import java.util.Map;
@@ -12,13 +13,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import static Terrain.TerrainVolumePoints.*;
 
 public class TerrainScene extends Scene {
-    static public final double VOLUME_SIZE = 10;
-    static public final int RENDER_SIZE = 3;
-    static public final long SEED = 12345678;
+    public double VOLUME_SIZE;
+    public int RENDER_SIZE;
+    public long SEED;
 
     private final Map<Vector3D, CollidableObject> terrainGrid = new ConcurrentHashMap<>();
-    public TerrainScene(Camera camera) {
-        super(camera);
+    public TerrainScene(Camera camera, Settings settings) {
+        super(camera, settings);
+        VOLUME_SIZE = settings.VOLUME_SIZE();
+        RENDER_SIZE = settings.RENDER_SIZE();
+        SEED = settings.SEED();
     }
 
     public void removeVolume(Vector3D location, CollidableObject object) {
@@ -66,10 +70,11 @@ public class TerrainScene extends Scene {
         }
 
         for (int x = (int) (playerPosGrid.x()-(RENDER_SIZE)*VOLUME_SIZE); x <= playerPosGrid.x()+(RENDER_SIZE)*VOLUME_SIZE ; x+=VOLUME_SIZE) {
-            for (int y = (int) (playerPosGrid.y()-(RENDER_SIZE)*VOLUME_SIZE); y <= playerPosGrid.y()+(RENDER_SIZE)*VOLUME_SIZE ; y+=VOLUME_SIZE) {
+            for (int y = (int) (playerPosGrid.y()+(RENDER_SIZE)*VOLUME_SIZE); y > playerPosGrid.y()-(RENDER_SIZE)*VOLUME_SIZE ; y-=VOLUME_SIZE) { //Go from top to bottom
                 for (int z = (int) (playerPosGrid.z()-(RENDER_SIZE)*VOLUME_SIZE); z <= playerPosGrid.z()+(RENDER_SIZE)*VOLUME_SIZE ; z+=VOLUME_SIZE) {
                     Vector3D key = new Vector3D(x,y,z);
-                    if (terrainGrid.containsKey(key)) {
+                    if (key.y() < 0) { continue; }
+                        if (terrainGrid.containsKey(key)) {
                         setObjectState(terrainGrid.get(key), true);
                     }
                     else { //If object hasn't been generated yet, generate it
@@ -77,7 +82,7 @@ public class TerrainScene extends Scene {
                         double[] heightOffset = new double[10];
                         if (key.y() <= 0) {
                             type = TerrainType.ROCK;
-                            addHeightOffset(0.01f, (float) VOLUME_SIZE,new Vector3D(x, y, z), heightOffset);
+                            addHeightOffset(0.01f, (float) VOLUME_SIZE*5,new Vector3D(x, y, z), heightOffset);
                             addHeightOffset(0.1f,1f,new Vector3D(x, y, z), heightOffset);
 
                         }
@@ -103,7 +108,7 @@ public class TerrainScene extends Scene {
      * @param volumeCoords coordinates of the volume this height offset is applied to.
      * @param heightOffset the array the offset should be added to.
      */
-    private static void addHeightOffset(float frequency, float volume, Vector3D volumeCoords, double[] heightOffset) {
+    private void addHeightOffset(float frequency, float volume, Vector3D volumeCoords, double[] heightOffset) {
 
         Vector3D miniPos;
 

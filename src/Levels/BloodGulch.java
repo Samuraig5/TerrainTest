@@ -8,12 +8,13 @@ import Engine3d.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
+import Menus.Settings;
 
 public class BloodGulch extends Scene
 {
 
-    public BloodGulch(Camera camera) {
-        super(camera);
+    public BloodGulch(Camera camera, Settings settings) {
+        super(camera, settings);
 
         camera.translate(new Vector3D(0,7,0));
 

@@ -7,6 +7,7 @@ import Engine3d.Rendering.SceneRenderer;
 import Math.Raycast.Ray;
 import Engine3d.Model.UnrotatableBox;
 import Math.Raycast.RayCollision;
+import Menus.Settings;
 import Physics.CollidableObject;
 import Physics.CollisionHandler;
 import Physics.GJK_EPA.GJK;
@@ -27,12 +28,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Scene implements Updatable
 {
+    private Settings settings;
     private final ObjParser objParser = new ObjParser();
     Camera camera;
     final SceneRenderer sceneRenderer = new SceneRenderer();
     protected Color backgroundColour = Color.BLACK;
     private TimeMeasurer timeMeasurer;
-    private double gravity = 1d;
+    private double gravity;
 
     protected List<Object3D> objects = new CopyOnWriteArrayList<>();
     protected List<Object3D> activeObjects = new CopyOnWriteArrayList<>();
@@ -41,7 +43,9 @@ public class Scene implements Updatable
     protected List<Gravitational> gravitationals = new ArrayList<>();
     protected List<CollidableObject> collidables = new ArrayList<>();
 
-    public Scene(Camera camera) {
+    public Scene(Camera camera, Settings settings) {
+        this.settings = settings;
+        gravity = settings.DEFAULT_GRAVITY();
         this.camera = camera;
         //if (camera instanceof PlayerCamera) {
         //    new PlayerObject(this, (PlayerCamera) camera);
@@ -194,7 +198,7 @@ public class Scene implements Updatable
                     }
                 }
                 catch (NullPointerException e) {
-                    System.err.println("RayCollision ran into NullPointerException: " + e.getMessage());
+                    //System.err.println("RayCollision ran into NullPointerException: " + e.getMessage());
                 }
             }
             ray.advance();

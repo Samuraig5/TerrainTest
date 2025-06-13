@@ -12,9 +12,11 @@ import java.awt.event.ActionListener;
 public class MainMenu extends Menu {
 
     public static final String GAME_NAME = "Terrain Test";
+    public Settings settings;
 
-    public MainMenu(JFrame frame) {
+    public MainMenu(JFrame frame, Settings settings) {
         super(frame);
+        this.settings = settings;
     }
 
     @Override
@@ -82,13 +84,15 @@ public class MainMenu extends Menu {
 
     // Stub method to launch the game.
     private void launchGame() {
+        System.out.println("Launching Game...");
+
         frame.getContentPane().removeAll();
 
         PlayerCamera camera = new PlayerCamera(frame);
-        //new BloodGulch(camera);
-        //new TestLevel(camera);
-        new TerrainLevel(camera);
-        //new GJKTest(camera);
+        //new BloodGulch(camera, settings);
+        //new TestLevel(camera, settings);
+        new TerrainLevel(camera, settings);
+        //new GJKTest(camera, settings);
 
         frame.revalidate();
         frame.repaint();

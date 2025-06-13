@@ -8,6 +8,7 @@ import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
 import Math.Vector.Vector3D;
+import Menus.Settings;
 import Physics.GJK_EPA.GJK;
 import Engine3d.Object3D;
 
@@ -17,8 +18,8 @@ public class GJKTest extends Scene{
 
     private Object3D object1;
     private Object3D object2;
-    public GJKTest(Camera camera) {
-        super(camera);
+    public GJKTest(Camera camera, Settings settings) {
+        super(camera, settings);
 
         backgroundColour = new Color(51, 153, 255);
 

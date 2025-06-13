@@ -22,6 +22,8 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
     private float turnStep = 4f;
     private float jumpStrength = 0.35f;
     private float mouseSensitivity = 0.5f; // Adjust for desired sensitivity
+    private float SCALING_FACTOR = 1f; // Digging height
+
 
     private PlayerObject playerObject;
 
@@ -99,7 +101,6 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         playerObject.localTranslate(transDelta);
         playerObject.rotate(rotDelta);
 
-        float SCALING_FACTOR = 0.25f;
         RayCollision res = playerObject.cursorRayCast(25, 0.5f);
         if (res == null) {
             targeter.getMesh().getDrawInstructions().drawWireFrame = false;

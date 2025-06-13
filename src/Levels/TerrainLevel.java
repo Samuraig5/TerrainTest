@@ -6,14 +6,15 @@ import Engine3d.Lighting.LightSource;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
+import Menus.Settings;
 import Physics.PlayerObject;
 import Terrain.TerrainScene;
 
 import java.awt.*;
 
 public class TerrainLevel extends TerrainScene {
-    public TerrainLevel(Camera camera) {
-        super(camera);
+    public TerrainLevel(Camera camera, Settings settings) {
+        super(camera, settings);
 
         backgroundColour = new Color(51, 153, 255);
 

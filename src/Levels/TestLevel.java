@@ -1,6 +1,7 @@
 package Levels;
 
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
+import Menus.Settings;
 import Physics.CollidableObject;
 import Physics.PlayerObject;
 import Engine3d.Lighting.HeadLight;
@@ -19,8 +20,8 @@ import java.io.IOException;
 
 public class TestLevel extends Scene
 {
-    public TestLevel(Camera camera) {
-        super(camera);
+    public TestLevel(Camera camera, Settings settings) {
+        super(camera, settings);
 
         backgroundColour = new Color(0, 128, 134);
 
