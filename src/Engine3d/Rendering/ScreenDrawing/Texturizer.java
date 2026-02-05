@@ -175,27 +175,10 @@ public class Texturizer
                                            double tex_u, double tex_v, double tex_w,
                                            int j, int i) {
 
-        // Compute color outside any lock — this is pure math, thread-safe
         int argb = computeShadedColor(sprite, mtl, luminance, tex_u, tex_v, tex_w, spriteWidth, spriteHeight);
         if (argb == 0) return; // transparent, skip
 
-        // One atomic call — one lock acquisition per pixel instead of three
         screenBuffer.writePixelIfOnTop(j, i, tex_w, argb);
-
-
-        /*
-        if (screenBuffer.pixelOnTop(j,i,tex_w))
-        {
-            screenBuffer.updateDepth(j,i,tex_w);
-            Color texture = sampleSprite(sprite, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w);
-            if (Drawer.colourEmpty(texture, 0.1f)) {return;}
-            Color diffuse = mtl.getDiffuseColour();
-            if (Drawer.colourEmpty(diffuse, 0.1f)) {return;}
-            Color base = Drawer.multiplyColors(texture, diffuse);
-            Color shaded =  Drawer.getColourShade(base, luminance);
-            PixelDrawer.drawPixel(screenBuffer, shaded, j, i);
-        }
-         */
     }
 
     private static int computeShadedColor (BufferedImage sprite, MTL mtl, double luminance, double tex_u, double tex_v, double tex_w, int spriteWidth, int spriteHeight) {

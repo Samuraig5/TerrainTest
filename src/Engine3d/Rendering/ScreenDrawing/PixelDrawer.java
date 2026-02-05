@@ -21,16 +21,11 @@ public class PixelDrawer
     }
 
     public static void drawPixel(ScreenBuffer screenBuffer, Color c, int x, int y) {
-        screenBuffer.setPixel(x,y,c);
+        screenBuffer.setPixel(x,y,c.getRGB());
     }
 
-    public static void checkAndDrawPixel(ScreenBuffer screenBuffer, Color c, int x, int y, double depth)
-    {
-        if (screenBuffer.pixelOnTop(x,y,depth))
-        {
-            PixelDrawer.drawPixel(screenBuffer, c, x, y);
-            screenBuffer.updateDepth(x,y,depth);
-        }
+    public static void checkAndDrawPixel(ScreenBuffer screenBuffer, Color c, int x, int y, double depth) {
+        screenBuffer.writePixelIfOnTop(x,y,depth, c.getRGB());
     }
 
     public void drawLine(ScreenBuffer screenBuffer, Color c, Vector3D v1, Vector3D v2, boolean ignorePixelDepth) {

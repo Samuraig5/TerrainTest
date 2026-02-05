@@ -48,39 +48,33 @@ public class ScreenBuffer
         return (x >= 0 && x < bufferedImage.getWidth()) && (y >= 0 && y < bufferedImage.getHeight());
     }
 
-    public void writePixelIfOnTop(int x, int y, double depth, int argb) {
+    public void writePixelIfOnTop(int x, int y, double depth, int colour) {
         if (!inBounds(x, y)) return;
 
-        synchronized (columnLocks[x]) {
-            if (depth > depthBuffer[x][y]) {
-                depthBuffer[x][y] = depth;
-                int flippedY = getBufferedImage().getHeight() - y;
-                bufferedImage.setRGB(x, flippedY, argb);
+        try {
+            synchronized (columnLocks[x]) {
+                if (depth > depthBuffer[x][y]) {
+                    depthBuffer[x][y] = depth;
+                    int flippedY = getBufferedImage().getHeight() - y - 1;
+                    bufferedImage.setRGB(x, flippedY, colour);
+                }
             }
         }
+        catch (IndexOutOfBoundsException e) {
+
+        }
     }
 
-    public synchronized boolean pixelOnTop(int x, int y, double depth) {
-        if (!inBounds(x,y)) {return false;}
-        //TODO: If the window size is changed between these two lines we get an array out of bounds exception!
-        try{
-            return depth > depthBuffer[x][y];
+    public void setPixel(int x, int y, int colour) {
+        if (!inBounds(x, y)) return;
+
+        try {
+            //synchronized (columnLocks[x]) {
+            int flippedY = getBufferedImage().getHeight() - y - 1;
+            bufferedImage.setRGB(x, flippedY, colour);
+            //}
         }
         catch (IndexOutOfBoundsException e) {
-            //System.err.println(e);
-        }
-        return false;
-    }
-    public synchronized void updateDepth(int x, int y, double depth) {
-        depthBuffer[x][y] = depth;
-    }
-
-    public synchronized void setPixel(int x, int y, Color c) {
-        try {
-            y = bufferedImage.getHeight() - y;
-            bufferedImage.setRGB(x, y, ScreenBuffer.colorToARGB(c));
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
 
         }
     }
