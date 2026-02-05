@@ -12,6 +12,7 @@ public class ScreenBuffer
 {
     private BufferedImage bufferedImage;
     private double[][] depthBuffer;
+    private Object[] columnLocks;
 
     public ScreenBuffer(Vector3D screenSize)
     {
@@ -31,10 +32,32 @@ public class ScreenBuffer
     public void clear(Color c) {
         clear(colorToIntArray(c));
     }
-    public void recompute(Vector3D screenSize)
-    {
-        bufferedImage = new BufferedImage((int)screenSize.x(), (int)screenSize.y(),TYPE_INT_ARGB);
-        depthBuffer = new double[(int) screenSize.x()][(int) screenSize.y()];
+    public void recompute(Vector3D screenSize) {
+        int width = (int) screenSize.x();
+        int height = (int) screenSize.y();
+        bufferedImage = new BufferedImage(width, height,TYPE_INT_ARGB);
+        depthBuffer = new double[width][height];
+        columnLocks = new Object[width];
+        for (int i = 0; i < width; i++) {
+            columnLocks[i] = new Object();
+        }
+
+    }
+
+    public boolean inBounds(int x, int y){
+        return (x >= 0 && x < bufferedImage.getWidth()) && (y >= 0 && y < bufferedImage.getHeight());
+    }
+
+    public void writePixelIfOnTop(int x, int y, double depth, int argb) {
+        if (!inBounds(x, y)) return;
+
+        synchronized (columnLocks[x]) {
+            if (depth > depthBuffer[x][y]) {
+                depthBuffer[x][y] = depth;
+                int flippedY = getBufferedImage().getHeight() - y;
+                bufferedImage.setRGB(x, flippedY, argb);
+            }
+        }
     }
 
     public synchronized boolean pixelOnTop(int x, int y, double depth) {
@@ -51,9 +74,7 @@ public class ScreenBuffer
     public synchronized void updateDepth(int x, int y, double depth) {
         depthBuffer[x][y] = depth;
     }
-    public synchronized boolean inBounds(int x, int y){
-        return (x >= 0 && x < bufferedImage.getWidth()) && (y >= 0 && y < bufferedImage.getHeight());
-    }
+
     public synchronized void setPixel(int x, int y, Color c) {
         try {
             y = bufferedImage.getHeight() - y;
@@ -63,7 +84,8 @@ public class ScreenBuffer
 
         }
     }
-    public synchronized BufferedImage getBufferedImage() {
+
+    public BufferedImage getBufferedImage() {
         return bufferedImage;
     }
 
