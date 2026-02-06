@@ -89,7 +89,7 @@ public class TerrainScene extends Scene {
                         else if (key.y() < 0) {
                             type = TerrainType.ROCK;
                             for (int i = 0; i < 5; i++) {
-                                heightOffset[i] = VOLUME_SIZE;
+                                heightOffset[i] = 0;
                             }
                         }
                         createNewTerrainVolume(key, type, heightOffset);
