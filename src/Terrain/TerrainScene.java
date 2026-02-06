@@ -81,12 +81,17 @@ public class TerrainScene extends Scene {
                     else { //If object hasn't been generated yet, generate it
                         TerrainType type = TerrainType.AIR;
                         double[] heightOffset = new double[10];
-                        if (key.y() <= 0) {
+                        if (key.y() == 0) {
                             type = TerrainType.ROCK;
-                            addHeightOffset(0.01f, (float) VOLUME_SIZE*5,new Vector3D(x, y, z), heightOffset);
-                            addHeightOffset(0.1f,1f,new Vector3D(x, y, z), heightOffset);
-
+                            addHeightOffset(0.001f, (float) VOLUME_SIZE*5,new Vector3D(x, y, z), heightOffset);
+                            addHeightOffset(0.01f,10,new Vector3D(x, y, z), heightOffset);
                         }
+//                        else if (key.y() < 0) {
+//                            type = TerrainType.ROCK;
+//                            for (int i = 0; i < 5; i++) {
+//                                heightOffset[i] = VOLUME_SIZE;
+//                            }
+//                        }
                         createNewTerrainVolume(key, type, heightOffset);
                     }
                 }
@@ -125,7 +130,8 @@ public class TerrainScene extends Scene {
         miniPos = TOP_BACK_RIGHT.getVector().scaled(VOLUME_SIZE).translated(volumeCoords).scaled(frequency);
         heightOffset[3] += volume * OpenSimplex2S.noise2(SEED, miniPos.x(), miniPos.z());
 
-        miniPos = TOP_CENTRE.getVector().scaled(VOLUME_SIZE).translated(volumeCoords).scaled(frequency);
-        heightOffset[4] += volume * OpenSimplex2S.noise2(SEED, miniPos.x(), miniPos.z());
+        //miniPos = TOP_CENTRE.getVector().scaled(VOLUME_SIZE).translated(volumeCoords).scaled(frequency);
+        //heightOffset[4] += volume * OpenSimplex2S.noise2(SEED, miniPos.x(), miniPos.z());
+        heightOffset[4] = -1000; //This makes sure terrainVolumes aren't "spiky" in the middle
     }
 }
