@@ -6,6 +6,7 @@
       {
         "id": "ef03c3e96bac5f94",
         "type": "tabs",
+        "dimension": 44.37984496124031,
         "children": [
           {
             "id": "3859c155c60673a1",
@@ -24,8 +25,9 @@
         ]
       },
       {
-        "id": "310bb38165cd5309",
+        "id": "45f252b02231a8db",
         "type": "tabs",
+        "dimension": 55.62015503875969,
         "children": [
           {
             "id": "e8352377ba066f1e",
@@ -199,10 +201,21 @@
       "bases:Create new base": false
     }
   },
-  "active": "3859c155c60673a1",
+  "active": "87fe48c96e73c006",
   "lastOpenFiles": [
-    "README.md",
     "Main.md",
+    "Engine3d/Rendering/ScreenDrawing/FlatShader.md",
+    "Engine3d/Rendering/ScreenDrawing/ScreenBuffer.md",
+    "Math/Vector/Vector.md",
+    "Math/Vector",
+    "Engine3d/Scene.md",
+    "Engine3d/Rendering/ScreenDrawing",
+    "Engine3d/Rendering",
+    "FlatShader.md",
+    "Scene.md",
+    "ScreenBuffer.md",
+    "Vector.md",
+    "README.md",
     "Terrain",
     "Physics",
     "Menus",

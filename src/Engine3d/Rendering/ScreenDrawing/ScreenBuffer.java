@@ -5,6 +5,7 @@ import Math.Vector.Vector3D;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.util.Arrays;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
@@ -23,7 +24,9 @@ public class ScreenBuffer
         WritableRaster raster = bufferedImage.getRaster();
         int width = bufferedImage.getWidth(); int height = bufferedImage.getHeight();
         raster.setPixels(0, 0, width, height, getSample(width, height, clearColour));
-        depthBuffer = new double[depthBuffer.length][depthBuffer[0].length];
+        for (double[] column : depthBuffer) {
+            Arrays.fill(column, 0.0);
+        }
     }
     public void clear() {
         int[] clearColor = new int[4];

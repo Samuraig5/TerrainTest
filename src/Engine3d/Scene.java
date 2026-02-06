@@ -118,12 +118,12 @@ public class Scene implements Updatable
         timeMeasurer.addCycle("frameTime");
 
         camera.getScreenBuffer().clear(backgroundColour);
+        Vector3D camPos = camera.getPosition();
         activeObjects.sort((o1, o2) -> {
-            // Calculate distances to the camera
-            double distance1 = o1.getPosition().distanceTo(camera.getPosition());
-            double distance2 = o2.getPosition().distanceTo(camera.getPosition());
-            // Sort objects by distance (closer first)
-            return Double.compare(distance1, distance2);
+            // Use squared distances to avoid sqrt (only comparing, not using actual values)
+            double distSq1 = squaredDistanceTo(o1.getPosition(), camPos);
+            double distSq2 = squaredDistanceTo(o2.getPosition(), camPos);
+            return Double.compare(distSq1, distSq2);
         });
 
         //These values are purely based off the camera.
@@ -216,6 +216,13 @@ public class Scene implements Updatable
             return true;
         }
         return false;
+    }
+
+    private static double squaredDistanceTo(Vector3D a, Vector3D b) {
+        double dx = a.x() - b.x();
+        double dy = a.y() - b.y();
+        double dz = a.z() - b.z();
+        return dx*dx + dy*dy + dz*dz;
     }
 
     public void createCollisionMarker(Vector3D pos) {

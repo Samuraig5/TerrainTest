@@ -164,7 +164,8 @@ public abstract class Vector implements Translatable
     public double magnitude() {
         double sumOfSquares = 0.0;
         for (int i = 0; i < getDimension(); i++) {
-            sumOfSquares += Math.pow(getValue(i), 2);
+            double v = getValue(i);
+            sumOfSquares += v * v;
         }
         return Math.sqrt(sumOfSquares);
     }
@@ -199,9 +200,10 @@ public abstract class Vector implements Translatable
 
         double result = 0;
         for (int i = 0; i < getDimension(); i++) {
-            result += Math.pow(getValue(i) - other.getValue(i), 2);
+            double diff = getValue(i) - other.getValue(i);
+            result += diff * diff;
         }
-        return Math.abs(Math.sqrt(result));
+        return Math.sqrt(result);
     }
 
     /**
