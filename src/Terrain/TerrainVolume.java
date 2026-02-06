@@ -169,8 +169,7 @@ public class TerrainVolume extends Mesh
         correctHeightAdjustment(targetPoint, targetIndex, delta);
     }
 
-    private boolean checkForRemoval() {
-
+    public boolean checkForRemoval() {
         boolean remove = true;
 
         for (int i = 0; i < 5; i++) {
@@ -213,7 +212,6 @@ public class TerrainVolume extends Mesh
             }
             return;
         }
-
 
         double[] heights = new double[5];
         for (int i = 0; i < 5; i++) {

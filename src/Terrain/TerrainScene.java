@@ -34,6 +34,7 @@ public class TerrainScene extends Scene {
         CollidableObject newObject = new CollidableObject(this);
         newObject.translate(location);
         TerrainVolume newVolume = new TerrainVolume(this, newObject, VOLUME_SIZE, type, heightOffset);
+        newVolume.checkForRemoval();
         newObject.setMesh(newVolume);
 
         terrainGrid.put(location, newObject);
@@ -74,7 +75,7 @@ public class TerrainScene extends Scene {
                 for (int z = (int) (playerPosGrid.z()-(RENDER_SIZE)*VOLUME_SIZE); z <= playerPosGrid.z()+(RENDER_SIZE)*VOLUME_SIZE ; z+=VOLUME_SIZE) {
                     Vector3D key = new Vector3D(x,y,z);
                     if (key.y() < 0) { continue; }
-                        if (terrainGrid.containsKey(key)) {
+                    if (terrainGrid.containsKey(key)) {
                         setObjectState(terrainGrid.get(key), true);
                     }
                     else { //If object hasn't been generated yet, generate it
