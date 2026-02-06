@@ -92,7 +92,7 @@ public class PixelDrawer
         textureTriangle(screenBuffer, t, colour);
     }
 
-    public synchronized void textureTriangle(ScreenBuffer screenBuffer, MeshTriangle tri, BufferedImage sprite)
+    public void textureTriangle(ScreenBuffer screenBuffer, MeshTriangle tri, BufferedImage sprite)
     {
         Vector3D[] points = tri.getPoints();
         Vector2D[] texPoints = tri.getMaterial().getTextureCoords();

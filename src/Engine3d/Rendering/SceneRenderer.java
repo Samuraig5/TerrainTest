@@ -99,9 +99,9 @@ public class SceneRenderer extends JPanel
 //        g.drawString(timeMeasurer.getMsPrintOut("updateTime", updateTime), 20, 240);
 //        g.drawString(timeMeasurer.getPercentAndMsPrintOut("applyGravity", updateTime), 30, 260);
 //        g.drawString(timeMeasurer.getPercentAndMsPrintOut("handleCollision", updateTime), 30, 280);
-//
-//
-//        g.setColor(Color.red);
+
+
+        g.setColor(Color.red);
 
         Vector3D cursorPos = new Vector3D(errorMessagePos);
         for (String err : errors) {
