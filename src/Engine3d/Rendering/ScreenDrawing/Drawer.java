@@ -34,7 +34,7 @@ public class Drawer
     }
 
     public void drawLine(Color c, Vector3D v1, Vector3D v2, boolean checkPixelDepth) {
-        p.drawLine(camera.getScreenBuffer(), c, v1, v2, checkPixelDepth);
+        p.drawLine(camera.getScreenBuffer(), c.getRGB(), v1, v2, checkPixelDepth);
     }
 
     public void drawTriangle(Color c, MeshTriangle t, boolean checkDepth)
@@ -56,7 +56,7 @@ public class Drawer
 
     public void fillTriangle(MeshTriangle t)
     {
-        p.fillTriangle(camera.getScreenBuffer(), t);
+        p.flatFillTriangle(camera.getScreenBuffer(), t);
     }
 
     public void textureTriangle(MeshTriangle tri)

@@ -1,9 +1,5 @@
 package Engine3d.Rendering.ScreenDrawing;
 
-import Engine3d.Model.MTL;
-import Engine3d.Rendering.ScreenDrawing.Drawer;
-
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import static java.lang.Math.abs;
@@ -175,13 +171,13 @@ public class Texturizer
                                            double tex_u, double tex_v, double tex_w,
                                            int j, int i) {
 
-        int argb = computeShadedColor(sprite, diffuseColour, luminance, tex_u, tex_v, tex_w, spriteWidth, spriteHeight);
+        int argb = computeShadedTextureColor(sprite, diffuseColour, luminance, tex_u, tex_v, tex_w, spriteWidth, spriteHeight);
         if (argb == 0) return; // transparent, skip
 
         screenBuffer.writePixelIfOnTop(j, i, tex_w, argb);
     }
 
-    private static int computeShadedColor (BufferedImage sprite, int diffuseColour, double luminance, double tex_u, double tex_v, double tex_w, int spriteWidth, int spriteHeight) {
+    private static int computeShadedTextureColor(BufferedImage sprite, int diffuseColour, double luminance, double tex_u, double tex_v, double tex_w, int spriteWidth, int spriteHeight) {
         if (diffuseColour == 0) {return 0;}
 
         int texture = sampleSprite(sprite, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w);

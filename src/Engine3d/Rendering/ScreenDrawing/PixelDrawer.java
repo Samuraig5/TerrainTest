@@ -20,15 +20,15 @@ public class PixelDrawer
         this.camera = camera;
     }
 
-    public static void drawPixel(ScreenBuffer screenBuffer, Color c, int x, int y) {
-        screenBuffer.setPixel(x,y,c.getRGB());
+    public static void drawPixel(ScreenBuffer screenBuffer, int colour, int x, int y) {
+        screenBuffer.setPixel(x,y,colour);
     }
 
-    public static void checkAndDrawPixel(ScreenBuffer screenBuffer, Color c, int x, int y, double depth) {
-        screenBuffer.writePixelIfOnTop(x,y,depth, c.getRGB());
+    public static void checkAndDrawPixel(ScreenBuffer screenBuffer, int colour, int x, int y, double depth) {
+        screenBuffer.writePixelIfOnTop(x,y,depth, colour);
     }
 
-    public void drawLine(ScreenBuffer screenBuffer, Color c, Vector3D v1, Vector3D v2, boolean ignorePixelDepth) {
+    public void drawLine(ScreenBuffer screenBuffer, int colour, Vector3D v1, Vector3D v2, boolean ignorePixelDepth) {
         // Extract coordinates and depths from the input vectors
         int x1 = (int) v1.x();
         int y1 = (int) v1.y();
@@ -64,10 +64,10 @@ public class PixelDrawer
 
             // Draw the current pixel
             if (ignorePixelDepth) {
-                drawPixel(screenBuffer, c, x1, y1);
+                drawPixel(screenBuffer, colour, x1, y1);
             }
             else {
-                checkAndDrawPixel(screenBuffer, c, x1, y1, depth);
+                checkAndDrawPixel(screenBuffer, colour, x1, y1, depth);
             }
 
             // Break when the line is complete
@@ -86,10 +86,21 @@ public class PixelDrawer
         }
     }
 
-    public void fillTriangle(ScreenBuffer screenBuffer, MeshTriangle t) {
-        BufferedImage colour = new BufferedImage(1, 1, TYPE_INT_ARGB);
-        colour.setRGB(0,0,t.getMaterial().getShadedColour());
-        textureTriangle(screenBuffer, t, colour);
+    public void flatFillTriangle(ScreenBuffer screenBuffer, MeshTriangle tri) {
+        Vector3D[] points = tri.getPoints();
+        Vector2D[] texPoints = tri.getMaterial().getTextureCoords();
+
+        int x1 = (int) points[0].x(); int y1 = (int) points[0].y();
+        int x2 = (int) points[1].x(); int y2 = (int) points[1].y();
+        int x3 = (int) points[2].x(); int y3 = (int) points[2].y();
+
+        // w values store the depth (1/z) at each vertex
+        double w1 = texPoints[0].w();
+        double w2 = texPoints[1].w();
+        double w3 = texPoints[2].w();
+
+        FlatShader.drawTriangle(screenBuffer, tri.getMaterial().getShadedColour(),
+                x1, y1, w1, x2, y2, w2, x3, y3, w3);
     }
 
     public void textureTriangle(ScreenBuffer screenBuffer, MeshTriangle tri, BufferedImage sprite)
