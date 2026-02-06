@@ -33,6 +33,7 @@ public class TimeMeasurer {
         }
     }
     public double getCyclesPerSecond(String key) {
+        if (perSecondMap.get(key) == null) {return 0;}
         return perSecondMap.get(key).get();
     }
 

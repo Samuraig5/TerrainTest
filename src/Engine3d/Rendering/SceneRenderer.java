@@ -68,10 +68,7 @@ public class SceneRenderer extends JPanel
 
     private void paintActiveScene(Graphics g)
     {
-        timeMeasurer.pauseAndEndMeasurement("frameTime");
-        timeMeasurer.addCycle("frameTime");
         long frameTime = timeMeasurer.getMeasurement("frameTime");
-        timeMeasurer.startMeasurement("frameTime");
 
         activeScene.getCamera().drawScreenBuffer(g); //This is the only non-UI call :helenaPepe:
 
@@ -86,25 +83,25 @@ public class SceneRenderer extends JPanel
         g.drawString(s,screenWidth-sWidth,40 );
 
         g.drawString("FPS: " + timeMeasurer.getCyclesPerSecond("frameTime"), 20, 20);
-        g.drawString(timeMeasurer.getMsPrintOut("frameTime", frameTime), 20, 40);
-
-        g.drawString("Buffers/s: " + timeMeasurer.getCyclesPerSecond("buildScreenBuffer"), 20, 70);
-        g.drawString(timeMeasurer.getMsPrintOut("buildScreenBuffer"), 20, 90);
-        long buildScreenBuffer = timeMeasurer.getMeasurement("buildScreenBuffer");
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", buildScreenBuffer), 30, 110);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Lighting", buildScreenBuffer), 30, 130);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", buildScreenBuffer), 30, 150);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", buildScreenBuffer),30, 170);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", buildScreenBuffer),30, 190);
-
-        g.drawString("Updates/s: " + timeMeasurer.getCyclesPerSecond("update"), 20, 220);
-        long updateTime = timeMeasurer.getMeasurement("update");
-        g.drawString(timeMeasurer.getMsPrintOut("updateTime", updateTime), 20, 240);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("applyGravity", updateTime), 30, 260);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("handleCollision", updateTime), 30, 280);
-
-
-        g.setColor(Color.red);
+//        g.drawString(timeMeasurer.getMsPrintOut("frameTime", frameTime), 20, 40);
+//
+//        g.drawString("Buffers/s: " + timeMeasurer.getCyclesPerSecond("buildScreenBuffer"), 20, 70);
+//        g.drawString(timeMeasurer.getMsPrintOut("buildScreenBuffer"), 20, 90);
+//        long buildScreenBuffer = timeMeasurer.getMeasurement("buildScreenBuffer");
+//        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", buildScreenBuffer), 30, 110);
+//        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Lighting", buildScreenBuffer), 30, 130);
+//        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", buildScreenBuffer), 30, 150);
+//        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", buildScreenBuffer),30, 170);
+//        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", buildScreenBuffer),30, 190);
+//
+//        g.drawString("Updates/s: " + timeMeasurer.getCyclesPerSecond("update"), 20, 220);
+//        long updateTime = timeMeasurer.getMeasurement("update");
+//        g.drawString(timeMeasurer.getMsPrintOut("updateTime", updateTime), 20, 240);
+//        g.drawString(timeMeasurer.getPercentAndMsPrintOut("applyGravity", updateTime), 30, 260);
+//        g.drawString(timeMeasurer.getPercentAndMsPrintOut("handleCollision", updateTime), 30, 280);
+//
+//
+//        g.setColor(Color.red);
 
         Vector3D cursorPos = new Vector3D(errorMessagePos);
         for (String err : errors) {

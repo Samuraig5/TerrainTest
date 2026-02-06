@@ -114,6 +114,9 @@ public class Scene implements Updatable
 
     public void buildScreenBuffer()
     {
+        timeMeasurer.pauseAndEndMeasurement("frameTime");
+        timeMeasurer.addCycle("frameTime");
+
         camera.getScreenBuffer().clear(backgroundColour);
         activeObjects.sort((o1, o2) -> {
             // Calculate distances to the camera
@@ -140,6 +143,8 @@ public class Scene implements Updatable
                 o.getSource().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
             }
         });
+
+        timeMeasurer.startMeasurement("frameTime");
     }
 
     public Camera getCamera() {return camera;}
