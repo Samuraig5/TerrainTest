@@ -32,17 +32,5 @@ public class TerrainLevel extends TerrainScene {
         sun.setLightIntensity(0.25);
 
         new HeadLight(camera, this);
-
-        /**
-        int maxX = 3;
-        int maxZ = 3;
-
-        for (int z = -maxZ; z < maxZ; z++) {
-            for (int x = -maxX; x < maxX; x++) {
-                Vector3D position = new Vector3D(x*VOLUME_SIZE,0,z*VOLUME_SIZE);
-                createNewTerrainVolume(position);
-            }
-        }
-         **/
     }
 }
