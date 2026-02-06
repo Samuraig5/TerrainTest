@@ -1,6 +1,10 @@
 package Terrain;
 
+import Engine3d.Model.MTL;
 import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Rendering.Material;
+
+import java.awt.*;
 
 public enum TerrainType {
     AIR,
@@ -8,7 +12,6 @@ public enum TerrainType {
     ROCK;
 
     public static DrawInstructions getDrawInstructions(TerrainType type){
-        DrawInstructions dw;
         switch (type.ordinal()) {
             case 0:
                 return new DrawInstructions(false,false,false,false);
@@ -43,6 +46,24 @@ public enum TerrainType {
                 return false;
             default:
                 return true;
+        }
+    }
+
+    public static Material getMaterial(TerrainType type) {
+        Material material = new Material();
+
+        switch (type.ordinal()) {
+            case 0:
+                material.setBaseColour(new Color(0));
+                return material;
+            case 1:
+                material.setBaseColour(new Color(89, 57, 0));
+                return material;
+            case 2:
+                material.setBaseColour(new Color(117, 117, 117));
+                return material;
+            default:
+                return new Material();
         }
     }
 }

@@ -1,6 +1,8 @@
 package Terrain;
 
+import Engine3d.Model.MTL;
 import Engine3d.Model.Mesh;
+import Engine3d.Rendering.Material;
 import Math.Vector.Vector3D;
 import Engine3d.Object3D;
 import Math.MeshTriangle;
@@ -257,6 +259,11 @@ public class TerrainVolume extends Mesh
 
         if (object3D instanceof CollidableObject) {
             ((CollidableObject) object3D).doesCollision(TerrainType.getCollisionLogic(terrainType));
+        }
+
+        Material material = TerrainType.getMaterial(terrainType);
+        for (int i = 0; i < faces.size(); i++) {
+            faces.get(i).setMaterial(material);
         }
     }
 }

@@ -74,7 +74,7 @@ public class TerrainScene extends Scene {
             for (int y = (int) (playerPosGrid.y()+(RENDER_SIZE)*VOLUME_SIZE); y > playerPosGrid.y()-(RENDER_SIZE)*VOLUME_SIZE ; y-=VOLUME_SIZE) { //Go from top to bottom
                 for (int z = (int) (playerPosGrid.z()-(RENDER_SIZE)*VOLUME_SIZE); z <= playerPosGrid.z()+(RENDER_SIZE)*VOLUME_SIZE ; z+=VOLUME_SIZE) {
                     Vector3D key = new Vector3D(x,y,z);
-                    if (key.y() < 0) { continue; }
+                    //if (key.y() < 0) { continue; }
                     if (terrainGrid.containsKey(key)) {
                         setObjectState(terrainGrid.get(key), true);
                     }
@@ -82,16 +82,16 @@ public class TerrainScene extends Scene {
                         TerrainType type = TerrainType.AIR;
                         double[] heightOffset = new double[10];
                         if (key.y() == 0) {
-                            type = TerrainType.ROCK;
+                            type = TerrainType.DIRT;
                             addHeightOffset(0.001f, (float) VOLUME_SIZE*5,new Vector3D(x, y, z), heightOffset);
                             addHeightOffset(0.01f,10,new Vector3D(x, y, z), heightOffset);
                         }
-//                        else if (key.y() < 0) {
-//                            type = TerrainType.ROCK;
-//                            for (int i = 0; i < 5; i++) {
-//                                heightOffset[i] = VOLUME_SIZE;
-//                            }
-//                        }
+                        else if (key.y() < 0) {
+                            type = TerrainType.ROCK;
+                            for (int i = 0; i < 5; i++) {
+                                heightOffset[i] = VOLUME_SIZE;
+                            }
+                        }
                         createNewTerrainVolume(key, type, heightOffset);
                     }
                 }
