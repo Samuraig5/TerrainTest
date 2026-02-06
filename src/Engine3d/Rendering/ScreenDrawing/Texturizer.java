@@ -10,7 +10,7 @@ import static java.lang.Math.abs;
 
 public class Texturizer
 {
-    public static void textureTriangle(ScreenBuffer screenBuffer, MTL mtl,
+    public static void textureTriangle(ScreenBuffer screenBuffer, int diffuseColour,
                                        int x1, int y1, double u1, double v1, double w1,
                                        int x2, int y2, double u2, double v2, double w2,
                                        int x3, int y3, double u3, double v3, double w3,
@@ -108,7 +108,7 @@ public class Texturizer
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-                    drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
+                    drawTextureToPixel(screenBuffer,diffuseColour,luminance,sprite,spriteWidth,spriteHeigth,
                             tex_u,tex_v,tex_w,j,i);
                     t += tstep;
                 }
@@ -161,7 +161,7 @@ public class Texturizer
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-                    drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
+                    drawTextureToPixel(screenBuffer,diffuseColour,luminance,sprite,spriteWidth,spriteHeigth,
                             tex_u,tex_v,tex_w,j,i);
 
                     t += tstep;
@@ -170,30 +170,29 @@ public class Texturizer
         }
     }
 
-    private static void drawTextureToPixel(ScreenBuffer screenBuffer, MTL mtl, double luminance,
+    private static void drawTextureToPixel(ScreenBuffer screenBuffer, int diffuseColour, double luminance,
                                            BufferedImage sprite, int spriteWidth, int spriteHeight,
                                            double tex_u, double tex_v, double tex_w,
                                            int j, int i) {
 
-        int argb = computeShadedColor(sprite, mtl, luminance, tex_u, tex_v, tex_w, spriteWidth, spriteHeight);
+        int argb = computeShadedColor(sprite, diffuseColour, luminance, tex_u, tex_v, tex_w, spriteWidth, spriteHeight);
         if (argb == 0) return; // transparent, skip
 
         screenBuffer.writePixelIfOnTop(j, i, tex_w, argb);
     }
 
-    private static int computeShadedColor (BufferedImage sprite, MTL mtl, double luminance, double tex_u, double tex_v, double tex_w, int spriteWidth, int spriteHeight) {
-        int texture = sampleSprite(sprite, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w).getRGB();
+    private static int computeShadedColor (BufferedImage sprite, int diffuseColour, double luminance, double tex_u, double tex_v, double tex_w, int spriteWidth, int spriteHeight) {
+        if (diffuseColour == 0) {return 0;}
+
+        int texture = sampleSprite(sprite, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w);
         if (texture == 0) {return 0;}
-        //if (Drawer.colourEmpty(texture, 0.1f)) {return 0;}
-        int diffuse = mtl.getDiffuseColour().getRGB();
-        //if (Drawer.colourEmpty(diffuse, 0.1f)) {return 0;}
-        int base = Drawer.multiplyColors(texture, diffuse);
+
+        int base = Drawer.multiplyColors(texture, diffuseColour);
         int shaded =  Drawer.getColourShade(base, luminance);
         return shaded;
     }
 
-    private static Color sampleSprite(BufferedImage sprite, int spriteWidth, int spriteHeigth, double u, double v)
-    {
+    private static int sampleSprite(BufferedImage sprite, int spriteWidth, int spriteHeigth, double u, double v) {
         u = (u % 1 + 1) % 1; // Ensures u is between 0 and 1
         v = (v % 1 + 1) % 1; // Ensures v is between 0 and 1
 
@@ -201,11 +200,7 @@ public class Texturizer
         v *= spriteHeigth;
 
         int rgb = sprite.getRGB((int)u, (int)v);
-        int alpha = (rgb >> 24) & 0xFF; // Extract the alpha channel (8 highest bits)
-        int red = (rgb >> 16) & 0xff;
-        int green = (rgb >> 8) & 0xff;
-        int blue = (rgb >> 0) & 0xff;
 
-        return new Color(red, green, blue, alpha);
+        return rgb;
     }
 }
