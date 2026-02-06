@@ -36,8 +36,8 @@ public class Material
         this.mtl = source.getMTL();
     }
 
-    public Color getShadedColour() {
-        return Drawer.getColourShade(getBaseColour(), luminance);
+    public int getShadedColour() {
+        return Drawer.getColourShade(getBaseColour().getRGB(), luminance);
     }
 
     public void setBaseColour(Color baseColour) {

@@ -182,13 +182,14 @@ public class Texturizer
     }
 
     private static int computeShadedColor (BufferedImage sprite, MTL mtl, double luminance, double tex_u, double tex_v, double tex_w, int spriteWidth, int spriteHeight) {
-        Color texture = sampleSprite(sprite, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w);
-        if (Drawer.colourEmpty(texture, 0.1f)) {return 0;}
-        Color diffuse = mtl.getDiffuseColour();
-        if (Drawer.colourEmpty(diffuse, 0.1f)) {return 0;}
-        Color base = Drawer.multiplyColors(texture, diffuse);
-        Color shaded =  Drawer.getColourShade(base, luminance);
-        return shaded.getRGB();
+        int texture = sampleSprite(sprite, spriteWidth, spriteHeight,tex_u / tex_w, tex_v / tex_w).getRGB();
+        if (texture == 0) {return 0;}
+        //if (Drawer.colourEmpty(texture, 0.1f)) {return 0;}
+        int diffuse = mtl.getDiffuseColour().getRGB();
+        //if (Drawer.colourEmpty(diffuse, 0.1f)) {return 0;}
+        int base = Drawer.multiplyColors(texture, diffuse);
+        int shaded =  Drawer.getColourShade(base, luminance);
+        return shaded;
     }
 
     private static Color sampleSprite(BufferedImage sprite, int spriteWidth, int spriteHeigth, double u, double v)

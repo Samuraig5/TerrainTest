@@ -86,10 +86,9 @@ public class PixelDrawer
         }
     }
 
-    public void fillTriangle(ScreenBuffer screenBuffer, MeshTriangle t)
-    {
+    public void fillTriangle(ScreenBuffer screenBuffer, MeshTriangle t) {
         BufferedImage colour = new BufferedImage(1, 1, TYPE_INT_ARGB);
-        colour.setRGB(0,0,t.getMaterial().getShadedColour().getRGB());
+        colour.setRGB(0,0,t.getMaterial().getShadedColour());
         textureTriangle(screenBuffer, t, colour);
     }
 

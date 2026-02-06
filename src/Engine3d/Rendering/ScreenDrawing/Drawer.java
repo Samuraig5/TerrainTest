@@ -67,42 +67,37 @@ public class Drawer
         p.textureTriangle(camera.getScreenBuffer(),tri,sprite);
     }
 
-    public static Color getColourShade(Color baseColor, double luminance) {
+    public static int getColourShade(int baseColor, double luminance) {
         luminance = Math.max(SHADING_HARSHNESS, Math.min(1, luminance)); //Clamp value for safety
+        int luminanceInt = (int) (luminance * 255);
 
-        int red = (int) (baseColor.getRed() * luminance);
-        int green = (int) (baseColor.getGreen() * luminance);
-        int blue = (int) (baseColor.getBlue() * luminance);
+        int luminanceColour = (255 << 24) | (luminanceInt << 16) | (luminanceInt << 8) | luminanceInt;
 
-        return new Color(red, green, blue);
+        int colourOUT = multiplyColors(baseColor, luminanceColour);
+
+        return colourOUT;
     }
-    public static Color multiplyColors(Color color1, Color color2) {
-        if (color1 == null || color2 == null) {return Color.magenta;}
-        // Normalize RGB components to the range [0, 1]
-        float red1 = color1.getRed() / 255.0f;
-        float green1 = color1.getGreen() / 255.0f;
-        float blue1 = color1.getBlue() / 255.0f;
-        float alpha1 = color1.getAlpha() / 255.0f;
+    public static int multiplyColors(int colour1, int colour2) {
+        if (colour1 == 0 || colour2 == 0) {return 0;}
 
-        float red2 = color2.getRed() / 255.0f;
-        float green2 = color2.getGreen() / 255.0f;
-        float blue2 = color2.getBlue() / 255.0f;
-        float alpha2 = color2.getAlpha() / 255.0f;
+        int alpha1 = (colour1 >> 24) & 0xFF;
+        int red1 = (colour1 >> 16) & 0xFF;
+        int green1 = (colour1 >> 8) & 0xFF;
+        int blue1 = colour1 & 0xFF;
 
-        // Multiply corresponding components
-        float redResult = red1 * red2;
-        float greenResult = green1 * green2;
-        float blueResult = blue1 * blue2;
-        float alphaResult = alpha1 * alpha2;
+        int alpha2 = (colour2 >> 24) & 0xFF;
+        int red2 = (colour2 >> 16) & 0xFF;
+        int green2 = (colour2 >> 8) & 0xFF;
+        int blue2 = colour2 & 0xFF;
 
-        // Convert back to the range [0, 255] and clamp
-        int red = Math.min(255, Math.max(0, Math.round(redResult * 255)));
-        int green = Math.min(255, Math.max(0, Math.round(greenResult * 255)));
-        int blue = Math.min(255, Math.max(0, Math.round(blueResult * 255)));
-        int alpha = Math.min(255, Math.max(0, Math.round(alphaResult * 255)));
+        int alphaOUT = (alpha1 * alpha2) / 255;
+        int redOUT = (red1 * red2) / 255;
+        int greenOUT = (green1 * green2) / 255;
+        int blueOUT = (blue1 * blue2) / 255;
 
-        // Create and return the resulting color
-        return new Color(red, green, blue, alpha);
+        int colourOUT = (alphaOUT << 24) | (redOUT << 16) | (greenOUT << 8) | blueOUT;
+
+        return colourOUT;
     }
     public static Color alphaBlend(Color color1, Color color2) {
         float alpha1 = color1.getAlpha() / 255.0f;
