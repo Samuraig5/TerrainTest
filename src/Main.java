@@ -1,7 +1,4 @@
 import Engine3d.Rendering.PlayerCamera;
-import Levels.BloodGulch;
-import Levels.GJKTest;
-import Levels.TerrainLevel;
 import Levels.TestLevel;
 import Menus.MainMenu;
 
@@ -23,11 +20,6 @@ public class Main {
         if (args.length == 0 || Objects.equals(args[0], "MainMenu"))
         {
             new MainMenu(frame);
-        }
-        else if (Objects.equals(args[0], "TerrainTest"))
-        {
-            PlayerCamera camera = new PlayerCamera(frame);
-            new TerrainLevel(camera);
         }
         else if (Objects.equals(args[0], "TestLevel"))
         {
