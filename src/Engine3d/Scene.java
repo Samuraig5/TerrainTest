@@ -45,7 +45,6 @@ public class Scene implements Updatable
     protected List<StaticAABBObject> staticAABBObjects = new ArrayList<>();
 
     //Makes sure we can't read game state while it is being written
-    //TODO: Replace with a swappable buffer so we can update and build frames?
     private final Object stateLock = new Object();
 
     public Scene(Camera camera) {
@@ -93,46 +92,62 @@ public class Scene implements Updatable
         updatables.add(updatable);
     }
 
-
+    record RenderItem(Mesh mesh, Vector3D position, Vector3D rotation) {}
     public void buildScreenBuffer()
     {
         camera.getScreenBuffer().clear(backgroundColour);
+
+        List<RenderItem> frame;
+
         synchronized (stateLock) {
-            objects.sort((o1, o2) -> {
-                // Calculate distances to the camera
-                double distance1 = o1.getPosition().distanceTo(camera.getPosition());
-                double distance2 = o2.getPosition().distanceTo(camera.getPosition());
-                // Sort objects by distance (closer first)
-                return Double.compare(distance1, distance2);
-            });
-
-            //These values are purely based off the camera.
-            //If they change between two objects on the same frame then the objects can "jitter"
-            //This is also slightly more efficient.
-            Vector3D constCamPos = new Vector3D(camera.getPosition());
-            Vector3D up = new Vector3D(0,1,0);
-            Vector3D target = camera.getDirection().translated(constCamPos);
-            Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);
-            Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
-
-
-            objects.parallelStream().forEach(o -> {
-                o.getMesh().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
-                if (camera.debugging) {
-
-                    o.getSource().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
-                    if (o instanceof AABBObject && !(o instanceof PlayerObject)) {
-                        UnrotatableBox collision = ((AABBObject) o).getAABBCollider().getAABBMesh();
-                        double scalingFactor = 1f;
-                        collision.scale(new Vector3D(scalingFactor,scalingFactor,scalingFactor));
-                        DrawInstructions di = new DrawInstructions(true,false,false,false);
-                        di.wireFrameColour = Color.ORANGE;
-                        collision.setDrawInstructions(di);
-                        collision.drawMesh(camera,constCamPos,viewMatrix,lightSources,timeMeasurer);
-                    }
-                }
-            });
+            frame = new ArrayList<>(objects.size());
+            for (Object3D obj : objects) {
+                frame.add(new RenderItem(
+                        obj.getMesh(),
+                        new Vector3D(obj.getPosition()),
+                        new Vector3D(obj.getRotation())
+                ));
+            }
         }
+
+        frame.sort((o1, o2) -> {
+            // Calculate distances to the camera
+            double distance1 = o1.position.distanceTo(camera.getPosition());
+            double distance2 = o2.position.distanceTo(camera.getPosition());
+            // Sort objects by distance (closer first)
+            return Double.compare(distance1, distance2);
+        });
+
+        //These values are purely based off the camera.
+        //If they change between two objects on the same frame then the objects can "jitter"
+        //This is also slightly more efficient.
+        Vector3D constCamPos = new Vector3D(camera.getPosition());
+        Vector3D up = new Vector3D(0,1,0);
+        Vector3D target = camera.getDirection().translated(constCamPos);
+        Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);
+        Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
+
+
+        frame.parallelStream().forEach(o -> {
+            o.mesh.drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+            //Legacy code to show where the source of the object is.
+            //Relies on a function in Object3D.
+            // TODO: Refactor to either replace it or go back to using copies of Object3D instead of records.
+            /*
+            if (camera.debugging) {
+                o.getSource().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+                if (o instanceof AABBObject && !(o instanceof PlayerObject)) {
+                    UnrotatableBox collision = ((AABBObject) o).getAABBCollider().getAABBMesh();
+                    double scalingFactor = 1f;
+                    collision.scale(new Vector3D(scalingFactor,scalingFactor,scalingFactor));
+                    DrawInstructions di = new DrawInstructions(true,false,false,false);
+                    di.wireFrameColour = Color.ORANGE;
+                    collision.setDrawInstructions(di);
+                    collision.drawMesh(camera,constCamPos,viewMatrix,lightSources,timeMeasurer);
+                }
+            }
+             */
+        });
     }
 
     public Camera getCamera() {return camera;}
