@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 
 public class MainMenu extends Menu {
 
-    public static final String GAME_NAME = "Terrain Test";
+    public static final String GAME_NAME = "Bug Game";
 
     public MainMenu(JFrame frame) {
         super(frame);
@@ -86,8 +86,8 @@ public class MainMenu extends Menu {
 
         PlayerCamera camera = new PlayerCamera(frame);
         //new BloodGulch(camera);
-        //new TestLevel(camera);
-        new TerrainLevel(camera);
+        new TestLevel(camera);
+        //new TerrainLevel(camera);
         //new GJKTest(camera);
 
         frame.revalidate();
