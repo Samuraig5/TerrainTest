@@ -20,7 +20,6 @@ import java.util.function.Function;
 
 public class Mesh implements Translatable, Rotatable, Scalable
 {
-    protected Object3D object3D;
     protected List<Vector3D> points = new ArrayList<>();
     protected List<MeshTriangle> faces = new CopyOnWriteArrayList<>();
     protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
@@ -28,22 +27,20 @@ public class Mesh implements Translatable, Rotatable, Scalable
     private TimeMeasurer tm = new TimeMeasurer();
     private record copyPnF(List<Vector3D> copiedPoints, List<MeshTriangle> copiedFaces) { }
     private DrawInstructions drawInstructions;
-    public Mesh(Object3D object3D) {
-        this.object3D = object3D;
+    public Mesh() {
         drawInstructions = new DrawInstructions(false,false,true,true);
-        //object3D.setMesh(this);
     }
     @Override
     public void translate(Vector3D delta) {
-        meshOffset.translate(delta);
+        meshOffset = meshOffset.translated(delta);
     }
     @Override
     public void rotate(Vector3D delta) {
-        meshOffrot.translate(delta);
+        meshOffrot = meshOffrot.translated(delta);
     }
     @Override
     public Vector3D getRotation() {
-        return meshOffrot.translated(object3D.getRotation());
+        return meshOffrot;
     }
     @Override
     public Vector3D getDirection() {
@@ -60,7 +57,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
             points.get(i).scale(delta);
         }
     }
-    public Vector3D getPosition() {return meshOffset.translated(object3D.getPosition());}
+    public Vector3D getPosition() {return meshOffset;}
     public DrawInstructions getDrawInstructions() {
         return drawInstructions;
     }
@@ -68,10 +65,12 @@ public class Mesh implements Translatable, Rotatable, Scalable
         this.drawInstructions = drawInstructions;
     }
     public List<Vector3D> getPoints() { return points; }
-    public List<Vector3D> getPointsInWorld() {
+    public List<Vector3D> getPointsInWorld(Vector3D worldPos, Vector3D worldRot) {
         copyPnF result = getCopyPnF();
 
-        localToWorld(result.copiedPoints());
+        localToWorld(result.copiedPoints(),
+                getPosition().translated(worldPos),
+                getRotation().translated(worldRot));
 
         return result.copiedPoints;
     }
@@ -82,14 +81,16 @@ public class Mesh implements Translatable, Rotatable, Scalable
         }
     }
 
-    public void drawMesh(Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
+    public void drawMesh(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
     {
         this.tm = tm;
 
         try {
             copyPnF result = getCopyPnF();
 
-            localToWorld(result.copiedPoints());
+            localToWorld(result.copiedPoints(),
+                    getPosition().translated(position),
+                    getRotation().translated(rotation));
 
             if (drawInstructions.doShading) {
                 calculateLuminance(cameraPos, lightSources, result.copiedFaces());
@@ -176,6 +177,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
 
     /**
      * Translates the points from local space to world space.
+     * TODO: Legacy Code. Remove once not used anymore.
      * @param copiedPoints the points to be translated.
      */
     private void localToWorld(List<Vector3D> copiedPoints) {
@@ -188,14 +190,27 @@ public class Mesh implements Translatable, Rotatable, Scalable
     }
 
     /**
+     * Translates the points from local space to world space.
+     */
+    private static List<Vector3D> localToWorld(List<Vector3D> points, Vector3D position, Vector3D rotation) {
+        //tm.startMeasurement("localToWorld");
+        Matrix4x4 trans = Matrix4x4.getTranslationMatrix(position);
+        Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(rotation), trans);
+
+        return worldTransform.matrixVectorManipulation(points);
+        //tm.pauseMeasurement("localToWorld");
+    }
+
+    /**
      * Translates a point from world space to local space.
      * @param worldPoint to be translated
      * @return the world point in local space
      */
-    public Vector3D worldToLocal(Vector3D worldPoint) {
-        Matrix4x4 trans = Matrix4x4.getTranslationMatrix(getPosition()).quickMatrixInverse();
-        Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(getRotation()), trans);
-        return worldTransform.matrixVectorMultiplication(worldPoint);
+    public Vector3D worldToLocal(Vector3D worldPoint, Vector3D worldPos, Vector3D worldRot) {
+        Matrix4x4 trans = Matrix4x4.getTranslationMatrix(getPosition().translated(worldPos));
+        Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(getRotation().translated(worldRot)), trans);
+        Matrix4x4 inverse = worldTransform.quickMatrixInverse();
+        return inverse.matrixVectorMultiplication(worldPoint);
     }
 
     /**
@@ -487,7 +502,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
         return copiedFaces;
     }
 
-    public AABB getAABB() {
+    public AABB getAABB(Vector3D worldPos, Vector3D worldRot) {
         if (points == null || points.isEmpty()) {
             throw new IllegalStateException("Mesh contains no points");
         }
@@ -504,7 +519,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
         localToWorld(result.copiedPoints());
 
         // Iterate through the points to find the min and max coordinates
-        for (Vector3D point : result.copiedPoints) {
+        for (Vector3D point : getPointsInWorld(worldPos, worldRot)) {
             if (point.x() < minX) { minX = point.x(); }
             if (point.y() < minY) { minY = point.y(); }
             if (point.z() < minZ) { minZ = point.z(); }

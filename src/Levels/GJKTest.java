@@ -33,7 +33,7 @@ public class GJKTest extends Scene{
         sun.setLightIntensity(0.25);
 
         object1 = new Object3D(this);
-        BoxMesh mesh1 = new BoxMesh(object1, new Vector3D(1,1,1));
+        BoxMesh mesh1 = new BoxMesh(new Vector3D(1,1,1));
         mesh1.getDrawInstructions().drawWireFrame = true;
         object1.setMesh(mesh1);
         addObject(object1);

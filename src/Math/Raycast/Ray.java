@@ -36,7 +36,7 @@ public class Ray extends Line
     public Object3D getPointObject() {
         double BOX_SIZE = 0.001;
         Object3D pointObject = new StaticAABBObject(source.getScene());
-        pointObject.setMesh(new BoxMesh(pointObject, new Vector3D(BOX_SIZE,BOX_SIZE,BOX_SIZE)));
+        pointObject.setMesh(new BoxMesh(new Vector3D(BOX_SIZE,BOX_SIZE,BOX_SIZE)));
         pointObject.translate(getDirection());
         return pointObject;
     }

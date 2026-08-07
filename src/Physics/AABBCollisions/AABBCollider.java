@@ -22,12 +22,12 @@ public abstract class AABBCollider implements Translatable
     }
 
     public AABB getAABB() {
-        AABB aabb = colliderMesh.getAABB();
+        AABB aabb = colliderMesh.getAABB(obj.getPosition(), obj.getRotation());
         return aabb;
     }
 
     public UnrotatableBox getAABBMesh() {
-        UnrotatableBox res = new UnrotatableBox(obj, colliderMesh.getAABB());
+        UnrotatableBox res = new UnrotatableBox(colliderMesh.getAABB(obj.getPosition(), obj.getRotation()));
         res.translate(obj.getPosition().inverted());
         return res;
     }

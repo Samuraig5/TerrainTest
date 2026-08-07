@@ -11,6 +11,7 @@ import Engine3d.Rotatable;
 import Engine3d.Translatable;
 
 import java.awt.*;
+import java.util.List;
 
 public class Object3D implements Translatable, Rotatable
 {
@@ -28,7 +29,7 @@ public class Object3D implements Translatable, Rotatable
     public Object3D(Object3D source) {
         this.scene = source.getScene();
 
-        this.mesh = new Mesh(this);
+        this.mesh = new Mesh();
         mesh.copy(source.getMesh());
         this.position = new Vector3D(source.getPosition());
         this.rotation = new Vector3D(source.getRotation());
@@ -44,9 +45,13 @@ public class Object3D implements Translatable, Rotatable
         return mesh;
     }
 
+    public List<Vector3D> getMeshPointsInWorld() {
+        return mesh.getPointsInWorld(getPosition(), getRotation());
+    }
+
     @Override
     public void rotate(Vector3D delta) {
-        rotation.translate(delta);
+        rotation = rotation.translated(delta);
     }
 
     @Override
@@ -66,7 +71,7 @@ public class Object3D implements Translatable, Rotatable
 
     @Override
     public void translate(Vector3D delta) {
-        position.translate(delta);
+        position = position.translated(delta);
     }
 
     @Override
@@ -79,8 +84,7 @@ public class Object3D implements Translatable, Rotatable
     // === DEBUGGING ===
 
     double sourceBoxSize = 0.1d;
-    UnrotatableBox source = new UnrotatableBox(this,
-            new Box(
+    UnrotatableBox source = new UnrotatableBox(new Box(
             new Vector3D(-sourceBoxSize,-sourceBoxSize,-sourceBoxSize),
             new Vector3D(sourceBoxSize,sourceBoxSize,sourceBoxSize))
     );

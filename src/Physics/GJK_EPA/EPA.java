@@ -18,8 +18,8 @@ public class EPA
         Simplex solGJK = solveGJK(o1, o2);
         if (solGJK == null) { return new Vector3D(); }
 
-        List<Vector3D> ver1 = o1.getMesh().getPointsInWorld();
-        List<Vector3D> ver2 = o2.getMesh().getPointsInWorld();
+        List<Vector3D> ver1 = o1.getMeshPointsInWorld();
+        List<Vector3D> ver2 = o2.getMeshPointsInWorld();
 
         Polytope polytope = new Polytope(solGJK);
 

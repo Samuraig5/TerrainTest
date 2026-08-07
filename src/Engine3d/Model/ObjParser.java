@@ -24,7 +24,7 @@ public class ObjParser
 
     public Mesh loadFromObjFile(Object3D object3D, String folderPath, String objFile)
     {
-        Mesh mesh = new Mesh(object3D);
+        Mesh mesh = new Mesh();
         object3D.setMesh(mesh);
 
         HashMap<String, MTL> mtlLib = new HashMap<>();

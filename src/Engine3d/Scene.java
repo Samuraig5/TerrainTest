@@ -129,7 +129,7 @@ public class Scene implements Updatable
 
 
         frame.parallelStream().forEach(o -> {
-            o.mesh.drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
+            o.mesh.drawMesh(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
             //Legacy code to show where the source of the object is.
             //Relies on a function in Object3D.
             // TODO: Refactor to either replace it or go back to using copies of Object3D instead of records.
@@ -167,7 +167,7 @@ public class Scene implements Updatable
         Mesh loaded = objParser.loadFromObjFile(object3D, folderPath, filePath);
         if (loaded == null) {
             getSceneRenderer().logError("ObjParser couldn't find file: " + folderPath + "/" + filePath);
-            object3D.setMesh(new Mesh(object3D));
+            object3D.setMesh(new Mesh());
         }
         return object3D;
     }

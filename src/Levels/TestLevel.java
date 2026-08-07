@@ -112,7 +112,7 @@ public class TestLevel extends Scene
 
     private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {
         StaticAABBObject wall = new StaticAABBObject(this);
-        BoxMesh boxMesh = new BoxMesh(wall, size);
+        BoxMesh boxMesh = new BoxMesh(size);
         wall.setMesh(boxMesh);
         boxMesh.setTexture(sprite);
         boxMesh.setDiffuseColour(Color.white);

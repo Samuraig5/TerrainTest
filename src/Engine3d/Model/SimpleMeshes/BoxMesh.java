@@ -17,8 +17,8 @@ public class BoxMesh extends Mesh
     Vector3D size;
     Vector3D min;
     Vector3D max;
-    public BoxMesh(Object3D object3D, Vector3D size) {
-        super(object3D);
+    public BoxMesh(Vector3D size) {
+        super();
         this.size = size;
         buildPoints(size);
         buildFaces(size);
@@ -26,8 +26,8 @@ public class BoxMesh extends Mesh
         setDiffuseColour(new Color(0,0,0,0));
     }
 
-    public BoxMesh(Object3D object3D, Box box) {
-        super(object3D);
+    public BoxMesh(Box box) {
+        super();
         Vector3D min = box.min();
         Vector3D max = box.max();
         double x = max.x() - min.x();

@@ -8,7 +8,7 @@ public class Matrix4x4
 {
     public double[][] mat = new double[4][4];
 
-    public void matrixVectorManipulation(Vector3D in)
+    public Vector3D matrixVectorManipulation(Vector3D in)
     {
         double x = in.x() * mat[0][0]
                 + in.y() * mat[1][0]
@@ -26,13 +26,20 @@ public class Matrix4x4
                 + in.y() * mat[1][3]
                 + in.z() * mat[2][3]
                 + in.w() * mat[3][3];
+
+        //TODO: Legacy mutation until the implicit update of faces by points is made explicit.
         in.x(x); in.y(y); in.z(z); in.w(w);
+
+        return new Vector3D(x,y,z,w);
     }
 
-    public void matrixVectorManipulation(List<Vector3D> in) {
+    public List<Vector3D> matrixVectorManipulation(List<Vector3D> in) {
         for (int i = 0; i < in.size(); i++) {
-            matrixVectorManipulation(in.get(i));
+            Vector3D out = matrixVectorManipulation(in.get(i));
+            //in.set(i,out); //TODO: Once immutability has been achieved, the updated points should be set like this
+
         }
+        return in;
     }
 
     public Vector3D matrixVectorMultiplication(Vector3D in)

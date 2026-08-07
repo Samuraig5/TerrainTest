@@ -6,6 +6,6 @@ import Math.Vector.Vector3D;
 public class CubeMesh extends BoxMesh
 {
     public CubeMesh(Object3D object3D, double size) {
-        super(object3D, new Vector3D(size,size,size));
+        super(new Vector3D(size,size,size));
     }
 }

@@ -31,7 +31,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         camera.setPlayerObject(this);
         Vector3D min = new Vector3D(-(SIZE.x()/2), 0, -(SIZE.z()/2));
         Vector3D max = new Vector3D(SIZE.x()/2, SIZE.y(), SIZE.z()/2);
-        UnrotatableBox playerMesh = new UnrotatableBox(this, new Box(min, max));
+        UnrotatableBox playerMesh = new UnrotatableBox(new Box(min, max));
         setMesh(playerMesh);
     }
 
@@ -159,7 +159,8 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         Vector3D col = rayCollision.collisionPoint;
         //getScene().createCollisionMarker(col); //Spawns a cube at the collision for debuggung
 
-        Vector3D localCol = rayCollision.collisionTarget.getMesh().worldToLocal(col);
+        Object3D target = rayCollision.collisionTarget;
+        Vector3D localCol = rayCollision.collisionTarget.getMesh().worldToLocal(col, target.getPosition(), target.getRotation());
         List<Vector3D> targetPoints = rayCollision.collisionTarget.getMesh().getPoints();
 
         Vector3D minPoint = targetPoints.get(0);

@@ -6,12 +6,12 @@ import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Physics.Object3D;
 
 public class UnrotatableBox extends BoxMesh {
-    public UnrotatableBox(Object3D object3D, Vector3D size) {
-        super(object3D, size);
+    public UnrotatableBox(Vector3D size) {
+        super(size);
     }
 
-    public UnrotatableBox(Object3D object3D, Box box) {
-        super(object3D, box);
+    public UnrotatableBox(Box box) {
+        super(box);
     }
 
     @Override
