@@ -16,9 +16,9 @@ public class Material
 
     public Material()
     {
-        textureCoords[0] = new Vector2D();
-        textureCoords[1] = new Vector2D();
-        textureCoords[2] = new Vector2D();
+        textureCoords[0] = new Vector2D(0,0,0);
+        textureCoords[1] = new Vector2D(0,0,0);
+        textureCoords[2] = new Vector2D(0,0,0);
     }
     public Material(Vector2D t1, Vector2D t2, Vector2D t3)
     {

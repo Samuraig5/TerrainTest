@@ -31,11 +31,11 @@ public class MeshTriangle implements Translatable
         Vector3D line1 = new Vector3D(points[1]);
         Vector3D line2 = new Vector3D(points[2]);
 
-        line1.translate(points[0].inverted());
-        line2.translate(points[0].inverted());
+        line1 = line1.translated(points[0].inverted());
+        line2 = line2.translated(points[0].inverted());
 
         Vector3D normal = line1.crossProduct(line2);
-        normal.normalize();
+        normal = normal.normalized();
         return normal;
     }
 
@@ -51,9 +51,9 @@ public class MeshTriangle implements Translatable
 
     @Override
     public void translate(Vector3D delta) {
-        points[0].translate(delta);
-        points[1].translate(delta);
-        points[2].translate(delta);
+        points[0] = points[0].translated(delta);
+        points[1] = points[1].translated(delta);
+        points[2] = points[2].translated(delta);
     }
 
     @Override
@@ -64,16 +64,16 @@ public class MeshTriangle implements Translatable
     public void translatePoint(Vector3D targetPoint, Vector3D delta) {
         Vector2D[] texturePoints = material.getTextureCoords();
         if (targetPoint == points[0]) {
-            points[0].translate(delta);
-            texturePoints[0].translate(new Vector3D(0, -delta.y()*4, 0));
+            points[0] = points[0].translated(delta);
+            texturePoints[0] = texturePoints[0].translate(new Vector2D(0, -delta.y()*4, 0));
         }
         else if (targetPoint == points[1]) {
-            points[1].translate(delta);
-            texturePoints[1].translate(new Vector3D(0, -delta.y()*4, 0));
+            points[1] = points[1].translated(delta);
+            texturePoints[1] = texturePoints[1].translate(new Vector2D(0, -delta.y()*4, 0));
         }
         else if (targetPoint == points[2]) {
-            points[2].translate(delta);
-            texturePoints[2].translate(new Vector3D(0, -delta.y()*4, 0));
+            points[2] = points[2].translated(delta);
+            texturePoints[2] = texturePoints[2].translate(new Vector2D(0, -delta.y()*4, 0));
         }
         else {
             //System.err.println("WARNING: MeshTriangle: Trying to update mesh triangle with point but triangle does not contain that point.");
@@ -81,16 +81,15 @@ public class MeshTriangle implements Translatable
     }
 
     public void scale(Vector3D scalar) {
-        points[0].scale(scalar);
-        points[1].scale(scalar);
-        points[2].scale(scalar);
+        points[0] = points[0].scaled(scalar);
+        points[1] = points[1].scaled(scalar);
+        points[2] = points[2].scaled(scalar);
     }
 
-    public void dividePointsByW()
-    {
-        points[0].scale(1/points[0].w());
-        points[1].scale(1/points[1].w());
-        points[2].scale(1/points[2].w());
+    public void dividePointsByW() {
+        points[0] = points[0].scaled(1/points[0].w());
+        points[1] = points[1].scaled(1/points[1].w());
+        points[2] = points[2].scaled(1/points[2].w());
     }
 
     public Material getMaterial() {

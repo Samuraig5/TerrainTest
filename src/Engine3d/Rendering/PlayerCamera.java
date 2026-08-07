@@ -26,7 +26,7 @@ public class PlayerCamera extends Camera {
     public Vector3D getPosition() {
         if (playerObject == null) {
             //System.err.println("PlayerCamera: No PlayerObject is set!");
-            return new Vector3D();
+            return new Vector3D(0,0,0);
         }
         return playerObject.getPosition().translated(playerObject.getCameraOffset());
     }
@@ -43,7 +43,7 @@ public class PlayerCamera extends Camera {
     public Vector3D getRotation() {
         if (playerObject == null) {
             //System.err.println("PlayerCamera: No PlayerObject is set!");
-            return new Vector3D();
+            return new Vector3D(0,0,0);
         }
         return playerObject.getRotation();
     }

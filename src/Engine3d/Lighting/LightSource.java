@@ -13,8 +13,8 @@ public class LightSource implements Translatable, Rotatable
     private double lightIntensity = 1;
     private double lightRange = Double.MAX_VALUE;
     private Color lightColour = new Color(255, 255, 255);
-    private Vector3D position = new Vector3D();
-    private Vector3D rotation = new Vector3D();
+    private Vector3D position = new Vector3D(0,0,0);
+    private Vector3D rotation = new Vector3D(0,0,0);
 
     public LightSource(Scene scene) {
         scene.addLight(this);
@@ -47,12 +47,12 @@ public class LightSource implements Translatable, Rotatable
     }
     @Override
     public void translate(Vector3D delta) {
-        rotation.translate(delta);
+        rotation = rotation.translated(delta);
     }
 
     @Override
     public void rotate(Vector3D delta) {
-        position.translate(delta);
+        rotation = rotation.translated(delta);
     }
     @Override
     public Vector3D getRotation() {

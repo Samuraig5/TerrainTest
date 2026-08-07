@@ -18,11 +18,11 @@ import java.util.List;
 public class PlayerObject extends DynamicAABBObject implements Gravitational
 {
     private Vector3D SIZE = new Vector3D(1, 1.8, 1);
-    private Vector3D position = new Vector3D();
-    private Vector3D rotation = new Vector3D();
+    private Vector3D position = new Vector3D(0,0,0);
+    private Vector3D rotation = new Vector3D(0,0,0);
     private final Vector3D cameraOffset = new Vector3D(0,1.5,0);
     private Camera camera;
-    private final Vector3D momentum = new Vector3D();
+    private Vector3D momentum = new Vector3D(0,0,0);
 
     public PlayerObject(Scene scene, PlayerCamera camera)
     {
@@ -36,7 +36,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     }
 
     public void addMomentum(Vector3D delta) {
-        momentum.translate(delta);
+        momentum = momentum.translated(delta);
     }
 
     @Override
@@ -50,10 +50,10 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     @Override
     public void applyGravity(double g, double deltaTime) {
         Vector3D delta = Vector3D.DOWN();
-        delta.scale(g);
-        delta.scale(deltaTime);
+        delta = delta.scaled(g);
+        delta = delta.scaled(deltaTime);
         if (!isGrounded()) {
-            momentum.translate(delta);
+            momentum = momentum.translated(delta);
         }
         else {
             momentum.y(Math.max(momentum.y(), 0));
@@ -125,17 +125,17 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     @Override
     public void translate(Vector3D delta) {
-        position.translate(delta);
+        position = position.translated(delta);
     }
 
     public void localTranslate(Vector3D delta) {
         Vector3D forwardMovement = getDirection();
-        forwardMovement.y(0);
-        forwardMovement.normalize();
-        forwardMovement.scale(delta.z());
+        forwardMovement = forwardMovement.y(0);
+        forwardMovement = forwardMovement.normalized();
+        forwardMovement = forwardMovement.scaled(delta.z());
         Vector3D sidewardMovement = getDirection(Vector3D.LEFT()).scaled(delta.x());
         Vector3D movement = forwardMovement.translated(sidewardMovement);
-        movement.translate(new Vector3D(0,delta.y(),0));
+        movement = movement.translated(new Vector3D(0,delta.y(),0));
         translate(movement);
     }
 
@@ -155,7 +155,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     }
 
     public Vector3D findClosestPointToCollision(RayCollision rayCollision) {
-        if (rayCollision == null) {return new Vector3D();}
+        if (rayCollision == null) {return new Vector3D(0,0,0);}
         Vector3D col = rayCollision.collisionPoint;
         //getScene().createCollisionMarker(col); //Spawns a cube at the collision for debuggung
 

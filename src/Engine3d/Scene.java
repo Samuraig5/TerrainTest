@@ -132,19 +132,10 @@ public class Scene implements Updatable
             o.mesh.drawMesh(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
             //Legacy code to show where the source of the object is.
             //Relies on a function in Object3D.
-            // TODO: Refactor to either replace it or go back to using copies of Object3D instead of records.
+            // TODO: Add debug showing debugging stuff (eg. Wireframes)
             /*
             if (camera.debugging) {
-                o.getSource().drawMesh(camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
-                if (o instanceof AABBObject && !(o instanceof PlayerObject)) {
-                    UnrotatableBox collision = ((AABBObject) o).getAABBCollider().getAABBMesh();
-                    double scalingFactor = 1f;
-                    collision.scale(new Vector3D(scalingFactor,scalingFactor,scalingFactor));
-                    DrawInstructions di = new DrawInstructions(true,false,false,false);
-                    di.wireFrameColour = Color.ORANGE;
-                    collision.setDrawInstructions(di);
-                    collision.drawMesh(camera,constCamPos,viewMatrix,lightSources,timeMeasurer);
-                }
+
             }
              */
         });

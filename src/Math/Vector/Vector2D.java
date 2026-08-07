@@ -1,46 +1,34 @@
 package Math.Vector;
 
-public class Vector2D extends VectorW {
-    @Override
-    protected void init() {
-        components = new double[2];
-    }
+public class Vector2D {
+    private final double u;
+    private final double v;
+    private final double w;
 
     public Vector2D(double u, double v, double w) {
-        init();
-        setComponents(new double[] {u,v});
-        w(w);
+        this.u = u;
+        this.v = v;
+        this.w = w;
     }
     public Vector2D(double u, double v) {
-        init();
-        setComponents(new double[] {u,v});
-    }
-    public Vector2D() {
-        init();
+        this.u = u;
+        this.v = v;
+        this.w = 1;
     }
     public Vector2D(Vector2D source) {
-        init();
-        setComponents(source);
-        w(source.w());
+        this.u = source.u();
+        this.v = source.v();
+        this.w = source.w();
     }
 
-    public double u() {return getValue(0);}
-    public void u(double u) {setComponent(0,u);}
-    public double v() {return getValue(1);}
-    public void v(double v) {setComponent(1,v);}
+    public double u() {return u;}
+    public double v() {return v;}
+    public double w() {return w;}
 
-    @Override
-    public Vector clone() {
-        return new Vector2D(this);
-    }
+    public Vector2D u(double u) {return new Vector2D(u, this.v, this.w);}
+    public Vector2D v(double v) {return new Vector2D(this.u, v, this.w);}
+    public Vector2D w(double w) {return new Vector2D(this.u, this.v, w);}
 
-    @Override
-    public Vector3D getPosition() {
-        return new Vector3D(u(), v(), 0);
-    }
-
-    @Override
-    public Vector2D scaled(double scalar) {
-        return (Vector2D) super.scaled(scalar);
-    }
+    public Vector2D translate(Vector2D delta) {return new Vector2D(u+delta.u, v+delta.v, w+delta.w);}
+    public Vector2D scale(Vector2D delta) {return new Vector2D(u*delta.u, v*delta.v, w*delta.w);}
 }

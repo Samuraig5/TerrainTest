@@ -18,6 +18,13 @@ public class Line
     public Vector3D p1() {return p1;}
     public Vector3D p2() {return p2;}
 
+    public void p1(Vector3D newP) {
+        p1 = newP;
+    }
+    public void p2(Vector3D newP) {
+        p2 = newP;
+    }
+
     /**
      * Finds the point at which a given plane intersects with this line.
      * It also returns the distance of the point from the other points in tOut. Range = [0, 1]
@@ -27,7 +34,7 @@ public class Line
      */
     public Vector3D getIntersectToPlane(Vector3D planePosition, Vector3D planeNormal)
     {
-        planeNormal.normalize();
+        planeNormal.normalized();
         double plane_d = -planeNormal.dotProduct(planePosition);
         double ad = p1.dotProduct(planeNormal);
         double bd = p2.dotProduct(planeNormal);

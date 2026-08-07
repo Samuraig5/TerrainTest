@@ -17,8 +17,8 @@ public class Object3D implements Translatable, Rotatable
 {
     private Scene scene;
     private Mesh mesh;
-    protected Vector3D rotation = new Vector3D();
-    protected Vector3D position = new Vector3D();
+    protected Vector3D rotation = new Vector3D(0,0,0);
+    protected Vector3D position = new Vector3D(0,0,0);
 
     public Object3D(Scene scene) {
         this.scene = scene;

@@ -32,20 +32,20 @@ public class OldSchoolFlyingControls extends Controller implements Updatable
 
     @Override
     public void update(double deltaTime) {
-        Vector3D transDelta = new Vector3D();
-        Vector3D rotDelta = new Vector3D();
+        Vector3D transDelta = new Vector3D(0,0,0);
+        Vector3D rotDelta = new Vector3D(0,0,0);
 
         double adjStepSize = stepSize * deltaTime;
         double adjTurnStep = turnStep * deltaTime;
 
         if (ctrlDown) {adjStepSize *= 5;}
 
-        if (wDown) {transDelta.translate(new Vector3D(0, 0, adjStepSize));}
-        if (sDown) {transDelta.translate(new Vector3D(0, 0, -adjStepSize));}
-        if (spaceDown) {transDelta.translate(new Vector3D(0, adjStepSize, 0));}
-        if (shiftDown) {transDelta.translate(new Vector3D(0, -adjStepSize, 0));}
-        if (aDown) {rotDelta.translate(new Vector3D(0, adjTurnStep, 0));}
-        if (dDown) {rotDelta.translate(new Vector3D(0, -adjTurnStep, 0));}
+        if (wDown) {transDelta = transDelta.translated(new Vector3D(0, 0, adjStepSize));}
+        if (sDown) {transDelta = transDelta.translated(new Vector3D(0, 0, -adjStepSize));}
+        if (spaceDown) {transDelta = transDelta.translated(new Vector3D(0, adjStepSize, 0));}
+        if (shiftDown) {transDelta = transDelta.translated(new Vector3D(0, -adjStepSize, 0));}
+        if (aDown) {rotDelta = rotDelta.translated(new Vector3D(0, adjTurnStep, 0));}
+        if (dDown) {rotDelta = rotDelta.translated(new Vector3D(0, -adjTurnStep, 0));}
 
         playerObject.localTranslate(transDelta);
         playerObject.rotate(rotDelta);

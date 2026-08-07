@@ -54,7 +54,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
     @Override
     public void scale(Vector3D delta) {
         for (int i = 0; i < points.size(); i++) {
-            points.get(i).scale(delta);
+            points.set(i, points.get(i).scaled(delta));
         }
     }
     public Vector3D getPosition() {return meshOffset;}
@@ -68,11 +68,9 @@ public class Mesh implements Translatable, Rotatable, Scalable
     public List<Vector3D> getPointsInWorld(Vector3D worldPos, Vector3D worldRot) {
         copyPnF result = getCopyPnF();
 
-        localToWorld(result.copiedPoints(),
+        return localToWorld(result.copiedPoints(),
                 getPosition().translated(worldPos),
                 getRotation().translated(worldRot));
-
-        return result.copiedPoints;
     }
 
     public void translatePoint(Vector3D targetPoint, Vector3D delta) {
@@ -88,16 +86,18 @@ public class Mesh implements Translatable, Rotatable, Scalable
         try {
             copyPnF result = getCopyPnF();
 
-            localToWorld(result.copiedPoints(),
-                    getPosition().translated(position),
-                    getRotation().translated(rotation));
+            Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(
+                    Matrix4x4.get3dRotationMatrix(getRotation().translated(rotation)),
+                    Matrix4x4.getTranslationMatrix(getPosition().translated(position))
+            );
+            result = transform(worldTransform, result.copiedPoints, result.copiedFaces);
 
             if (drawInstructions.doShading) {
                 calculateLuminance(cameraPos, lightSources, result.copiedFaces());
             }
 
             tm.startMeasurement("ObjWorldToScreen");
-            viewMatrix.matrixVectorManipulation(result.copiedPoints());
+            result = transform(viewMatrix, result.copiedPoints, result.copiedFaces);
             tm.pauseMeasurement("ObjWorldToScreen");
 
             List<MeshTriangle> trianglesToRaster = clipAgainstNearPlane(camera, result.copiedFaces());
@@ -173,20 +173,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
         List<MeshTriangle> copiedFaces = generateCopyFaces(pointMap, faces);
         copyPnF result = new copyPnF(copiedPoints, copiedFaces);
         return result;
-    }
-
-    /**
-     * Translates the points from local space to world space.
-     * TODO: Legacy Code. Remove once not used anymore.
-     * @param copiedPoints the points to be translated.
-     */
-    private void localToWorld(List<Vector3D> copiedPoints) {
-        tm.startMeasurement("localToWorld");
-        Matrix4x4 trans = Matrix4x4.getTranslationMatrix(getPosition());
-        Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(Matrix4x4.get3dRotationMatrix(getRotation()), trans);
-
-        worldTransform.matrixVectorManipulation(copiedPoints);
-        tm.pauseMeasurement("localToWorld");
     }
 
     /**
@@ -325,7 +311,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
             Vector3D triNormal = tri.getNormal();
             //All three points lie on the same plane, so we can choose any
             Vector3D cameraRay = new Vector3D(tri.getPoints()[0]);
-            cameraRay.translate(cameraPos.inverted());
+            cameraRay = cameraRay.translated(cameraPos.inverted());
 
             //If the camera can't see the triangle, don't draw it
             if (triNormal.dotProduct(cameraRay) >= 0) {
@@ -351,12 +337,13 @@ public class Mesh implements Translatable, Rotatable, Scalable
     {
         tm.startMeasurement("TriangleClipping");
 
-        planeNormal.normalize();
+        planeNormal = planeNormal.normalized();
 
+        Vector3D finalPlaneNormal = planeNormal;
         Function<Vector3D, Double> dist = (Vector3D p) -> {
             //Vector3D n = p.normalized();
-            return (planeNormal.x() * p.x() + planeNormal.y() * p.y() + planeNormal.z() * p.z()
-                    - planeNormal.dotProduct(planePosition));
+            return (finalPlaneNormal.x() * p.x() + finalPlaneNormal.y() * p.y() + finalPlaneNormal.z() * p.z()
+                    - finalPlaneNormal.dotProduct(planePosition));
         };
 
         Vector3D[] inPoints = new Vector3D[3]; int numInPoints = 0;
@@ -479,6 +466,17 @@ public class Mesh implements Translatable, Rotatable, Scalable
         drawInstructions = new DrawInstructions(diSoruce.drawWireFrame, diSoruce.drawFlatColour, diSoruce.drawTexture, diSoruce.doShading);
     }
 
+    private copyPnF transform(Matrix4x4 transformMatrix, List<Vector3D> points, List<MeshTriangle> faces) {
+        Map<Vector3D, Vector3D> pointMap = new HashMap<>();
+        List<Vector3D> newPoints = new ArrayList<>(points.size());
+        for (Vector3D p : points) {
+            Vector3D tp = transformMatrix.matrixVectorManipulation(p);
+            pointMap.put(p,tp);
+            newPoints.add(tp);
+        }
+        return new copyPnF(newPoints, generateCopyFaces(pointMap, faces));
+    }
+
     /**
      * Since the faces of a mesh necessarily need to reference the points of the mesh, when the points of a mesh are changed,
      * the faces need to be updated to use the new points.
@@ -514,9 +512,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
         double maxX = -Double.MAX_VALUE;
         double maxY = -Double.MAX_VALUE;
         double maxZ = -Double.MAX_VALUE;
-
-        copyPnF result = getCopyPnF();
-        localToWorld(result.copiedPoints());
 
         // Iterate through the points to find the min and max coordinates
         for (Vector3D point : getPointsInWorld(worldPos, worldRot)) {

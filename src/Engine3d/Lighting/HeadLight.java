@@ -8,7 +8,7 @@ public class HeadLight
 {
     public HeadLight(Camera camera, Scene scene) {
         //Front
-        CameraLight cl = new CameraLight(camera, scene, new Vector3D());
+        CameraLight cl = new CameraLight(camera, scene, new Vector3D(0,0,0));
         cl.setLightRange(100);
         //Down
         CameraLight cl1 = new CameraLight(camera, scene, new Vector3D(Math.toRadians(-45),0,0));

@@ -26,7 +26,7 @@ public class BloodGulch extends Scene
         //sun.setRotation(new Vector3D(Math.toRadians(-90),0,0));
         //sun.setLightIntensity(0.5);
 
-        CameraLight cl = new CameraLight(camera, this, new Vector3D());
+        CameraLight cl = new CameraLight(camera, this, new Vector3D(0,0,0));
         cl.setLightRange(100);
 
         CameraLight cl1 = new CameraLight(camera, this, new Vector3D(Math.toRadians(-45),0,0));

@@ -21,12 +21,20 @@ public class Ray extends Line
     public Vector3D getDirection() {
         return p2();
     }
+
+    public void setOrigin(Vector3D newP) {
+        p1(newP);
+    }
+    public void setDirection(Vector3D newP) {
+        p2(newP);
+    }
+
     public Object3D getSource() {
         return source;
     }
 
     public void advance() {
-        getOrigin().translate(getDirection());
+        setOrigin(getOrigin().translated(getDirection()));
     }
 
     public Vector3D next() {

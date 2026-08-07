@@ -67,20 +67,20 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
     @Override
     public void update(double deltaTime) {
-        Vector3D transDelta = new Vector3D();
-        Vector3D rotDelta = new Vector3D();
+        Vector3D transDelta = new Vector3D(0,0,0);
+        Vector3D rotDelta = new Vector3D(0,0,0);
 
         double adjStepSize = stepSize * deltaTime;
         double adjTurnStep = turnStep * deltaTime;
 
         if (ctrlDown) {adjStepSize *= 2;}
 
-        if (wDown) {transDelta.translate(new Vector3D(0, 0, adjStepSize));}
-        if (sDown) {transDelta.translate(new Vector3D(0, 0, -adjStepSize));}
-        //if (spaceDown) {transDelta.translate(new Vector3D(0, adjStepSize, 0));}
-        if (shiftDown) {transDelta.translate(new Vector3D(0, -adjStepSize, 0));}
-        if (aDown) {transDelta.translate(new Vector3D(adjStepSize, 0, 0));}
-        if (dDown) {transDelta.translate(new Vector3D(-adjStepSize, 0, 0));}
+        if (wDown) {transDelta = transDelta.translated(new Vector3D(0, 0, adjStepSize));}
+        if (sDown) {transDelta = transDelta.translated(new Vector3D(0, 0, -adjStepSize));}
+        //if (spaceDown) {transDelta = transDelta.translate(new Vector3D(0, adjStepSize, 0));}
+        if (shiftDown) {transDelta = transDelta.translated(new Vector3D(0, -adjStepSize, 0));}
+        if (aDown) {transDelta = transDelta.translated(new Vector3D(adjStepSize, 0, 0));}
+        if (dDown) {transDelta = transDelta.translated(new Vector3D(-adjStepSize, 0, 0));}
 
         playerObject.localTranslate(transDelta);
         playerObject.rotate(rotDelta);

@@ -109,7 +109,7 @@ public class SceneRenderer extends JPanel
         Vector3D cursorPos = new Vector3D(errorMessagePos);
         for (String err : errors) {
             g.drawString(err, (int) cursorPos.x(), (int) cursorPos.y());
-            cursorPos.translate(errorPosDelta);
+            cursorPos = cursorPos.translated(errorPosDelta);
         }
     }
 

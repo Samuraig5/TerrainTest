@@ -42,16 +42,16 @@ public class BoxMesh extends Mesh
     @Override
     public void scale(Vector3D delta) {
         super.scale(delta);
-        size.scale(delta);
-        min.scale(delta);
-        max.scale(delta);
+        size = size.scaled(delta);
+        min = min.scaled(delta);
+        max = max.scaled(delta);
     }
 
     @Override
     public void translate(Vector3D delta) {
         super.translate(delta);
-        min.translate(delta);
-        max.translate(delta);
+        min = min.translated(delta);
+        max = max.translated(delta);
     }
 
     private void buildPoints(Vector3D min, Vector3D max) {
@@ -149,7 +149,7 @@ public class BoxMesh extends Mesh
     }
 
     public void centreToMiddleBottom() {
-        centreOn(new Vector3D());
+        centreOn(new Vector3D(0,0,0));
         translate(new Vector3D(0, -meshOffset.y(), 0));
     }
 

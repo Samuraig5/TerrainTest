@@ -16,7 +16,7 @@ public class EPA
 
     public static Vector3D solveEPA(Object3D o1, Object3D o2) {
         Simplex solGJK = solveGJK(o1, o2);
-        if (solGJK == null) { return new Vector3D(); }
+        if (solGJK == null) { return new Vector3D(0,0,0); }
 
         List<Vector3D> ver1 = o1.getMeshPointsInWorld();
         List<Vector3D> ver2 = o2.getMeshPointsInWorld();
@@ -24,7 +24,7 @@ public class EPA
         Polytope polytope = new Polytope(solGJK);
 
         double minDistance = Double.POSITIVE_INFINITY;
-        Vector3D minNormal = new Vector3D();
+        Vector3D minNormal = new Vector3D(0,0,0);
 
         int stopper = 0;
         while (minDistance == Double.POSITIVE_INFINITY) {
@@ -86,7 +86,7 @@ public class EPA
 
             if (distance < 0) {
                 distance *= -1;
-                face.normal().invert();
+                face.normal().inverted();
             }
 
             if (distance < minDistance) {
