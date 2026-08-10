@@ -94,7 +94,9 @@ public class TileRasterizer {
                     camera.drawer.fillTriangle(ref.tri(), tile.rect);
                 }
                 else if (drawInstructions.drawTexture) {
-                    camera.drawer.textureTriangle(ref.tri(), tile.rect);
+                    if (ref.tri().getMaterial().getTexture() != null) {
+                        camera.drawer.textureTriangle(ref.tri(), tile.rect);
+                    }
                 }
             }
         });

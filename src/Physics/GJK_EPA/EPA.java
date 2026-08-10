@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static Physics.GJK_EPA.GJK.solveGJK;
+import static Physics.GJK_EPA.Polytope.outwardFace;
 
 public class EPA
 {
@@ -29,6 +30,7 @@ public class EPA
         int stopper = 0;
         while (minDistance == Double.POSITIVE_INFINITY) {
             Face minFace = getMinFace(polytope);
+            if (minFace == null) { return new Vector3D(0,0,0); }
             minDistance = minFace.normal().dotProduct(minFace.a());
             minNormal = minFace.normal();
 
@@ -58,12 +60,16 @@ public class EPA
                 List<Face> newFaces = new ArrayList<>();
                 for (int i = 0; i < uniqueEdges.size(); i++) {
                     Line edge = uniqueEdges.get(i);
-                    Face newFace = new Face(edge.p1(), edge.p2(), support);
+                    Face newFace = outwardFace(edge.p1(), edge.p2(), support);
                     newFaces.add(newFace);
                 }
 
                 polytope.vertices.add(support);
                 polytope.faces.addAll(newFaces);
+
+                if (polytope.faces.size() > 256) {
+                    return minNormal.scaled(supportDistance + THRESHOLD);
+                }
             }
             if (stopper == 100) {
                 return Vector3D.UP().scaled(0.01f);
@@ -83,11 +89,6 @@ public class EPA
         for (int i = 0; i < polytope.faces.size(); i++) {
             Face face = polytope.faces.get(i);
             double distance = face.normal().dotProduct(face.a());
-
-            if (distance < 0) {
-                distance *= -1;
-                face.normal().inverted();
-            }
 
             if (distance < minDistance) {
                 minDistance = distance;

@@ -25,14 +25,22 @@ public class Polytope
             vertices.add(c);
             vertices.add(d);
 
-            faces.add(new Face(a,b,c));
-            faces.add(new Face(a,d,b));
-            faces.add(new Face(a,c,d));
-            faces.add(new Face(b,d,c));
+            faces.add(outwardFace(a,b,c));
+            faces.add(outwardFace(a,d,b));
+            faces.add(outwardFace(a,c,d));
+            faces.add(outwardFace(b,d,c));
         }
         catch (NullPointerException e) {
             System.err.println("Polytope: Unable to generate polytope!");
         }
+    }
+
+    static Face outwardFace(Vector3D a, Vector3D b, Vector3D c) {
+        Face f = new Face(a, b, c);
+        if (f.normal().dotProduct(a) < 0) {   // normal points toward origin wound inward
+            return new Face(a, c, b);         // swap b,c to reverse winding
+        }
+        return f;
     }
 
     public void splice(double minIndex, int i, Vector3D support) {
