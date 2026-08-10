@@ -13,13 +13,13 @@ public class OldSchoolFlyingControls extends Controller implements Updatable
 
     private CreativeCamera playerObject;
 
-    private boolean wDown = false;
-    private boolean aDown = false;
-    private boolean sDown = false;
-    private boolean dDown = false;
-    private boolean spaceDown = false;
-    private boolean shiftDown = false;
-    private boolean ctrlDown = false;
+    private volatile boolean wDown = false;
+    private volatile boolean aDown = false;
+    private volatile boolean sDown = false;
+    private volatile boolean dDown = false;
+    private volatile boolean spaceDown = false;
+    private volatile boolean shiftDown = false;
+    private volatile boolean ctrlDown = false;
 
 
     public OldSchoolFlyingControls(SceneRenderer renderer, CreativeCamera playerObject) {

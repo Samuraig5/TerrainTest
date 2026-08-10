@@ -14,7 +14,7 @@ public class Texturizer
                                        int x1, int y1, double u1, double v1, double w1,
                                        int x2, int y2, double u2, double v2, double w2,
                                        int x3, int y3, double u3, double v3, double w3,
-                                       double luminance, BufferedImage sprite)
+                                       double luminance, Rect clip, BufferedImage sprite)
     {
         int spriteWidth = sprite.getWidth()-1;
         int spriteHeigth = sprite.getHeight()-1;
@@ -109,7 +109,7 @@ public class Texturizer
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
                     drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
-                            tex_u,tex_v,tex_w,j,i);
+                            tex_u,tex_v,tex_w,clip,j,i);
                     t += tstep;
                 }
             }
@@ -162,7 +162,7 @@ public class Texturizer
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
                     drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
-                            tex_u,tex_v,tex_w,j,i);
+                            tex_u,tex_v,tex_w,clip,j,i);
 
                     t += tstep;
                 }
@@ -173,9 +173,10 @@ public class Texturizer
     private static void drawTextureToPixel(ScreenBuffer screenBuffer, MTL mtl, double luminance,
                                            BufferedImage sprite, int spriteWidth, int spriteHeight,
                                            double tex_u, double tex_v, double tex_w,
-                                           int j, int i)
+                                           Rect clip, int j, int i)
     {
-
+        //If the pixel isn't within the allowed clip (Raster Tile)
+        if (j < clip.x0() || j >= clip.x1() || i < clip.y0() || i >= clip.y1()) {return;}
         if (screenBuffer.pixelOnTop(j,i,tex_w))
         {
             screenBuffer.updateDepth(j,i,tex_w);

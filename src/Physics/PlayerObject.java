@@ -56,7 +56,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
             momentum = momentum.translated(delta);
         }
         else {
-            momentum.y(Math.max(momentum.y(), 0));
+            momentum = momentum.y(Math.max(momentum.y(), 0));
         }
     }
 

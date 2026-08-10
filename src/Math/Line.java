@@ -34,7 +34,7 @@ public class Line
      */
     public Vector3D getIntersectToPlane(Vector3D planePosition, Vector3D planeNormal)
     {
-        planeNormal.normalized();
+        planeNormal = planeNormal.normalized();
         double plane_d = -planeNormal.dotProduct(planePosition);
         double ad = p1.dotProduct(planeNormal);
         double bd = p2.dotProduct(planeNormal);

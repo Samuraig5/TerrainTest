@@ -1,13 +1,14 @@
 package Engine3d;
 
-import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Rendering.SceneRenderer;
+import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
+import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
 import Math.Raycast.Ray;
-import Engine3d.Model.UnrotatableBox;
 import Math.Raycast.RayCollision;
+import Math.Vector.Vector2D;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
@@ -21,7 +22,6 @@ import Physics.Object3D;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
-import Physics.PlayerObject;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -46,6 +46,7 @@ public class Scene implements Updatable
 
     //Makes sure we can't read game state while it is being written
     private final Object stateLock = new Object();
+    private final TileRasterizer tileRasterizer = new TileRasterizer();
 
     public Scene(Camera camera) {
         this.camera = camera;
@@ -110,14 +111,6 @@ public class Scene implements Updatable
             }
         }
 
-        frame.sort((o1, o2) -> {
-            // Calculate distances to the camera
-            double distance1 = o1.position.distanceTo(camera.getPosition());
-            double distance2 = o2.position.distanceTo(camera.getPosition());
-            // Sort objects by distance (closer first)
-            return Double.compare(distance1, distance2);
-        });
-
         //These values are purely based off the camera.
         //If they change between two objects on the same frame then the objects can "jitter"
         //This is also slightly more efficient.
@@ -127,18 +120,29 @@ public class Scene implements Updatable
         Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);
         Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
 
-
-        frame.parallelStream().forEach(o -> {
-            o.mesh.drawMesh(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources, timeMeasurer);
-            //Legacy code to show where the source of the object is.
-            //Relies on a function in Object3D.
-            // TODO: Add debug showing debugging stuff (eg. Wireframes)
-            /*
-            if (camera.debugging) {
-
-            }
-             */
+        frame.sort((o1, o2) -> {
+            // Calculate distances to the camera
+            double distance1 = o1.position.distanceTo(constCamPos);
+            double distance2 = o2.position.distanceTo(constCamPos);
+            // Sort objects by distance (closer first)
+            return Double.compare(distance1, distance2);
         });
+
+        //Compute Geometry
+        List<Mesh.ProjectedTriangles> geometry = frame.parallelStream()
+                .map(o ->
+            o.mesh.computeGeometry(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources, timeMeasurer))
+                .toList();
+
+        //Rasterize
+        tileRasterizer.render(camera, geometry, backgroundColour);
+
+        /*
+        TODO: Add debug showing debugging stuff (eg. Wireframes)
+        if (camera.debugging) {
+
+        }
+         */
     }
 
     public Camera getCamera() {return camera;}

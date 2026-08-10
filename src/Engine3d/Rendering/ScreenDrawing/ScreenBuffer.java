@@ -1,5 +1,6 @@
 package Engine3d.Rendering.ScreenDrawing;
 
+import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
 
 import java.awt.*;
@@ -17,6 +18,8 @@ public class ScreenBuffer
     {
         recompute(screenSize);
     }
+
+    public Vector2D getSize() { return new Vector2D(bufferedImage.getWidth(), bufferedImage.getHeight()); }
 
     public void clear(int[] clearColour) {
         WritableRaster raster = bufferedImage.getRaster();

@@ -91,14 +91,14 @@ public class PixelDrawer
         }
     }
 
-    public void fillTriangle(ScreenBuffer screenBuffer, MeshTriangle t)
+    public void fillTriangle(ScreenBuffer screenBuffer, Rect clip, MeshTriangle t)
     {
         BufferedImage colour = new BufferedImage(1, 1, TYPE_INT_ARGB);
         colour.setRGB(0,0,t.getMaterial().getShadedColour().getRGB());
-        textureTriangle(screenBuffer, t, colour);
+        textureTriangle(screenBuffer, clip, t, colour);
     }
 
-    public synchronized void textureTriangle(ScreenBuffer screenBuffer, MeshTriangle tri, BufferedImage sprite)
+    public synchronized void textureTriangle(ScreenBuffer screenBuffer, Rect clip, MeshTriangle tri, BufferedImage sprite)
     {
         Vector3D[] points = tri.getPoints();
         Vector2D[] texPoints = tri.getMaterial().getTextureCoords();
@@ -113,6 +113,6 @@ public class PixelDrawer
 
         Texturizer.textureTriangle(screenBuffer,tri.getMaterial().getMTL(),
                 x1,y1,u1,v1,w1,x2,y2,u2,v2,w2,x3,y3,u3,v3,w3,
-                tri.getMaterial().getLuminance(),sprite);
+                tri.getMaterial().getLuminance(),clip,sprite);
     }
 }

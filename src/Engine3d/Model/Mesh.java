@@ -7,7 +7,6 @@ import Math.Vector.Vector3D;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Scalable;
 import Physics.AABBCollisions.AABB;
-import Physics.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Material;
 import Engine3d.Rotatable;
@@ -79,7 +78,8 @@ public class Mesh implements Translatable, Rotatable, Scalable
         }
     }
 
-    public void drawMesh(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
+    public record ProjectedTriangles(List<MeshTriangle> meshTriangles, DrawInstructions drawInstructions) { }
+    public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
     {
         this.tm = tm;
 
@@ -106,37 +106,15 @@ public class Mesh implements Translatable, Rotatable, Scalable
 
             trianglesToRaster = clipAgainstFrustum(camera, trianglesToRaster);
 
-            drawTriangles(camera, trianglesToRaster);
+            return new ProjectedTriangles(trianglesToRaster, drawInstructions);
+
+            //drawTriangles(camera, trianglesToRaster);
 
         } catch (NullPointerException e) {
-            System.err.println("Mesh has a null point and is not drawable");
             //If a point is null, then the mesh is not drawable
-        }
-    }
-
-    /**
-     * Draws the triangles to the screen.
-     * @param camera the camera to which the triangle is drawn.
-     * @param triangles the list of triangles to be drawn.
-     */
-    private void drawTriangles(Camera camera, List<MeshTriangle> triangles) {
-        for (MeshTriangle triToDraw : triangles)
-        {
-            if (drawInstructions.drawWireFrame) {
-                camera.drawer.drawTriangle(drawInstructions.wireFrameColour, triToDraw, drawInstructions.ignorePixelDepth);
-            }
-            if (drawInstructions.drawFlatColour) {
-                if (triToDraw.getMaterial().getBaseColour().getAlpha() > 0) {
-                    camera.drawer.fillTriangle(triToDraw);
-                }
-            }
-            else if (drawInstructions.drawTexture) {
-                if ((triToDraw.getMaterial().getTexture() != null)) {
-                    tm.startMeasurement("Texturizer");
-                    camera.drawer.textureTriangle(triToDraw);
-                    tm.pauseMeasurement("Texturizer");
-                }
-            }
+            System.err.println("Mesh has a null point and is not drawable");
+            //return an empty raster instruction
+            return new ProjectedTriangles(new ArrayList<>(), drawInstructions);
         }
     }
 

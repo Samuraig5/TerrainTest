@@ -54,17 +54,16 @@ public class Drawer
         drawLine(c,depthPoints[2],depthPoints[0], checkDepth);
     }
 
-    public void fillTriangle(MeshTriangle t)
+    public void fillTriangle(MeshTriangle t, Rect clip)
     {
-        p.fillTriangle(camera.getScreenBuffer(), t);
+        p.fillTriangle(camera.getScreenBuffer(), clip, t);
     }
 
-    public void textureTriangle(MeshTriangle tri)
-    {
+    public void textureTriangle(MeshTriangle tri, Rect clip) {
         BufferedImage sprite = tri.getMaterial().getTexture();
         if (sprite == null) {System.err.println("Drawer: Triangle doesn't have a texture!"); return;}
 
-        p.textureTriangle(camera.getScreenBuffer(),tri,sprite);
+        p.textureTriangle(camera.getScreenBuffer(),clip,tri,sprite);
     }
 
     public static Color getColourShade(Color baseColor, double luminance) {
