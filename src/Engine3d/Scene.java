@@ -9,6 +9,7 @@ import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
 import Math.Raycast.Ray;
 import Math.Raycast.RayCollision;
 import Math.Vector.Vector2D;
+import Physics.AABBCollisions.AABB;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
@@ -233,5 +234,12 @@ public class Scene implements Updatable
         mesh.setDrawInstructions(new DrawInstructions(true,false,false,false));
 
         objects.add(marker);
+    }
+
+    public boolean boxOnGround(AABB probe) {
+        for (StaticAABBObject s : staticAABBObjects) {
+            if (s.getAABBCollider().getAABB().overlaps(probe)) return true;
+        }
+        return false;
     }
 }

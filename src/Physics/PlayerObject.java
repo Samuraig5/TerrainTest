@@ -1,13 +1,12 @@
 package Physics;
 
-import Engine3d.Model.Mesh;
 import Engine3d.Rendering.Camera;
 import Math.Box;
 import Math.Matrix4x4;
 import Math.Raycast.Ray;
 import Engine3d.Model.UnrotatableBox;
 import Math.Raycast.RayCollision;
-import Physics.AABBCollisions.AABBObject;
+import Physics.AABBCollisions.AABB;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
@@ -23,6 +22,8 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     private final Vector3D cameraOffset = new Vector3D(0,1.5,0);
     private Camera camera;
     private Vector3D momentum = new Vector3D(0,0,0);
+    private volatile boolean grounded = false;
+    private volatile long lastGroundedNanos = 0;
 
     public PlayerObject(Scene scene, PlayerCamera camera)
     {
@@ -41,8 +42,14 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     @Override
     public void onCollision(Vector3D appliedMove) {
-
+        if (appliedMove.magnitude() == 0) return;
+        Vector3D n = appliedMove.normalized();
+        double into = momentum.dotProduct(n);   // negative = moving into the surface
+        if (into < 0) {
+            momentum = new Vector3D(momentum.x() * 0.8, Math.max(momentum.y(), 0), momentum.z() * 0.8);
+        }
     }
+
     public Vector3D getCameraOffset() {
         return cameraOffset;
     }
@@ -62,39 +69,18 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     @Override
     public boolean isGrounded() {
+        return grounded;
+    }
 
-        float RAY_SIZE = 0.25f;
+    private static final double SKIN = 0.1, INSET = 0.05;
 
-        Vector3D corner1 = new Vector3D(-SIZE.x()/2, -0.1 , -SIZE.z()/2);
-        Vector3D corner2 = new Vector3D(SIZE.x()/2, -0.1 , SIZE.z()/2);
-        Vector3D corner3 = new Vector3D(SIZE.x()/2, -0.1 , -SIZE.z()/2);
-        Vector3D corner4 = new Vector3D(-SIZE.x()/2, -0.1 , SIZE.z()/2);
-
-        Vector3D pos = getPosition();
-        //pos.translate(Vector3D.UP().scaled(RAY_SIZE)); //First ray will hit the bottom of the player hitbox
-
-        Ray ray0 = new Ray(this, pos , Vector3D.DOWN().scaled(RAY_SIZE));
-        boolean res0 = getScene().checkForCollision(3, ray0);
-        if (res0) {return true;}
-
-        Ray ray1 = new Ray(this, pos.translated(corner1) , Vector3D.DOWN().scaled(RAY_SIZE));
-        boolean res1 = getScene().checkForCollision(3, ray1);
-        if (res1) {return true;}
-
-        Ray ray2 = new Ray(this, pos.translated(corner2) , Vector3D.DOWN().scaled(RAY_SIZE));
-        boolean res2 = getScene().checkForCollision(3, ray2);
-        if (res2) {return true;}
-
-        Ray ray3 = new Ray(this, pos.translated(corner3) , Vector3D.DOWN().scaled(RAY_SIZE));
-        boolean res3 = getScene().checkForCollision(3, ray3);
-        if (res3) {return true;}
-
-        Ray ray4 = new Ray(this, pos.translated(corner4) , Vector3D.DOWN().scaled(RAY_SIZE));
-        boolean res4 = getScene().checkForCollision(3, ray4);
-        if (res4) {return true;}
-
-        //System.out.println(false);
-        return false;
+    private void updateGrounded() {
+        AABB b = getAABBCollider().getAABB();
+        AABB probe = new AABB(
+                new Vector3D(b.min().x()+INSET, b.min().y()-SKIN, b.min().z()+INSET),
+                new Vector3D(b.max().x()-INSET, b.min().y(),      b.max().z()-INSET));
+        grounded = getScene().boxOnGround(probe);
+        if (grounded) lastGroundedNanos = System.nanoTime();
     }
 
     @Override
@@ -146,6 +132,8 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     @Override
     public void update(double deltaTime) {
+        updateGrounded();
+        tryJump();
         translate(momentum);
     }
 
@@ -177,4 +165,21 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         return minPoint;
     }
 
+    // PlayerObject:
+    private volatile long lastJumpRequestNanos = 0;
+    public void requestJump() { lastJumpRequestNanos = System.nanoTime(); }
+
+    private static final long COYOTE = 100_000_000L;  // 100 ms
+    private static final long BUFFER = 100_000_000L;
+
+    private void tryJump() {
+        long now = System.nanoTime();
+        boolean recentlyGrounded = now - lastGroundedNanos < COYOTE;   // coyote time
+        boolean bufferedPress   = now - lastJumpRequestNanos < BUFFER; // jump buffering
+        if (recentlyGrounded && bufferedPress) {
+            addMomentum(Vector3D.UP().scaled(0.35f));
+            lastJumpRequestNanos = 0;   // consume it
+            lastGroundedNanos = 0;      // prevent double-jump
+        }
+    }
 }

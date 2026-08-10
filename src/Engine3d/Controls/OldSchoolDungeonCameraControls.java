@@ -77,7 +77,11 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
         if (wDown) {transDelta = transDelta.translated(new Vector3D(0, 0, adjStepSize));}
         if (sDown) {transDelta = transDelta.translated(new Vector3D(0, 0, -adjStepSize));}
-        //if (spaceDown) {transDelta = transDelta.translate(new Vector3D(0, adjStepSize, 0));}
+        if (spaceDown) {
+            if (playerObject.isGrounded()) {
+                playerObject.requestJump();
+            }
+        }
         if (shiftDown) {transDelta = transDelta.translated(new Vector3D(0, -adjStepSize, 0));}
         if (aDown) {transDelta = transDelta.translated(new Vector3D(adjStepSize, 0, 0));}
         if (dDown) {transDelta = transDelta.translated(new Vector3D(-adjStepSize, 0, 0));}
@@ -102,19 +106,13 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
     @Override
     public void keyPressed(KeyEvent e) {
-        Vector3D adjJump = Vector3D.UP().scaled(jumpStrength);
 
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W -> wDown = true;
             case KeyEvent.VK_A -> aDown = true;
             case KeyEvent.VK_S -> sDown = true;
             case KeyEvent.VK_D -> dDown = true;
-            case KeyEvent.VK_SPACE -> {
-                spaceDown = true;
-                if (playerObject.isGrounded()) {
-                    playerObject.addMomentum(adjJump);
-                }
-            }
+            case KeyEvent.VK_SPACE -> spaceDown = true;
             case KeyEvent.VK_SHIFT -> shiftDown = true;
             case KeyEvent.VK_CONTROL -> ctrlDown = true;
             case KeyEvent.VK_ESCAPE -> {

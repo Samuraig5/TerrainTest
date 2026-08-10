@@ -236,7 +236,7 @@ public class GJK
         int iterations = 0;
         while (true)
         {
-            if (++iterations > 32) return null;   // give up -> treat as "no collision this frame"
+            if (++iterations > 512) return null;   // give up -> treat as "no collision this frame"
 
             simplex.shiftBack();
             simplex.a(calculateNewVertex(ver1, ver2, dir));
