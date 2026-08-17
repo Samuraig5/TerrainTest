@@ -78,8 +78,7 @@ public class Texturizer
 
         if (dy1 != 0)
         {
-            for (int i = y1; i <= y2; i++)
-            {
+            for (int i = Math.max(y1, clip.y0()); i <= Math.min(y2, clip.y1()-1); i++) {
                 int ax = (int) (x1 + (double)(i - y1) * dax_step);
                 int bx = (int) (x1 + (double)(i - y1) * dbx_step);
 
@@ -99,11 +98,12 @@ public class Texturizer
                     tempd = tex_sw; tex_sw = tex_ew; tex_ew = tempd;
                 }
 
-                double tstep = 1.0f / ((double)(bx - ax));
-                double t = 0.0f;
+                double tstep = 1.0 / (bx - ax);
+                int sx = Math.max(ax, clip.x0());
+                int ex = Math.min(bx, clip.x1());
+                double t = (sx - ax) * tstep;
 
-                for (int j = ax; j < bx; j++)
-                {
+                for (int j = sx; j < ex; j++) {
                     tex_u = (1.0f - t) * tex_su + t * tex_eu;
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
@@ -131,8 +131,7 @@ public class Texturizer
 
         if (dy1 != 0)
         {
-            for (int i = y2; i <= y3; i++)
-            {
+            for (int i = Math.max(y2, clip.y0()); i <= Math.min(y3, clip.y1()-1); i++) { //Clipping loop to only cover RasterTile
                 int ax = (int) (x2 + (double)(i - y2) * dax_step);
                 int bx = (int) (x1 + (double)(i - y1) * dbx_step);
 
@@ -153,9 +152,11 @@ public class Texturizer
                 }
 
                 double tstep = 1.0f / ((double)(bx - ax));
-                double t = 0.0f;
+                int sx = Math.max(ax, clip.x0());
+                int ex = Math.min(bx, clip.x1());
+                double t = (sx - ax) * tstep;      // ← pre-advance so texels line up across tile
 
-                for (int j = ax; j < bx; j++)
+                for (int j = sx; j < ex; j++)
                 {
                     tex_u = (1.0f - t) * tex_su + t * tex_eu;
                     tex_v = (1.0f - t) * tex_sv + t * tex_ev;
