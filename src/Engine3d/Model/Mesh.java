@@ -92,12 +92,20 @@ public class Mesh implements Translatable, Rotatable, Scalable
             );
             result = transform(worldTransform, result.copiedPoints, result.copiedFaces);
 
+            // --- Backface cull (world space): keep only triangles facing the camera ---
+            List<MeshTriangle> visible = new ArrayList<>();
+            for (MeshTriangle tri : result.copiedFaces()) {
+                Vector3D n = tri.getNormal();
+                Vector3D camRay = tri.getPoints()[0].translated(cameraPos.inverted());  // point - camera
+                if (n.dotProduct(camRay) < 0) visible.add(tri);   // front-facing → keep
+            }
+
             if (drawInstructions.doShading) {
-                calculateLuminance(cameraPos, lightSources, result.copiedFaces());
+                calculateLuminance(cameraPos, lightSources, visible);
             }
 
             tm.startMeasurement("ObjWorldToScreen");
-            result = transform(viewMatrix, result.copiedPoints, result.copiedFaces);
+            result = transform(viewMatrix, result.copiedPoints, visible);
             tm.pauseMeasurement("ObjWorldToScreen");
 
             List<MeshTriangle> trianglesToRaster = clipAgainstNearPlane(camera, result.copiedFaces());

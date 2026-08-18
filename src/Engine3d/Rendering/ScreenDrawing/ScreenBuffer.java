@@ -5,7 +5,10 @@ import Math.Vector.Vector3D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.awt.image.WritableRaster;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
@@ -13,10 +16,29 @@ public class ScreenBuffer
 {
     private BufferedImage bufferedImage;
     private double[][] depthBuffer;
+    private static final Map<BufferedImage, int[]> SPRITE_CACHE = new ConcurrentHashMap<>();
 
     public ScreenBuffer(Vector3D screenSize)
     {
         recompute(screenSize);
+    }
+
+    public int[] colourArray() {
+        return ((DataBufferInt)bufferedImage.getRaster().getDataBuffer()).getData();
+    }
+    public double[][] depthArray() {
+        return depthBuffer;
+    }
+    public int width() {
+        return bufferedImage.getWidth();
+    }
+    public int height() {
+        return bufferedImage.getHeight();
+    }
+
+    static int[] spritePixels(BufferedImage img) {
+        return SPRITE_CACHE.computeIfAbsent(img,
+                im -> im.getRGB(0,0, im.getWidth(), im.getHeight(), null, 0, im.getWidth()));
     }
 
     public Vector2D getSize() { return new Vector2D(bufferedImage.getWidth(), bufferedImage.getHeight()); }
@@ -102,5 +124,19 @@ public class ScreenBuffer
                 color.getBlue(),   // Extract blue component (0-255)
                 color.getAlpha()   // Extract alpha component (0-255)
         };
+    }
+
+    static int mul(int c1, int c2) {                 // per-channel multiply
+        int r = (((c1>>16)&0xff) * ((c2>>16)&0xff) + 127) / 255;
+        int g = (((c1>>8) &0xff) * ((c2>>8) &0xff) + 127) / 255;
+        int b = (( c1     &0xff) * ( c2     &0xff) + 127) / 255;
+        return 0xff000000 | (r<<16) | (g<<8) | b;
+    }
+    static int shade(int c, double lum) {            // luminance, clamped
+        lum = Math.max(Drawer.SHADING_HARSHNESS, Math.min(1, lum));
+        int r = (int)(((c>>16)&0xff) * lum);
+        int g = (int)(((c>>8) &0xff) * lum);
+        int b = (int)(( c     &0xff) * lum);
+        return 0xff000000 | (r<<16) | (g<<8) | b;
     }
 }

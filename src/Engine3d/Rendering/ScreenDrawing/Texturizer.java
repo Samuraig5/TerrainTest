@@ -6,6 +6,7 @@ import Engine3d.Rendering.ScreenDrawing.Drawer;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import static Engine3d.Rendering.ScreenDrawing.ScreenBuffer.*;
 import static java.lang.Math.abs;
 
 public class Texturizer
@@ -16,6 +17,13 @@ public class Texturizer
                                        int x3, int y3, double u3, double v3, double w3,
                                        double luminance, Rect clip, BufferedImage sprite)
     {
+        int[] color = screenBuffer.colourArray();
+        double[][] depth = screenBuffer.depthArray();
+        int W = screenBuffer.width(), H = screenBuffer.height();
+        int[] tex = spritePixels(sprite);
+        int texW = sprite.getWidth(), texH = sprite.getHeight();
+        int diffuse = mtl.getDiffuseColour().getRGB();     // packed once, not per pixel
+
         int spriteWidth = sprite.getWidth()-1;
         int spriteHeigth = sprite.getHeight()-1;
 
@@ -104,12 +112,25 @@ public class Texturizer
                 double t = (sx - ax) * tstep;
 
                 for (int j = sx; j < ex; j++) {
-                    tex_u = (1.0f - t) * tex_su + t * tex_eu;
-                    tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-                    drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
-                            tex_u,tex_v,tex_w,clip,j,i);
+                    if (tex_w > depth[j][i]) {                          // depth test (in bounds by clamp)
+                        depth[j][i] = tex_w;
+
+                        tex_u = (1.0f - t) * tex_su + t * tex_eu;
+                        tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+
+                        double uu = ((tex_u/tex_w) % 1 + 1) % 1;
+                        double vv = ((tex_v/tex_w) % 1 + 1) % 1;
+                        int texel = tex[(int)(vv*(texH-1)) * texW + (int)(uu*(texW-1))];
+                        if ((texel >>> 24) != 0) {                      // skip fully-transparent texels
+                            int argb = shade(mul(texel, diffuse), luminance);
+                            color[(H - 1 - i) * W + j] = argb;
+                        }
+                    }
+
+                    //drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
+                    //        tex_u,tex_v,tex_w,clip,j,i);
                     t += tstep;
                 }
             }
@@ -158,12 +179,25 @@ public class Texturizer
 
                 for (int j = sx; j < ex; j++)
                 {
-                    tex_u = (1.0f - t) * tex_su + t * tex_eu;
-                    tex_v = (1.0f - t) * tex_sv + t * tex_ev;
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
-                    drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
-                            tex_u,tex_v,tex_w,clip,j,i);
+                    if (tex_w > depth[j][i]) {                          // depth test (in bounds by clamp)
+                        depth[j][i] = tex_w;
+
+                        tex_u = (1.0f - t) * tex_su + t * tex_eu;
+                        tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+
+                        double uu = ((tex_u/tex_w) % 1 + 1) % 1;
+                        double vv = ((tex_v/tex_w) % 1 + 1) % 1;
+                        int texel = tex[(int)(vv*(texH-1)) * texW + (int)(uu*(texW-1))];
+                        if ((texel >>> 24) != 0) {                      // skip fully-transparent texels
+                            int argb = shade(mul(texel, diffuse), luminance);
+                            color[(H - 1 - i) * W + j] = argb;
+                        }
+                    }
+
+                    //drawTextureToPixel(screenBuffer,mtl,luminance,sprite,spriteWidth,spriteHeigth,
+                    //        tex_u,tex_v,tex_w,clip,j,i);
 
                     t += tstep;
                 }
