@@ -1,15 +1,18 @@
 package Engine3d;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import Engine3d.DevTools.Profiler;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Rendering.SceneRenderer;
-import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
 import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
 import Math.Raycast.Ray;
 import Math.Raycast.RayCollision;
-import Math.Vector.Vector2D;
+import Math.Raycast.RayTriangle;
 import Physics.AABBCollisions.AABB;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
@@ -19,16 +22,12 @@ import Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Math.Matrix4x4;
 import Math.Vector.Vector3D;
+import Math.MeshTriangle;
 import Engine3d.Model.ObjParser;
 import Physics.Object3D;
 import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Scene implements Updatable
 {
@@ -246,5 +245,18 @@ public class Scene implements Updatable
             if (s.getAABBCollider().getAABB().overlaps(probe)) return true;
         }
         return false;
+    }
+
+    public double groundDistanceBelow(Vector3D origin) {
+        Vector3D dir = Vector3D.DOWN();     // unit, so the result is a real distance
+        double best = Double.POSITIVE_INFINITY;
+        for (StaticAABBObject s : staticAABBObjects) {
+            for (MeshTriangle tri : s.getMesh().getFacesInWorld(s.getPosition(), s.getRotation())) {
+                Vector3D[] p = tri.getPoints();
+                double t = RayTriangle.intersect(origin, dir, p[0], p[1], p[2]);
+                if (!Double.isNaN(t) && t < best) best = t;
+            }
+        }
+        return best;
     }
 }

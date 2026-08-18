@@ -18,13 +18,17 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 {
     private Vector3D SIZE = new Vector3D(1, 1.8, 1);
     private Vector3D position = new Vector3D(0,0,0);
-    private Vector3D rotation = new Vector3D(0,0,0);
+    private Vector3D rotation = new Vector3D(0,0,0); //BODY: yaw only
+    private double pitch = 0; //LOOK: up/down, camera only
     private final Vector3D cameraOffset = new Vector3D(0,1.5,0);
     private Camera camera;
     private Vector3D momentum = new Vector3D(0,0,0);
     private volatile boolean grounded = false;
     private volatile long lastGroundedNanos = 0;
 
+    private static final double PROBE_UP = 0.5;   // start the ray above the feet
+    private static final double SKIN     = 0.15;  // grounded if surface is within this of the
+    private static final double INSET = 0.05;
     public PlayerObject(Scene scene, PlayerCamera camera)
     {
         super(scene);
@@ -72,31 +76,32 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         return grounded;
     }
 
-    private static final double SKIN = 0.1, INSET = 0.05;
-
     private void updateGrounded() {
-        AABB b = getAABBCollider().getAABB();
-        AABB probe = new AABB(
-                new Vector3D(b.min().x()+INSET, b.min().y()-SKIN, b.min().z()+INSET),
-                new Vector3D(b.max().x()-INSET, b.min().y(),      b.max().z()-INSET));
-        grounded = getScene().boxOnGround(probe);
+        double hx = SIZE.x()/2 - INSET, hz = SIZE.z()/2 - INSET;
+        Vector3D up = Vector3D.UP().scaled(PROBE_UP);
+        Vector3D p  = getPosition();
+
+        Vector3D[] offsets = {
+                new Vector3D(0, 0, 0),
+                new Vector3D( hx, 0,  hz), new Vector3D( hx, 0, -hz),
+                new Vector3D(-hx, 0,  hz), new Vector3D(-hx, 0, -hz),
+        };
+
+        double dist = Double.POSITIVE_INFINITY;
+        for (Vector3D off : offsets) {
+            Vector3D origin = p.translated(off).translated(up);
+            dist = Math.min(dist, getScene().groundDistanceBelow(origin));
+        }
+
+        grounded = dist <= PROBE_UP + SKIN;
         if (grounded) lastGroundedNanos = System.nanoTime();
     }
 
     @Override
     public void rotate(Vector3D delta) {
-        Vector3D newRot = rotation.translated(delta);
-
-        double maxPitch = Math.toRadians(89);
-        double minPitch = Math.toRadians(-89);
-
-        newRot = new Vector3D(
-                Math.max(minPitch, Math.min(maxPitch, newRot.x())),
-                newRot.y(),
-                newRot.z()
-        );
-
-        rotation = newRot;
+        double maxPitch = Math.toRadians(89), minPitch = Math.toRadians(-89);
+        pitch = Math.max(minPitch, Math.min(maxPitch, pitch + delta.x()));
+        rotation = new Vector3D(0, rotation.y() + delta.y(), 0);   // yaw accumulates, no pitch/roll
     }
 
     @Override
@@ -108,6 +113,8 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     public Vector3D getDirection() {
         return Matrix4x4.get3dRotationMatrix(rotation).matrixVectorMultiplication(Vector3D.FORWARD());
     }
+
+    public Vector3D getLookRotation() { return new Vector3D(pitch, rotation.y(), 0); }
 
     @Override
     public void translate(Vector3D delta) {

@@ -45,6 +45,6 @@ public class PlayerCamera extends Camera {
             //System.err.println("PlayerCamera: No PlayerObject is set!");
             return new Vector3D(0,0,0);
         }
-        return playerObject.getRotation();
+        return playerObject.getLookRotation();
     }
 }

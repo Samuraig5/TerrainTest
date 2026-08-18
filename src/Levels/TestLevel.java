@@ -1,6 +1,7 @@
 package Levels;
 
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
+import Math.Raycast.RayTriangle;
 import Physics.PlayerObject;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
@@ -60,17 +61,19 @@ public class TestLevel extends Scene
         String lightMoss = "Resources/Textures/StoneBrickWallLightlyMossy.png";
         String heavyMoss = "Resources/Textures/StoneBrickWallHeavilyMossy.png";
         String grime = "Resources/Textures/Grime Top.png";
+        String crimson = "Resources/Textures/Crimson Nylium.png";
 
         try {
             BufferedImage stoneImg = ImageIO.read(new File(stone));
             BufferedImage lightMossImg = ImageIO.read(new File(lightMoss));
             BufferedImage heavyMossImg = ImageIO.read(new File(heavyMoss));
             BufferedImage grimeImg = ImageIO.read(new File(grime));
+            BufferedImage cimsonImg = ImageIO.read(new File(crimson));
 
             double roomSize = 50;
             double wallHeight = 4;
 
-            StaticAABBObject ground = spawnWall(stoneImg, new Vector3D(roomSize*2,1,roomSize*2));
+            StaticAABBObject ground = spawnWall(cimsonImg, new Vector3D(roomSize*2,1,roomSize*2));
             ground.translate(Vector3D.DOWN().scaled(0.5));
 
 
