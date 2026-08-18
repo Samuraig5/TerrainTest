@@ -1,5 +1,6 @@
 package Engine3d;
 
+import Engine3d.DevTools.Profiler;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
@@ -95,8 +96,7 @@ public class Scene implements Updatable
     }
 
     record RenderItem(Mesh mesh, Vector3D position, Vector3D rotation) {}
-    public void buildScreenBuffer()
-    {
+    public void buildScreenBuffer() {
         camera.getScreenBuffer().clear(backgroundColour);
 
         List<RenderItem> frame;
@@ -130,13 +130,18 @@ public class Scene implements Updatable
         });
 
         //Compute Geometry
-        List<Mesh.ProjectedTriangles> geometry = frame.parallelStream()
-                .map(o ->
-            o.mesh.computeGeometry(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources, timeMeasurer))
-                .toList();
+        List<Mesh.ProjectedTriangles> geometry;
+        try (Profiler.Span s = Profiler.span("geometry")) {
+            geometry = frame.parallelStream()
+                    .map(o ->
+                            o.mesh.computeGeometry(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources, timeMeasurer))
+                    .toList();
+        }
 
         //Rasterize
-        tileRasterizer.render(camera, geometry, backgroundColour);
+        try (Profiler.Span s = Profiler.span("raster")) {
+            tileRasterizer.render(camera, geometry, backgroundColour);
+        }
 
         /*
         TODO: Add debug showing debugging stuff (eg. Wireframes)

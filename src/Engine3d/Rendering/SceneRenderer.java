@@ -1,5 +1,6 @@
 package Engine3d.Rendering;
 
+import Engine3d.DevTools.Profiler;
 import Engine3d.Scene;
 import Math.Vector.Vector3D;
 import Engine3d.Time.TimeMeasurer;
@@ -76,6 +77,11 @@ public class SceneRenderer extends JPanel
         activeScene.getCamera().drawScreenBuffer(g); //This is the only non-UI call :helenaPepe:
 
         g.setColor(Color.white);
+        g.drawString("Buffers/s: " + timeMeasurer.getCyclesPerSecond("buildScreenBuffer"), 20, 70);
+        g.drawString(String.format("geometry: %.2f ms", Profiler.ms("geometry")), 20, 90);
+        g.drawString(String.format("raster:   %.2f ms", Profiler.ms("raster")),   20, 110);
+
+        /*
         int screenWidth = (int) activeScene.getCamera().getScreenDimensions().x() - 20;
         String s = "Cam Pos: " + activeScene.getCamera().getPosition().toStringRounded();
         int sWidth = g.getFontMetrics().stringWidth(s);
@@ -111,6 +117,7 @@ public class SceneRenderer extends JPanel
             g.drawString(err, (int) cursorPos.x(), (int) cursorPos.y());
             cursorPos = cursorPos.translated(errorPosDelta);
         }
+         */
     }
 
     public void logError(String message) {
