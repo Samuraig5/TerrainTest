@@ -25,7 +25,6 @@ import Math.Vector.Vector3D;
 import Math.MeshTriangle;
 import Engine3d.Model.ObjParser;
 import Physics.Object3D;
-import Engine3d.Time.TimeMeasurer;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
 
@@ -35,7 +34,6 @@ public class Scene implements Updatable
     Camera camera;
     final SceneRenderer sceneRenderer = new SceneRenderer();
     protected Color backgroundColour = Color.BLACK;
-    private TimeMeasurer timeMeasurer;
     protected List<Object3D> objects = new CopyOnWriteArrayList<>();
     List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 1d;
@@ -133,7 +131,7 @@ public class Scene implements Updatable
         try (Profiler.Span s = Profiler.span("geometry")) {
             geometry = frame.parallelStream()
                     .map(o ->
-                            o.mesh.computeGeometry(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources, timeMeasurer))
+                            o.mesh.computeGeometry(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources))
                     .toList();
         }
 
@@ -152,9 +150,6 @@ public class Scene implements Updatable
 
     public Camera getCamera() {return camera;}
 
-    public void addTimeMeasurer(TimeMeasurer tm) {
-        this.timeMeasurer = tm;
-    }
     public void addLight(LightSource lightSource) {
         lightSources.add(lightSource);
     }
@@ -179,26 +174,26 @@ public class Scene implements Updatable
                 updatable.update(deltaTime);
             }
 
-            timeMeasurer.startMeasurement("applyGravity");
-            for (Gravitational grav : gravitationals) {
-                grav.applyGravity(gravity, deltaTime);
+            try (Profiler.Span s = Profiler.span("applyGravity")) {
+                for (Gravitational grav : gravitationals) {
+                    grav.applyGravity(gravity, deltaTime);
+                }
             }
-            timeMeasurer.pauseAndEndMeasurement("applyGravity");
 
-            timeMeasurer.startMeasurement("handleCollision");
-            for (int i = 0; i < dynamicAABBObjects.size(); i++) {
-                for (int j = 0; j < staticAABBObjects.size(); j++) {
-                    dynamicAABBObjects.get(i).
-                            getAABBCollider().handleCollision(
-                                    staticAABBObjects.get(j).getAABBCollider());
-                }
-                for (int j = i+1; j < dynamicAABBObjects.size(); j++) {
-                    dynamicAABBObjects.get(i).
-                            getAABBCollider().handleCollision(
-                                    dynamicAABBObjects.get(j).getAABBCollider());
+            try (Profiler.Span s = Profiler.span("handleCollision")) {
+                for (int i = 0; i < dynamicAABBObjects.size(); i++) {
+                    for (int j = 0; j < staticAABBObjects.size(); j++) {
+                        dynamicAABBObjects.get(i).
+                                getAABBCollider().handleCollision(
+                                        staticAABBObjects.get(j).getAABBCollider());
+                    }
+                    for (int j = i+1; j < dynamicAABBObjects.size(); j++) {
+                        dynamicAABBObjects.get(i).
+                                getAABBCollider().handleCollision(
+                                        dynamicAABBObjects.get(j).getAABBCollider());
+                    }
                 }
             }
-            timeMeasurer.pauseAndEndMeasurement("handleCollision");
         }
     }
 

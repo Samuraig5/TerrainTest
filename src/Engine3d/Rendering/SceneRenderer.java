@@ -3,7 +3,6 @@ package Engine3d.Rendering;
 import Engine3d.DevTools.Profiler;
 import Engine3d.Scene;
 import Math.Vector.Vector3D;
-import Engine3d.Time.TimeMeasurer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +17,6 @@ public class SceneRenderer extends JPanel
     private long lastTime;
 
     private Scene activeScene;
-    private TimeMeasurer timeMeasurer;
     Vector3D errorMessagePos;
     Vector3D errorPosDelta = new Vector3D(0, 20, 0);
     List<String> errors = new ArrayList<>();
@@ -39,10 +37,7 @@ public class SceneRenderer extends JPanel
     }
 
     public void setActiveScene(Scene activeScene) {
-        timeMeasurer = new TimeMeasurer();
-
         this.activeScene = activeScene;
-        activeScene.addTimeMeasurer(timeMeasurer);
 
         errorMessagePos = new Vector3D(20, activeScene.getCamera().getScreenDimensions().y()/2,0);
 
@@ -69,17 +64,19 @@ public class SceneRenderer extends JPanel
 
     private void paintActiveScene(Graphics g)
     {
-        timeMeasurer.pauseAndEndMeasurement("frameTime");
-        timeMeasurer.addCycle("frameTime");
-        long frameTime = timeMeasurer.getMeasurement("frameTime");
-        timeMeasurer.startMeasurement("frameTime");
-
         activeScene.getCamera().drawScreenBuffer(g); //This is the only non-UI call :helenaPepe:
 
         g.setColor(Color.white);
-        g.drawString("Buffers/s: " + timeMeasurer.getCyclesPerSecond("buildScreenBuffer"), 20, 70);
-        g.drawString(String.format("geometry: %.2f ms", Profiler.ms("geometry")), 20, 90);
-        g.drawString(String.format("raster:   %.2f ms", Profiler.ms("raster")),   20, 110);
+
+        g.drawString("Buffers/s: " + Math.round(Profiler.rate("buffers")), 20, 40);
+        g.drawString(String.format("build: %.2f ms", Profiler.ms("buildScreenBuffer")), 20, 60);
+        g.drawString(String.format("  geometry: %.2f ms", Profiler.ms("geometry")), 30, 78);
+        g.drawString(String.format("  raster:   %.2f ms", Profiler.ms("raster")),   30, 96);
+
+        g.drawString("Updates/s: " + Math.round(Profiler.rate("updates")), 20, 130);
+        g.drawString(String.format("update: %.2f ms", Profiler.ms("update")), 20, 150);
+        g.drawString(String.format("  applyGravity:    %.2f ms", Profiler.ms("applyGravity")),    30, 168);
+        g.drawString(String.format("  handleCollision: %.2f ms", Profiler.ms("handleCollision")), 30, 186);
 
         /*
         int screenWidth = (int) activeScene.getCamera().getScreenDimensions().x() - 20;
@@ -145,16 +142,10 @@ public class SceneRenderer extends JPanel
         bufferThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 if (activeScene != null) {
-                    timeMeasurer.startMeasurement("buildScreenBuffer");
-                    activeScene.buildScreenBuffer();
-                    timeMeasurer.pauseAndEndMeasurement("buildScreenBuffer");
-                    timeMeasurer.addCycle("buildScreenBuffer");
-
-                    timeMeasurer.endMeasurement("Get Matrices");
-                    timeMeasurer.endMeasurement("ObjWorldToScreen");
-                    timeMeasurer.endMeasurement("Lighting");
-                    timeMeasurer.endMeasurement("TriangleClipping");
-                    timeMeasurer.endMeasurement("Texturizer");
+                    try (Profiler.Span s = Profiler.span("buildScreenBuffer")) {
+                        activeScene.buildScreenBuffer();
+                    }
+                    Profiler.count("buffers");
 
                     synchronized (activeScene.getCamera()) {
                         activeScene.getCamera().swapBuffers();
@@ -181,10 +172,10 @@ public class SceneRenderer extends JPanel
             while (running) {
                 try {
                     if (activeScene != null) {
-                        timeMeasurer.startMeasurement("update");
-                        activeScene.update(deltaTime()); // Update game logic
-                        timeMeasurer.pauseAndEndMeasurement("update");
-                        timeMeasurer.addCycle("update");
+                        try (Profiler.Span s = Profiler.span("update")) {
+                            activeScene.update(deltaTime()); // Update game logic
+                        }
+                        Profiler.count("updates");
                     }
                 }
                 catch (Exception e) {

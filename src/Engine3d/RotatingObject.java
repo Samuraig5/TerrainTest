@@ -1,6 +1,6 @@
-package Engine3d.Time;
+package Engine3d;
 
-import Engine3d.Scene;
+import Engine3d.Time.Updatable;
 import Physics.Object3D;
 import Math.Vector.Vector3D;
 

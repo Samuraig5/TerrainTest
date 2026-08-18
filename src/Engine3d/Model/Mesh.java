@@ -10,7 +10,6 @@ import Physics.AABBCollisions.AABB;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Material;
 import Engine3d.Rotatable;
-import Engine3d.Time.TimeMeasurer;
 import Engine3d.Translatable;
 
 import java.util.*;
@@ -23,7 +22,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
     protected List<MeshTriangle> faces = new CopyOnWriteArrayList<>();
     protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
     protected Vector3D meshOffset = new Vector3D(0,0,0,1);
-    private TimeMeasurer tm = new TimeMeasurer();
     private record copyPnF(List<Vector3D> copiedPoints, List<MeshTriangle> copiedFaces) { }
     private DrawInstructions drawInstructions;
     public Mesh() {
@@ -79,10 +77,9 @@ public class Mesh implements Translatable, Rotatable, Scalable
     }
 
     public record ProjectedTriangles(List<MeshTriangle> meshTriangles, DrawInstructions drawInstructions) { }
-    public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos, Matrix4x4 viewMatrix, List<LightSource> lightSources, TimeMeasurer tm)
+    public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos,
+                                              Matrix4x4 viewMatrix, List<LightSource> lightSources)
     {
-        this.tm = tm;
-
         try {
             copyPnF result = getCopyPnF();
 
@@ -104,9 +101,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
                 calculateLuminance(cameraPos, lightSources, visible);
             }
 
-            tm.startMeasurement("ObjWorldToScreen");
             result = transform(viewMatrix, result.copiedPoints, visible);
-            tm.pauseMeasurement("ObjWorldToScreen");
 
             List<MeshTriangle> trianglesToRaster = clipAgainstNearPlane(camera, result.copiedFaces());
 
@@ -137,7 +132,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
         for (MeshTriangle tri : triangles) {
             Vector3D planePosition = camera.getNearPlane();
             Vector3D planeNormal = new Vector3D(0,0,1);
-            List<MeshTriangle> newTrigs = clipTriangleAgainstPlane(planePosition, planeNormal, tri, tm);
+            List<MeshTriangle> newTrigs = clipTriangleAgainstPlane(planePosition, planeNormal, tri);
 
             clippedTriangles.addAll(newTrigs);
         }
@@ -209,19 +204,19 @@ public class Mesh implements Translatable, Rotatable, Scalable
                         case 0 -> triToAdd = clipTriangleAgainstPlane(
                                 new Vector3D(0, 0, 0),
                                 new Vector3D(0, 1, 0),
-                                curr, tm);
+                                curr);
                         case 1 -> triToAdd = clipTriangleAgainstPlane(
                                 new Vector3D(0, camera.getResolution().y() - 1, 0),
                                 new Vector3D(0, -1, 0),
-                                curr, tm);
+                                curr);
                         case 2 -> triToAdd = clipTriangleAgainstPlane(
                                 new Vector3D(0, 0, 0),
                                 new Vector3D(1, 0, 0),
-                                curr, tm);
+                                curr);
                         case 3 -> triToAdd = clipTriangleAgainstPlane(
                                 new Vector3D(camera.getResolution().x() - 1, 0, 0),
                                 new Vector3D(-1, 0, 0),
-                                curr, tm);
+                                curr);
                     }
                     triangleQueue.addAll(triToAdd);
                 }
@@ -239,7 +234,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
      * @return projection of the triangles.
      */
     private List<MeshTriangle> projectTriangles(Camera camera, List<MeshTriangle> triangles) {
-        tm.startMeasurement("ObjWorldToScreen");
         List<MeshTriangle> projected = new ArrayList<>();
         for (MeshTriangle triClipped : triangles)
         {
@@ -278,7 +272,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
             //= Add triangle to list=
             projected.add(triProj);
         }
-        tm.pauseMeasurement("ObjWorldToScreen");
         return projected;
     }
 
@@ -289,7 +282,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
      * @param copiedFaces the faces that should be illuminated
      */
     private void calculateLuminance(Vector3D cameraPos, List<LightSource> lightSources, List<MeshTriangle> copiedFaces) {
-        tm.startMeasurement("Lighting");
         for (MeshTriangle tri : copiedFaces) {
             tri.getMaterial().setLuminance(0);
 
@@ -316,13 +308,10 @@ public class Mesh implements Translatable, Rotatable, Scalable
                 }
             }
         }
-        tm.pauseMeasurement("Lighting");
     }
 
-    private List<MeshTriangle> clipTriangleAgainstPlane(Vector3D planePosition, Vector3D planeNormal, MeshTriangle in, TimeMeasurer tm)
+    private List<MeshTriangle> clipTriangleAgainstPlane(Vector3D planePosition, Vector3D planeNormal, MeshTriangle in)
     {
-        tm.startMeasurement("TriangleClipping");
-
         planeNormal = planeNormal.normalized();
 
         Vector3D finalPlaneNormal = planeNormal;
@@ -386,7 +375,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
             newTriangle.setMaterial(newMaterial);
             out.add(newTriangle);
 
-            tm.pauseMeasurement("TriangleClipping");
             return out;
         }
         if (numInPoints == 2) // Two point of the triangle was inside the clipping area
@@ -426,10 +414,8 @@ public class Mesh implements Translatable, Rotatable, Scalable
             tri2.setMaterial(mat2);
             out.add(tri2);
 
-            tm.pauseMeasurement("TriangleClipping");
             return out;
         }
-        tm.pauseMeasurement("TriangleClipping");
         return out;
     }
 
