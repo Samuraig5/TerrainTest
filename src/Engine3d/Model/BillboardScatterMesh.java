@@ -17,7 +17,7 @@ public class BillboardScatterMesh extends Mesh{
     public record Instance(Vector3D position, double width, double height) { }
     public record Wind(Vector3D direction, double amplitude, double frequency, double waveLength) { }
 
-    private final List<Instance> instances = new ArrayList<>();
+    private volatile List<Instance> instances = new ArrayList<>();
     private final BufferedImage sprite;
     private Wind wind = new Wind(new Vector3D(0,0,0),0,0,0);
 
@@ -30,6 +30,9 @@ public class BillboardScatterMesh extends Mesh{
 
     public void add(Instance i) {
         instances.add(i);
+    }
+    public void setInstances(List<Instance> newInstances) {
+        instances = newInstances;
     }
     public void add(Wind wind) { this.wind = wind; }
 
@@ -44,15 +47,17 @@ public class BillboardScatterMesh extends Mesh{
     private void rebuildQuads(Camera camera) {
         double time = System.nanoTime() * 1e-9;
 
+        List<Instance> snap = this.instances;
+
         Vector3D f = camera.getDirection();
         Vector3D right = new Vector3D(-f.z(), 0, f.x());
         if (right.magnitude() < 1e-6) right = Vector3D.RIGHT();   // camera looking straight up/down
         right = right.normalized();
 
-        List<Vector3D> newPoints = new ArrayList<>(instances.size() * 4);
-        List<MeshTriangle> newFaces = new ArrayList<>(instances.size() * 2);
+        List<Vector3D>      newPoints = new ArrayList<>(snap.size() * 4);
+        List<MeshTriangle>  newFaces  = new ArrayList<>(snap.size() * 2);
 
-        for (Instance in : instances) {
+        for (Instance in : snap) {
             double hw = in.width() * 0.5;
             double h  = in.height();
             double rx = right.x() * hw, rz = right.z() * hw;   // right.y() is 0

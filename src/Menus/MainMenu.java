@@ -1,6 +1,7 @@
 package Menus;
 
 import Engine3d.Rendering.PlayerCamera;
+import Levels.LastGiftLevel;
 import Levels.TestLevel;
 
 import javax.swing.*;
@@ -85,9 +86,10 @@ public class MainMenu extends Menu {
 
         PlayerCamera camera = new PlayerCamera(frame);
         //new BloodGulch(camera);
-        new TestLevel(camera);
+        //new TestLevel(camera);
         //new TerrainLevel(camera);
         //new GJKTest(camera);
+        new LastGiftLevel(camera);
 
         frame.revalidate();
         frame.repaint();
