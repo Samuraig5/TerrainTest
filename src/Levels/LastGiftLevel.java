@@ -2,6 +2,9 @@ package Levels;
 
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.Model.BillboardScatterMesh;
+import Engine3d.Model.ChunkPopulator;
+import Engine3d.Model.FloorFollower;
+import Engine3d.Model.ScatterChunkManager;
 import Math.Raycast.RayTriangle;
 import Physics.Object3D;
 import Physics.PlayerObject;
@@ -19,6 +22,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 public class LastGiftLevel extends Scene
 {
@@ -28,7 +32,7 @@ public class LastGiftLevel extends Scene
         backgroundColour = new Color(73, 0, 0);
 
         PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
-        playerObject.translate(new Vector3D(0,20,0));
+        playerObject.translate(new Vector3D(0,1,0));
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
 
         addUpdatable(cameraController);
@@ -46,25 +50,33 @@ public class LastGiftLevel extends Scene
             BufferedImage cimsonImg = ImageIO.read(new File(crimson));
             BufferedImage roseImg = ImageIO.read(new File(rose));
 
-            double floorSize = 600;
-            StaticAABBObject ground = spawnWall(cimsonImg, new Vector3D(floorSize,1,floorSize));
+            double floorSize = 50;
+            StaticAABBObject ground = spawnWall(cimsonImg, new Vector3D(floorSize, 1, floorSize));
             ground.translate(Vector3D.DOWN().scaled(0.5));
 
-            double roomSize = 50;
-            BillboardScatterMesh flowers = new BillboardScatterMesh(roseImg);
-            for (int x = (int)-roomSize; x < (int)roomSize; x++) {
-                for (int z = (int)-roomSize; z < (int)roomSize; z++) {
-                    flowers.add(new BillboardScatterMesh.Instance(
-                            new Vector3D((x+Math.random()) /2,0.7, (z+Math.random()) /2), 0.5, 0.7));
-                }
-            }
-            flowers.add(new BillboardScatterMesh.Wind(
-                    new Vector3D(1,0,0.25).normalized(),
-                    0.12,0.5,1
-            ));
+            FloorFollower floorFollower = new FloorFollower(ground, playerObject, 1.0);
+            addUpdatable(floorFollower);
 
-            Object3D flowerField = new Object3D(this);
-            flowerField.setMesh(flowers);
+            ChunkPopulator flowers = (cx, cz, size, out) -> {
+                long seed = ((long) cx * 73856093L) ^ ((long) cz * 19349663L);
+                Random rng = new Random(seed);
+                for (int i = 0; i < 40; i++) {
+                    double fx = cx * size + rng.nextDouble() * size;
+                    double fz = cz * size + rng.nextDouble() * size;
+                    double w  = 0.4 + rng.nextDouble() * 0.2;
+                    double h  = 0.6 + rng.nextDouble() * 0.3;
+                    out.add(new BillboardScatterMesh.Instance(new Vector3D(fx, 0.7, fz), w, h));
+                }
+            };
+
+            ScatterChunkManager flowerChunks =
+                    new ScatterChunkManager(this, playerObject, roseImg, 3, 25, flowers,
+                            new BillboardScatterMesh.Wind(
+                                    new Vector3D(1,0,0.25).normalized(),
+                                    0.12,0.5,1
+                            )
+                    );
+            addUpdatable(flowerChunks);
 
         }
         catch (IOException e1) {
