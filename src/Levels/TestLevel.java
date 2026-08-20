@@ -109,6 +109,11 @@ public class TestLevel extends Scene
                             new Vector3D((x+Math.random()) /2,0.7, (z+Math.random()) /2), 0.5, 0.7));
                 }
             }
+            flowers.add(new BillboardScatterMesh.Wind(
+                    new Vector3D(1,0,0.25).normalized(),
+                    0.12,0.5,1
+            ));
+
             Object3D flowerField = new Object3D(this);
             flowerField.setMesh(flowers);
 

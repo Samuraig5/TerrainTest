@@ -15,9 +15,11 @@ import Math.MeshTriangle;
 
 public class BillboardScatterMesh extends Mesh{
     public record Instance(Vector3D position, double width, double height) { }
+    public record Wind(Vector3D direction, double amplitude, double frequency, double waveLength) { }
 
     private final List<Instance> instances = new ArrayList<>();
     private final BufferedImage sprite;
+    private Wind wind = new Wind(new Vector3D(0,0,0),0,0,0);
 
     public BillboardScatterMesh(BufferedImage sprite) {
         super();
@@ -29,6 +31,7 @@ public class BillboardScatterMesh extends Mesh{
     public void add(Instance i) {
         instances.add(i);
     }
+    public void add(Wind wind) { this.wind = wind; }
 
     @Override
     public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation,
@@ -39,6 +42,8 @@ public class BillboardScatterMesh extends Mesh{
     }
 
     private void rebuildQuads(Camera camera) {
+        double time = System.nanoTime() * 1e-9;
+
         Vector3D f = camera.getDirection();
         Vector3D right = new Vector3D(-f.z(), 0, f.x());
         if (right.magnitude() < 1e-6) right = Vector3D.RIGHT();   // camera looking straight up/down
@@ -53,11 +58,16 @@ public class BillboardScatterMesh extends Mesh{
             double rx = right.x() * hw, rz = right.z() * hw;   // right.y() is 0
             Vector3D p = in.position();
 
-            // Component-wise, w stays exactly 1
-            Vector3D bl = new Vector3D(p.x() - rx, p.y(),     p.z() - rz);
-            Vector3D br = new Vector3D(p.x() + rx, p.y(),     p.z() + rz);
-            Vector3D tl = new Vector3D(p.x() - rx, p.y() + h, p.z() - rz);
-            Vector3D tr = new Vector3D(p.x() + rx, p.y() + h, p.z() + rz);
+            // Per-flower wind sway (top of the quad only)
+            double phase = (p.x() + p.z()) * wind.waveLength;
+            double s  = wind.amplitude * Math.sin(time * wind.frequency + phase);
+            double sx = wind.direction.x() * s, sz = wind.direction.z() * s;
+
+            // Base stays planted; keep component-wise so w stays exactly 1
+            Vector3D bl = new Vector3D(p.x() - rx,      p.y(),     p.z() - rz);
+            Vector3D br = new Vector3D(p.x() + rx,      p.y(),     p.z() + rz);
+            Vector3D tl = new Vector3D(p.x() - rx + sx, p.y() + h, p.z() - rz + sz);
+            Vector3D tr = new Vector3D(p.x() + rx + sx, p.y() + h, p.z() + rz + sz);
 
             newPoints.add(bl); newPoints.add(br); newPoints.add(tl); newPoints.add(tr);
 
