@@ -22,15 +22,17 @@ public class Drawer
         p = new PixelDrawer(camera);
     }
 
-    public void drawBuffer(Graphics g, ScreenBuffer screenBuffer)
-    {
+    public void drawBuffer(Graphics g, ScreenBuffer screenBuffer) {
         BufferedImage buffer = screenBuffer.getBufferedImage();
-        int screenWidth = (int) (buffer.getWidth() / camera.getResolutionFactor());
-        int screenHeight = (int) (buffer.getHeight() / camera.getResolutionFactor());
+        Vector3D win = camera.getScreenDimensions();
 
-        g.drawImage(buffer, 0, 0, screenWidth, screenHeight,
-                                0, 0, buffer.getWidth(), buffer.getHeight(),
-                                null);
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, (int) win.x(), (int) win.y());   // paint the letterbox bars
+
+        double scale = Math.min(win.x()/buffer.getWidth(), win.y()/buffer.getHeight());
+        int dw = (int)(buffer.getWidth()*scale), dh = (int)(buffer.getHeight()*scale);
+        int ox = ((int)win.x()-dw)/2, oy = ((int)win.y()-dh)/2;
+        g.drawImage(buffer, ox, oy, ox+dw, oy+dh, 0, 0, buffer.getWidth(), buffer.getHeight(), null);
     }
 
     public void drawLine(Color c, Vector3D v1, Vector3D v2, boolean checkPixelDepth) {

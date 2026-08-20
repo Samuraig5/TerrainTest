@@ -5,8 +5,7 @@ import Engine3d.Model.BillboardScatterMesh;
 import Engine3d.Model.ChunkPopulator;
 import Engine3d.Model.FloorFollower;
 import Engine3d.Model.ScatterChunkManager;
-import Math.Raycast.RayTriangle;
-import Physics.Object3D;
+import Levels.Skyboxes.NightSkyBox;
 import Physics.PlayerObject;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
@@ -78,7 +77,6 @@ public class LastGiftLevel extends Scene
                             )
                     );
             addUpdatable(flowerChunks);
-
         }
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file ");

@@ -66,6 +66,7 @@ public class SceneRenderer extends JPanel
     {
         activeScene.getCamera().drawScreenBuffer(g); //This is the only non-UI call :helenaPepe:
 
+
         g.setColor(Color.white);
 
         g.drawString("Buffers/s: " + Math.round(Profiler.rate("buffers")), 20, 40);
@@ -77,44 +78,6 @@ public class SceneRenderer extends JPanel
         g.drawString(String.format("update: %.2f ms", Profiler.ms("update")), 20, 150);
         g.drawString(String.format("  applyGravity:    %.2f ms", Profiler.ms("applyGravity")),    30, 168);
         g.drawString(String.format("  handleCollision: %.2f ms", Profiler.ms("handleCollision")), 30, 186);
-
-        /*
-        int screenWidth = (int) activeScene.getCamera().getScreenDimensions().x() - 20;
-        String s = "Cam Pos: " + activeScene.getCamera().getPosition().toStringRounded();
-        int sWidth = g.getFontMetrics().stringWidth(s);
-        g.drawString(s,screenWidth-sWidth,20 );
-
-        s = "Cam Rot: " + activeScene.getCamera().getRotation().toStringRounded();
-        sWidth = g.getFontMetrics().stringWidth(s);
-        g.drawString(s,screenWidth-sWidth,40 );
-
-        g.drawString("FPS: " + timeMeasurer.getCyclesPerSecond("frameTime"), 20, 20);
-        g.drawString(timeMeasurer.getMsPrintOut("frameTime", frameTime), 20, 40);
-
-        g.drawString("Buffers/s: " + timeMeasurer.getCyclesPerSecond("buildScreenBuffer"), 20, 70);
-        g.drawString(timeMeasurer.getMsPrintOut("buildScreenBuffer"), 20, 90);
-        long buildScreenBuffer = timeMeasurer.getMeasurement("buildScreenBuffer");
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Get Matrices", buildScreenBuffer), 30, 110);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Lighting", buildScreenBuffer), 30, 130);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("ObjWorldToScreen", buildScreenBuffer), 30, 150);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("TriangleClipping", buildScreenBuffer),30, 170);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("Texturizer", buildScreenBuffer),30, 190);
-
-        g.drawString("Updates/s: " + timeMeasurer.getCyclesPerSecond("update"), 20, 220);
-        long updateTime = timeMeasurer.getMeasurement("update");
-        g.drawString(timeMeasurer.getMsPrintOut("updateTime", updateTime), 20, 240);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("applyGravity", updateTime), 30, 260);
-        g.drawString(timeMeasurer.getPercentAndMsPrintOut("handleCollision", updateTime), 30, 280);
-
-
-        g.setColor(Color.red);
-
-        Vector3D cursorPos = new Vector3D(errorMessagePos);
-        for (String err : errors) {
-            g.drawString(err, (int) cursorPos.x(), (int) cursorPos.y());
-            cursorPos = cursorPos.translated(errorPosDelta);
-        }
-         */
     }
 
     public void logError(String message) {

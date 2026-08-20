@@ -14,7 +14,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 public abstract class Camera implements Rotatable, Translatable {
-    double resolution = 0.25f;
+    private Vector3D resolution = new Vector3D(200, 200, 0);
     double fov = 90;
     double zNear = 0.25d;
     double zFar = 1000;
@@ -54,9 +54,9 @@ public abstract class Camera implements Rotatable, Translatable {
         buildBuffer = temp;
     }
     public void onFrameSizeChange() {
-        this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
-        this.buildBuffer.recompute(getResolution());
-        this.displayBuffer.recompute(getResolution());
+        //this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
+        //this.buildBuffer.recompute(getResolution());
+        //this.displayBuffer.recompute(getResolution());
     }
     public MeshTriangle projectTriangle(MeshTriangle in) {
         return projectionMatrix.multiplyWithTriangle(in);
@@ -64,16 +64,19 @@ public abstract class Camera implements Rotatable, Translatable {
     public Vector3D getScreenDimensions() {
         return new Vector3D(window.getWidth(), window.getHeight(), 0);
     }
-    private double getAspectRatio()
-    {
-        return getScreenDimensions().y() / getScreenDimensions().x();
-    }
     public JFrame getFrame() {return window;}
-    public Vector3D getResolution() { return getScreenDimensions().scaled(resolution); }
-    public double getResolutionFactor() {return resolution;}
+    public Vector3D getResolution() { return new Vector3D(resolution); }
+    private double getAspectRatio() { return getResolution().y() / getResolution().x(); }
     public ScreenBuffer getScreenBuffer(){ return buildBuffer; }
     public Vector3D getNearPlane() {return new Vector3D(0,0,zNear);}
     public Vector3D getFarPlane() {return new Vector3D(0,0,zFar);}
+
+    public void setResolution(int width, int height) {
+        this.resolution = new Vector3D(width, height, 0);
+        this.projectionMatrix = Matrix4x4.getProjectionMatrix(fov, getAspectRatio(), zNear, zFar);
+        this.buildBuffer.recompute(getResolution());
+        this.displayBuffer.recompute(getResolution());
+    }
 
     @Override
     public Vector3D getDirection() {

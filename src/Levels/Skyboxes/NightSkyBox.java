@@ -1,4 +1,4 @@
-package Levels;
+package Levels.Skyboxes;
 
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
