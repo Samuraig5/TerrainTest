@@ -115,8 +115,6 @@ public class Texturizer
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
                     if (tex_w > depth[j][i]) {                          // depth test (in bounds by clamp)
-                        depth[j][i] = tex_w;
-
                         tex_u = (1.0f - t) * tex_su + t * tex_eu;
                         tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 
@@ -124,6 +122,7 @@ public class Texturizer
                         double vv = ((tex_v/tex_w) % 1 + 1) % 1;
                         int texel = tex[(int)(vv*(texH-1)) * texW + (int)(uu*(texW-1))];
                         if ((texel >>> 24) != 0) {                      // skip fully-transparent texels
+                            depth[j][i] = tex_w;
                             int argb = shade(mul(texel, diffuse), luminance);
                             color[(H - 1 - i) * W + j] = argb;
                         }
@@ -182,8 +181,6 @@ public class Texturizer
                     tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
                     if (tex_w > depth[j][i]) {                          // depth test (in bounds by clamp)
-                        depth[j][i] = tex_w;
-
                         tex_u = (1.0f - t) * tex_su + t * tex_eu;
                         tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 
@@ -191,6 +188,7 @@ public class Texturizer
                         double vv = ((tex_v/tex_w) % 1 + 1) % 1;
                         int texel = tex[(int)(vv*(texH-1)) * texW + (int)(uu*(texW-1))];
                         if ((texel >>> 24) != 0) {                      // skip fully-transparent texels
+                            depth[j][i] = tex_w;
                             int argb = shade(mul(texel, diffuse), luminance);
                             color[(H - 1 - i) * W + j] = argb;
                         }

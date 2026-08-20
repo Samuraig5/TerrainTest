@@ -1,7 +1,9 @@
 package Levels;
 
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
+import Engine3d.Model.BillboardScatterMesh;
 import Math.Raycast.RayTriangle;
+import Physics.Object3D;
 import Physics.PlayerObject;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
@@ -62,6 +64,7 @@ public class TestLevel extends Scene
         String heavyMoss = "Resources/Textures/StoneBrickWallHeavilyMossy.png";
         String grime = "Resources/Textures/Grime Top.png";
         String crimson = "Resources/Textures/Crimson Nylium.png";
+        String rose = "Resources/Textures/Rose.png";
 
         try {
             BufferedImage stoneImg = ImageIO.read(new File(stone));
@@ -69,14 +72,16 @@ public class TestLevel extends Scene
             BufferedImage heavyMossImg = ImageIO.read(new File(heavyMoss));
             BufferedImage grimeImg = ImageIO.read(new File(grime));
             BufferedImage cimsonImg = ImageIO.read(new File(crimson));
+            BufferedImage roseImg = ImageIO.read(new File(rose));
 
             double roomSize = 50;
             double wallHeight = 4;
 
-            StaticAABBObject ground = spawnWall(cimsonImg, new Vector3D(roomSize*2,1,roomSize*2));
+            StaticAABBObject ground = spawnWall(cimsonImg, new Vector3D(roomSize,1,roomSize));
             ground.translate(Vector3D.DOWN().scaled(0.5));
 
 
+            /*
             StaticAABBObject wall1 = spawnWall(lightMossImg, new Vector3D(roomSize,wallHeight,1));
             wall1.translate(Vector3D.FORWARD().scaled(roomSize/2));
             StaticAABBObject wall2 = spawnWall(lightMossImg, new Vector3D(roomSize,wallHeight,1));
@@ -95,6 +100,17 @@ public class TestLevel extends Scene
             StaticAABBObject wa = spawnWall(grimeImg, new Vector3D(25,2,25));
             wa.translate(new Vector3D(10,0,10));
             wa.rotate(new Vector3D(Math.toRadians(-25),0,0));
+             */
+
+            BillboardScatterMesh flowers = new BillboardScatterMesh(roseImg);
+            for (int x = (int)-roomSize; x < (int)roomSize; x++) {
+                for (int z = (int)-roomSize; z < (int)roomSize; z++) {
+                    flowers.add(new BillboardScatterMesh.Instance(
+                            new Vector3D((x+Math.random()) /2,0.7, (z+Math.random()) /2), 0.5, 0.7));
+                }
+            }
+            Object3D flowerField = new Object3D(this);
+            flowerField.setMesh(flowers);
 
             /*
             StaticAABBObject box = spawnWall(grimeImg, new Vector3D(5,5,5));
