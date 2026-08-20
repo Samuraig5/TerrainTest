@@ -6,6 +6,8 @@ import Engine3d.Model.ChunkPopulator;
 import Engine3d.Model.FloorFollower;
 import Engine3d.Model.ScatterChunkManager;
 import Levels.Skyboxes.NightSkyBox;
+import Physics.AABBCollisions.StaticAABBCollider;
+import Physics.Object3D;
 import Physics.PlayerObject;
 import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
@@ -77,6 +79,10 @@ public class LastGiftLevel extends Scene
                             )
                     );
             addUpdatable(flowerChunks);
+
+            Object3D temple = loadFromFile("Resources/Models/Temple", "BloodTemple.obj");
+            temple.translate(new Vector3D(0,0,100));
+
         }
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file ");

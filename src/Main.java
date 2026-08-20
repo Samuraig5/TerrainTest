@@ -15,6 +15,10 @@ public class Main {
         JFrame frame = new JFrame("Bug Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //frame.setUndecorated(true);
+
         frame.setLocationRelativeTo(null);
 
         if (args.length == 0 || Objects.equals(args[0], "MainMenu"))
