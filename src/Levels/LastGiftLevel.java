@@ -1,10 +1,12 @@
 package Levels;
 
+import Engine3d.Audio.Sound;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.Model.BillboardScatterMesh;
 import Engine3d.Model.ChunkPopulator;
 import Engine3d.Model.FloorFollower;
 import Engine3d.Model.ScatterChunkManager;
+import Engine3d.Rendering.DrawInstructions;
 import Levels.Skyboxes.NightSkyBox;
 import Physics.AABBCollisions.StaticAABBCollider;
 import Physics.Object3D;
@@ -19,6 +21,7 @@ import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.Clip;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -40,10 +43,10 @@ public class LastGiftLevel extends Scene
         addUpdatable(cameraController);
 
         LightSource sun = new LightSource(this);
-        sun.setRotation(new Vector3D(Math.toRadians(90),0,0));
-        sun.setLightIntensity(1);
+        sun.setRotation(new Vector3D(Math.toRadians(160),0,0));
+        sun.setLightIntensity(5);
 
-        new HeadLight(camera, this);
+        //new HeadLight(camera, this);
 
         String crimson = "Resources/Textures/Crimson Nylium.png";
         String rose = "Resources/Textures/Rose.png";
@@ -80,9 +83,23 @@ public class LastGiftLevel extends Scene
                     );
             addUpdatable(flowerChunks);
 
-            Object3D temple = loadFromFile("Resources/Models/Temple", "BloodTemple.obj");
-            temple.translate(new Vector3D(0,0,100));
+            Vector3D templeLocation = new Vector3D(0,0,10);
 
+            Object3D temple = loadFromFile("Resources/Models/Temple", "BloodTemple.obj");
+            temple.translate(templeLocation);
+
+            spawnCollider(new Vector3D(1.5, 10, 1.5), templeLocation);
+            spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(5.1,0,2.25)));
+            spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(5.1,0,-2.25)));
+            spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-5.1,0,2.25)));
+            spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-5.1,0,-2.25)));
+
+            spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(2.25,0,5.1)));
+            spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(2.25,0,-5.1)));
+            spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,5.1)));
+            spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,-5.1)));
+
+            Clip music = Sound.playLoop("Resources/Audio/Hymn of the Cherubim.wav");
         }
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file ");
@@ -98,5 +115,15 @@ public class LastGiftLevel extends Scene
         boxMesh.getDrawInstructions().drawWireFrame = false;
         boxMesh.centreToMiddleBottom();
         return wall;
+    }
+
+    private StaticAABBObject spawnCollider(Vector3D size, Vector3D pos) {
+        StaticAABBObject c = new StaticAABBObject(this);
+        BoxMesh box = new BoxMesh(size);
+        c.setMesh(box);                                                  // builds the collider
+        box.setDrawInstructions(new DrawInstructions(false, false, false, false)); // invisible
+        box.centreToMiddleBottom();
+        c.translate(pos);
+        return c;
     }
 }
