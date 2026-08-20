@@ -30,6 +30,7 @@ public class LastGiftLevel extends Scene
         super(camera);
 
         backgroundColour = new Color(73, 0, 0);
+        setSkyBox(new NightSkyBox(new Vector3D(0, 0.28, 1), 12, 500, 1234L));
 
         PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
         playerObject.translate(new Vector3D(0,1,0));

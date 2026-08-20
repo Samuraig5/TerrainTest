@@ -2,6 +2,7 @@ package Engine3d.Rendering.ScreenDrawing;
 
 import Engine3d.Model.Mesh;
 import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Rendering.SkyBox;
 import Math.MeshTriangle;
 import Engine3d.Rendering.Camera;
 import Math.Vector.Vector2D;
@@ -21,13 +22,13 @@ public class TileRasterizer {
     private RasterTile[] tiles;
     private int gridW = -1, gridH = -1;
 
-    public void render(Camera camera, List<Mesh.ProjectedTriangles> geometry, Color background) {
+    public void render(Camera camera, List<Mesh.ProjectedTriangles> geometry, Color background, SkyBox skyBox) {
         ScreenBuffer buffer = camera.getScreenBuffer();
 
         ensureGrid(buffer.getSize());
         clearBins();
         bin(geometry);
-        rasterize(buffer, camera, background);
+        rasterize(buffer, camera, background,skyBox);
     }
 
     private void ensureGrid(Vector2D size) {
@@ -81,8 +82,9 @@ public class TileRasterizer {
         }
     }
 
-    private void rasterize(ScreenBuffer buffer, Camera camera, Color background) {
+    private void rasterize(ScreenBuffer buffer, Camera camera, Color background, SkyBox skyBox) {
         buffer.clear(background);
+        if (skyBox != null) skyBox.render(buffer, camera);
 
         Arrays.stream(tiles).parallel().forEach(tile -> {
             for (TriRef ref : tile.bin) {

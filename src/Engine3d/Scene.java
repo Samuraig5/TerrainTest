@@ -10,6 +10,7 @@ import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
+import Engine3d.Rendering.SkyBox;
 import Math.Raycast.Ray;
 import Math.Raycast.RayCollision;
 import Math.Raycast.RayTriangle;
@@ -46,6 +47,8 @@ public class Scene implements Updatable
     //Makes sure we can't read game state while it is being written
     private final Object stateLock = new Object();
     private final TileRasterizer tileRasterizer = new TileRasterizer();
+
+    private volatile SkyBox skyBox;
 
     public Scene(Camera camera) {
         this.camera = camera;
@@ -137,7 +140,7 @@ public class Scene implements Updatable
 
         //Rasterize
         try (Profiler.Span s = Profiler.span("raster")) {
-            tileRasterizer.render(camera, geometry, backgroundColour);
+            tileRasterizer.render(camera, geometry, backgroundColour,skyBox);
         }
 
         /*
@@ -152,6 +155,10 @@ public class Scene implements Updatable
 
     public void addLight(LightSource lightSource) {
         lightSources.add(lightSource);
+    }
+
+    public void setSkyBox(SkyBox skyBox) {
+        this.skyBox = skyBox;
     }
 
     public void setGravity(double grav) {
