@@ -11,7 +11,9 @@ import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Rendering.Filters.CensorFilter;
 import Engine3d.Rendering.Filters.GlitchFilter;
 import Engine3d.Rendering.Filters.WakeUpFilter;
+import Levels.Skyboxes.EyeAwakening;
 import Levels.Skyboxes.NightSkyBox;
+import Levels.Utils.GazeLock;
 import Physics.AABBCollisions.StaticAABBCollider;
 import Physics.Object3D;
 import Physics.PlayerObject;
@@ -38,7 +40,6 @@ public class LastGiftLevel extends Scene
         super(camera);
 
         backgroundColour = new Color(73, 0, 0);
-        setSkyBox(new NightSkyBox(new Vector3D(0, 0.28, 1), 12, 500, 1234L));
 
         PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
         playerObject.translate(new Vector3D(0,1,0));
@@ -53,13 +54,14 @@ public class LastGiftLevel extends Scene
 
         //new HeadLight(camera, this);
 
-        String crimson = "Resources/Textures/Crimson Nylium.png";
-        String rose = "Resources/Textures/Rose.png";
-
         try {
-            BufferedImage cimsonImg = ImageIO.read(new File(crimson));
-            BufferedImage roseImg = ImageIO.read(new File(rose));
+            BufferedImage cimsonImg = ImageIO.read(new File("Resources/Textures/Crimson Nylium.png"));
+            BufferedImage roseImg = ImageIO.read(new File( "Resources/Textures/Rose.png"));
+            BufferedImage signImg = ImageIO.read(new File("Resources/Textures/The White Sign.png"));
 
+            NightSkyBox sky = new NightSkyBox(new Vector3D(0,0.28,1),
+                    12, 500, 1234L, signImg, 75);
+            setSkyBox(sky);
             double floorSize = 50;
             StaticAABBObject ground = spawnWall(cimsonImg, new Vector3D(floorSize, 1, floorSize));
             ground.translate(Vector3D.DOWN().scaled(0.5));
@@ -104,9 +106,16 @@ public class LastGiftLevel extends Scene
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,5.1)));
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,-5.1)));
 
+            EyeAwakening awakening = new EyeAwakening(sky, 10.0);   // 10s turn
+            addUpdatable(awakening);
 
             GlitchFilter glitch = new GlitchFilter();
             addFilter(glitch);
+
+            GazeLock gaze = new GazeLock(playerObject, new Vector3D(0, -0.2, 1),
+                    18, 0.5);
+            gaze.setOnWallHit(glitch::trigger);
+            addUpdatable(gaze);
 
             WakeUpFilter wake = new WakeUpFilter(
                     ()->{
@@ -120,10 +129,16 @@ public class LastGiftLevel extends Scene
             addFilter(new CensorFilter(getCamera(), templeLocation.translated(new Vector3D(-0.1, 4.25, 0.5)), 0.3, 0.3));
 
             getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
+
         }
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file ");
         }
+    }
+
+    private void onEndgame(EyeAwakening awakening, GazeLock gaze) {
+        awakening.start();
+        gaze.setActive(true);
     }
 
     private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {

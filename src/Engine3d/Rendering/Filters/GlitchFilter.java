@@ -39,12 +39,16 @@ public class GlitchFilter implements ScreenFilter, KeyListener {
 
     private static int clamp(int v, int W) { return v < 0 ? 0 : (v >= W ? W-1 : v); }
 
-    @Override public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_F) {
-            startTime = System.nanoTime() * 1e-9;
-            active = true;
-        }
+    public void trigger() {
+        startTime = System.nanoTime() * 1e-9;
+        active = true;
     }
-    @Override public void keyReleased(KeyEvent e) {}
-    @Override public void keyTyped(KeyEvent e) {}
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_F) trigger();
+    }
+    @Override
+    public void keyReleased(KeyEvent e) {}
+    @Override
+    public void keyTyped(KeyEvent e) {}
 }

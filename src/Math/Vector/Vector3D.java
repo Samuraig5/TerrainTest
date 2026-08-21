@@ -120,6 +120,10 @@ public class Vector3D {
         return sb.toString();
     }
 
+    public static Vector3D lerp(Vector3D a, Vector3D b, double t) {
+        return new Vector3D(a.x()+(b.x()-a.x())*t, a.y()+(b.y()-a.y())*t, a.z()+(b.z()-a.z())*t);
+    }
+
     public static Vector3D FORWARD() {
         return new Vector3D(0,0,1);
     }

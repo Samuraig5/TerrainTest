@@ -4,19 +4,37 @@ import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
 import Engine3d.Rendering.SkyBox;
 import Math.Vector.Vector3D;
+
+import java.awt.image.BufferedImage;
 import java.util.Random;
+
+import static Math.Vector.Vector3D.lerp;
 
 public class NightSkyBox implements SkyBox {
     private final Vector3D moonDir;
     private final double   moonCos;
     private final Vector3D[] stars;
     private final double fovRad = Math.toRadians(90);
+    private final int[] signPixels;
+    private final int signW, signH;
+    private final double irisCos, sinIris, sinDiscR;
+    private volatile double gaze = 0;                       // 0 = away, 1 = facing camera
+    private final Vector3D gazeStart = new Vector3D(0.45, 0.55, -0.70).normalized(); // eye-local look-away
+    private Vector3D eRight, eUp, gLocal, irisRight, irisUp;
 
-    public NightSkyBox(Vector3D moonDir, double moonRadiusDeg, int starCount, long seed) {
+    public NightSkyBox(Vector3D moonDir, double moonRadiusDeg, int starCount, long seed,
+                       BufferedImage sign, double irisRadiusDeg) {
         this.moonDir = moonDir.normalized();
         this.moonCos = Math.cos(Math.toRadians(moonRadiusDeg));
         this.stars   = generateStars(starCount, seed);
+        this.signW = sign.getWidth(); this.signH = sign.getHeight();
+        this.signPixels = sign.getRGB(0, 0, signW, signH, null, 0, signW);
+        this.irisCos = Math.cos(Math.toRadians(irisRadiusDeg));
+        this.sinIris = Math.sqrt(1 - irisCos*irisCos);
+        this.sinDiscR = Math.sqrt(1 - moonCos*moonCos);       // sin of the disc's angular radius
     }
+
+    public void setGaze(double t) { this.gaze = Math.max(0, Math.min(1, t)); }
 
     private static Vector3D[] generateStars(int n, long seed) {
         Random rng = new Random(seed);
@@ -36,6 +54,13 @@ public class NightSkyBox implements SkyBox {
 
     @Override
     public void render(ScreenBuffer buffer, Camera camera) {
+        eRight = new Vector3D(0,1,0).crossProduct(moonDir).normalized();
+        eUp    = moonDir.crossProduct(eRight).normalized();
+        gLocal = lerp(gazeStart, new Vector3D(0,0,1), gaze).normalized();   // eye-local (right, up, toward-cam)
+        Vector3D refUp = new Vector3D(0,1,0);
+        irisRight = refUp.crossProduct(gLocal).normalized();
+        irisUp    = gLocal.crossProduct(irisRight).normalized();
+
         int W = buffer.width(), H = buffer.height();
         int[] color = buffer.colourArray();
 
@@ -83,11 +108,30 @@ public class NightSkyBox implements SkyBox {
         double glow = Math.exp(-h*16);
         rr += (int)(130*glow); gg += (int)(15*glow); bb += (int)(18*glow);
         double d = dir.dotProduct(moonDir);
-        if (d > moonCos) { rr = gg = bb = 255; }
-        else {
-            double mg = Math.pow(Math.max(0, d), 90);
-            rr += (int)(255*mg); gg += (int)(90*mg); bb += (int)(90*mg);
+        if (d > moonCos) {
+            return eyeColor(dir);          // on the disc → eyeball
         }
+        double mg = Math.pow(Math.max(0, d), 90);       // keep the outer glow
+        rr += (int)(255*mg); gg += (int)(90*mg); bb += (int)(90*mg);
         return 0xff000000 | (Math.min(255,rr)<<16) | (Math.min(255,gg)<<8) | Math.min(255,bb);
     }
+
+    private int eyeColor(Vector3D dir) {
+        double x = dir.dotProduct(eRight) / sinDiscR;   // disc-local coords in [-1,1]
+        double y = dir.dotProduct(eUp)    / sinDiscR;
+        double r2 = x*x + y*y;
+        if (r2 > 1) return 0xffEFE8EA;                   // rim safety
+        double z = Math.sqrt(1 - r2);
+        Vector3D p = new Vector3D(x, y, z);              // surface point, eye-local
+
+        if (p.dotProduct(gLocal) > irisCos) {            // inside the iris cap
+            double u = p.dotProduct(irisRight) / sinIris * 0.5 + 0.5;
+            double v = p.dotProduct(irisUp)    / sinIris * 0.5 + 0.5;
+            int sx = clampi((int)(u*signW), signW), sy = clampi((int)(v*signH), signH);
+            int texel = signPixels[sy*signW + sx];
+            if ((texel >>> 24) != 0) return 0xff000000 | (texel & 0xffffff);  // Sign pixel
+        }
+        return 0xffEFE8EA;                                // sclera (soft off-white)
+    }
+    private static int clampi(int v, int n) { return v < 0 ? 0 : (v >= n ? n-1 : v); }
 }
