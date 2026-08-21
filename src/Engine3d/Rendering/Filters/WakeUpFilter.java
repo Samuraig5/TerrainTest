@@ -32,7 +32,6 @@ public class WakeUpFilter implements ScreenFilter, KeyListener {
                 if (y < bar || y >= H - bar)
                     for (int x = 0; x < W; x++) color[y*W + x] = 0xff000000;
         }
-        // DONE: nothing — the scene shows through, and isDone() removes us
     }
 
     private void drawPrompt(ScreenBuffer buffer) {

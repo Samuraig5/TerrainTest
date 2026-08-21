@@ -8,6 +8,7 @@ import Engine3d.Model.ChunkPopulator;
 import Engine3d.Model.FloorFollower;
 import Engine3d.Model.ScatterChunkManager;
 import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Rendering.Filters.GlitchFilter;
 import Engine3d.Rendering.Filters.WakeUpFilter;
 import Levels.Skyboxes.NightSkyBox;
 import Physics.AABBCollisions.StaticAABBCollider;
@@ -102,8 +103,15 @@ public class LastGiftLevel extends Scene
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,5.1)));
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,-5.1)));
 
+            GlitchFilter glitch = new GlitchFilter();
+            addFilter(glitch);
+
             WakeUpFilter wake = new WakeUpFilter(
-                    ()->onWake(cameraController)
+                    ()->{
+                        cameraController.isEnabled(true);
+                        getSceneRenderer().addKeyListener(glitch);
+                        Clip music = Sound.playLoop("Resources/Audio/Hymn of the Cherubim.wav");
+                    }
             );
             addFilter(wake);
             getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
@@ -111,11 +119,6 @@ public class LastGiftLevel extends Scene
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file ");
         }
-    }
-
-    private void onWake(Controller cameraController) {
-        cameraController.isEnabled(true);
-        Clip music = Sound.playLoop("Resources/Audio/Hymn of the Cherubim.wav");
     }
 
     private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {
