@@ -68,8 +68,9 @@ public class Mesh implements Translatable, Rotatable, Scalable
         this.drawInstructions = drawInstructions;
     }
     public List<Vector3D> getPoints() { return points; }
+
     public List<Vector3D> getPointsInWorld(Vector3D worldPos, Vector3D worldRot) {
-        return localToWorld(points,
+        return localToWorld(new ArrayList<>(points),
                 getPosition().translated(worldPos),
                 getRotation().translated(worldRot));
     }
@@ -96,11 +97,12 @@ public class Mesh implements Translatable, Rotatable, Scalable
             for (MeshTriangle tri : result.copiedFaces()) {
                 Vector3D n = tri.getNormal();
                 Vector3D camRay = tri.getPoints()[0].translated(cameraPos.inverted());  // point - camera
-                if (n.dotProduct(camRay) < 0) visible.add(tri);   // front-facing → keep
-            }
+                if (n.dotProduct(camRay) >= 0) { continue; } //skip back-face
+                visible.add(tri);   // front-facing
 
-            if (drawInstructions.doShading) {
-                calculateLuminance(cameraPos, lightSources, visible);
+                if (drawInstructions.doShading) {
+                    shadeTriangle(tri, n, lightSources);
+                }
             }
 
             result = transform(viewMatrix, result.copiedPoints, visible);
@@ -260,52 +262,18 @@ public class Mesh implements Translatable, Rotatable, Scalable
         return projected;
     }
 
-    /**
-     * Calculates the luminance of each mesh triangle and writes the result to the triangle's material.
-     * @param cameraPos position of the camera
-     * @param lightSources list of lightSources
-     * @param copiedFaces the faces that should be illuminated
-     */
-    private void calculateLuminance(Vector3D cameraPos, List<LightSource> lightSources, List<MeshTriangle> copiedFaces) {
-        for (MeshTriangle tri : copiedFaces) {
-            tri.getMaterial().setLuminance(0);
-
-            //= Check if triangle normal is facing the camera =
-            Vector3D triNormal = tri.getNormal();
-            //All three points lie on the same plane, so we can choose any
-            Vector3D cameraRay = new Vector3D(tri.getPoints()[0]);
-            cameraRay = cameraRay.translated(cameraPos.inverted());
-
-            //If the camera can't see the triangle, don't draw it
-            if (triNormal.dotProduct(cameraRay) >= 0) {
-                continue;
-            }
-
-            for (LightSource ls : lightSources) {
-                double lightIntensity = ls.getLightIntensity(tri.getMidPoint().distanceTo(ls.getPosition()));
-                if (lightIntensity == 0) {continue;}
-
-                Vector3D lightDirection = ls.getDirection().normalized().inverted();
-
-                double lightDotProduct = (triNormal.dotProduct(lightDirection)*lightIntensity);
-                if (tri.getMaterial().getLuminance() < lightDotProduct) {
-                    tri.getMaterial().setLuminance(lightDotProduct);
-                }
-            }
+    private void shadeTriangle(MeshTriangle tri, Vector3D normal, List<LightSource> lights) {
+        tri.getMaterial().setLuminance(0);
+        for (LightSource ls : lights) {
+            double intensity = ls.getLightIntensity(tri.getMidPoint().distanceTo(ls.getPosition()));
+            if (intensity == 0) continue;
+            Vector3D lightDir = ls.getDirection().normalized().inverted();
+            double dot = normal.dotProduct(lightDir) * intensity;
+            if (tri.getMaterial().getLuminance() < dot) tri.getMaterial().setLuminance(dot);
         }
     }
 
-    private List<MeshTriangle> clipTriangleAgainstPlane(Vector3D planePosition, Vector3D planeNormal, MeshTriangle in)
-    {
-        planeNormal = planeNormal.normalized();
-
-        Vector3D finalPlaneNormal = planeNormal;
-        Function<Vector3D, Double> dist = (Vector3D p) -> {
-            //Vector3D n = p.normalized();
-            return (finalPlaneNormal.x() * p.x() + finalPlaneNormal.y() * p.y() + finalPlaneNormal.z() * p.z()
-                    - finalPlaneNormal.dotProduct(planePosition));
-        };
-
+    private List<MeshTriangle> clipTriangleAgainstPlane(Vector3D planePosition, Vector3D planeNormal, MeshTriangle in) {
         Vector3D[] inPoints = new Vector3D[3]; int numInPoints = 0;
         Vector3D[] outPoints = new Vector3D[3]; int numOutPoints = 0;
         Vector2D[] texInPoints = new Vector2D[3]; int numTexInPoints = 0;
@@ -316,7 +284,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
         Vector2D[] texPoints = in.getMaterial().getTextureCoords();
 
         for (int i = 0; i < 3; i++) {
-            double distance = dist.apply(points[i]);
+            double distance = signedDistance(planeNormal, planePosition, points[i]);
             if (distance >= 0)
             {
                 inPoints[numInPoints++] = points[i];
@@ -402,6 +370,10 @@ public class Mesh implements Translatable, Rotatable, Scalable
             return out;
         }
         return out;
+    }
+
+    private static double signedDistance(Vector3D n, Vector3D planePos, Vector3D p) {
+        return n.x()*p.x() + n.y()*p.y() + n.z()*p.z() - n.dotProduct(planePos);
     }
 
     public void copy(Mesh source) {
