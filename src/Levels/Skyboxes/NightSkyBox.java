@@ -126,7 +126,7 @@ public class NightSkyBox implements SkyBox {
 
         if (p.dotProduct(gLocal) > irisCos) {            // inside the iris cap
             double u = p.dotProduct(irisRight) / sinIris * 0.5 + 0.5;
-            double v = p.dotProduct(irisUp)    / sinIris * 0.5 + 0.5;
+            double v = -p.dotProduct(irisUp)    / sinIris * 0.5 + 0.5;
             int sx = clampi((int)(u*signW), signW), sy = clampi((int)(v*signH), signH);
             int texel = signPixels[sy*signW + sx];
             if ((texel >>> 24) != 0) return 0xff000000 | (texel & 0xffffff);  // Sign pixel

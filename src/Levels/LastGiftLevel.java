@@ -25,6 +25,7 @@ import Physics.AABBCollisions.StaticAABBObject;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
+import Physics.Triggers.TriggerZone;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.Clip;
@@ -130,16 +131,21 @@ public class LastGiftLevel extends Scene
 
             getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
 
+            TriggerZone endZone = new TriggerZone(
+                    TriggerZone.box(templeLocation,
+                            new Vector3D(6,4,6)),
+                    playerObject).onEnter(()-> {
+                awakening.start();
+                gaze.setActive(true);
+            });
+            addUpdatable(endZone);
+
         }
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file ");
         }
     }
 
-    private void onEndgame(EyeAwakening awakening, GazeLock gaze) {
-        awakening.start();
-        gaze.setActive(true);
-    }
 
     private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {
         StaticAABBObject wall = new StaticAABBObject(this);
