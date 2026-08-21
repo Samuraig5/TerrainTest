@@ -50,9 +50,15 @@ public class Mesh implements Translatable, Rotatable, Scalable
 
     @Override
     public void scale(Vector3D delta) {
-        for (int i = 0; i < points.size(); i++) {
-            points.set(i, points.get(i).scaled(delta));
+        Map<Vector3D, Vector3D> pointMap = new HashMap<>();
+        List<Vector3D> newPoints = new ArrayList<>(points.size());
+        for (Vector3D p : points) {
+            Vector3D scaled = p.scaled(delta);   // new vector, old one untouched
+            pointMap.put(p, scaled);             // remember old -> new
+            newPoints.add(scaled);
         }
+        points = newPoints;                                              // replace the list
+        faces = new CopyOnWriteArrayList<>(generateCopyFaces(pointMap, faces)); // rebuild faces onto new vectors
     }
     public Vector3D getPosition() {return meshOffset;}
     public DrawInstructions getDrawInstructions() {

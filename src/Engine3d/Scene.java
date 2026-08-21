@@ -104,6 +104,15 @@ public class Scene implements Updatable
         }
     }
 
+    public void removeObject(Object3D object) {
+        objects.remove(object);
+        updatables.remove(object);
+        gravitationals.remove(object);
+        AABBObjects.remove(object);
+        dynamicAABBObjects.remove(object);
+        staticAABBObjects.remove(object);
+    }
+
     public void addUpdatable(Updatable updatable) {
         updatables.add(updatable);
         if (updatable instanceof TriggerZone tz) {

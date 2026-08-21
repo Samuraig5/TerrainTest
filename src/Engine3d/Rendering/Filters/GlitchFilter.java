@@ -10,7 +10,8 @@ import java.util.Random;
 public class GlitchFilter implements ScreenFilter, KeyListener {
     private volatile boolean active = false;
     private volatile double startTime;
-    private final double duration = 0.45;
+    private double duration = 0.45;
+    private double strength = 1;
     private final Random rng = new Random();
 
     @Override
@@ -39,13 +40,16 @@ public class GlitchFilter implements ScreenFilter, KeyListener {
 
     private static int clamp(int v, int W) { return v < 0 ? 0 : (v >= W ? W-1 : v); }
 
-    public void trigger() {
+    public void trigger(double strength, double dur) {
+        this.strength = strength;     // scales shift + slice amounts in apply()
+        this.duration = dur;
         startTime = System.nanoTime() * 1e-9;
         active = true;
     }
+
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_F) trigger();
+        if (e.getKeyCode() == KeyEvent.VK_F) trigger(1,0.45);
     }
     @Override
     public void keyReleased(KeyEvent e) {}
