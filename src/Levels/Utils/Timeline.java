@@ -10,7 +10,12 @@ public class Timeline implements Updatable {
     private double clock = 0; private int next = 0; private boolean running = false;
 
     public Timeline at(double time, Runnable action) { steps.add(new Step(time, action)); return this; }
-    public void start() { clock = 0; next = 0; running = true; }
+    public void start() {
+        steps.sort(java.util.Comparator.comparingDouble(Step::time));
+        clock = 0;
+        next = 0;
+        running = true;
+    }
     @Override public void update(double dt) {
         if (!running) return;
         clock += dt;

@@ -8,10 +8,7 @@ import Engine3d.Model.ChunkPopulator;
 import Engine3d.Model.FloorFollower;
 import Engine3d.Model.ScatterChunkManager;
 import Engine3d.Rendering.DrawInstructions;
-import Engine3d.Rendering.Filters.BlackScreenText;
-import Engine3d.Rendering.Filters.CensorFilter;
-import Engine3d.Rendering.Filters.GlitchFilter;
-import Engine3d.Rendering.Filters.WakeUpFilter;
+import Engine3d.Rendering.Filters.*;
 import Levels.Skyboxes.EyeAwakening;
 import Levels.Skyboxes.NightSkyBox;
 import Levels.Utils.GazeLock;
@@ -154,9 +151,10 @@ public class LastGiftLevel extends Scene
         Timeline gateSeq = new Timeline()
                 .at(0.0, () -> {
                     glitch.trigger(3.0, 1.4);
-                    //Sound.play("Resources/Audio/tear.wav");
+                    Sound.play("Resources/Audio/Digital Error.wav", 0.1);
                     })
                 .at(0.7, () -> {
+                    Sound.play("Resources/Audio/Error Buzz.wav", 0.1);
                     blackText.show(BlackScreenText.builder().add("WAKE UP", new Color(255, 0, 0)).build());
                     textGlitch.trigger(2.5,3.8);
                 })
@@ -195,6 +193,9 @@ public class LastGiftLevel extends Scene
 
         addFilter(new CensorFilter(getCamera(), templeLocation.translated(new Vector3D(-0.1, 4.25, 0.5)), 0.3, 0.3));
 
+        PopupFilter errors = new PopupFilter();
+        addFilter(errors);
+
         Timeline templeSeq = new Timeline()
                 .at(0.0, () -> {
                     glitch.trigger(1.0, 0.5);
@@ -212,9 +213,113 @@ public class LastGiftLevel extends Scene
                     awakening.start();
                     glitch.trigger(10.0, 1);
                 })
-                .at(16, () -> {
-                    glitch.trigger(15.0, 30.0);
+                .at(23, () -> {
+                    glitch.trigger(10.0, 30.0);
+                    Sound.play("Resources/Audio/Error Buzz.wav", 0.1);
+                })
+                .at(23.3, () -> {
+                    errors.add("HELL", new Color(255, 0, 0));
+                })
+                .at(23.6, () -> {
+                    errors.add("HELL", new Color(255, 0, 0));
+                })
+                .at(23.9, () -> {
+                    errors.add("HELP", new Color(255, 0, 0));
+                })
+                .at(24.2, () -> {
+                    errors.add("HELL", new Color(255, 0, 0));
+                })
+                .at(24.4, () -> {
+                    errors.add("HELL", new Color(255, 0, 0));
+                })
+                .at(24.6, () -> {
+                    errors.add("PLEASE", new Color(255, 0, 0));
+                })
+                .at(24.7, () -> {
+                    errors.add("HELL", new Color(255, 0, 0));
+                })
+                .at(24.8, () -> {
+                    errors.add("WHY", new Color(255, 0, 0));
+                })
+                .at(24.9, () -> {
+                    errors.add("WHY", new Color(255, 0, 0));
+                })
+                .at(25, () -> {
+                    errors.add("HELL", new Color(255, 0, 0));
+                })
+                .at(25.1, () -> {
+                    errors.add("HELL", new Color(255, 0, 0));
+                    errors.add("GOD", new Color(255, 0, 0));
+                    errors.add("WHY", new Color(255, 0, 0));
+                })
+                .at(25.2, () -> {
+                    errors.add("HOPELESS", new Color(255, 0, 0));
+                    errors.add("MOTHER", new Color(255, 0, 0));
+                    errors.add("HELP", new Color(255, 0, 0));
+                    errors.add("WHY", new Color(255, 0, 0));
+                    errors.add("HELL", new Color(255, 0, 0));
+                })
+                .at(25.3, () -> {
+                    errors.add("DIE", new Color(255, 0, 0));
+                    errors.add("HELP", new Color(255, 0, 0));
+                    errors.add("WHY", new Color(255, 0, 0));
+                    errors.add("HELL", new Color(255, 0, 0));
+                    errors.add("HELL", new Color(255, 0, 0));
+                    errors.add("HELL", new Color(255, 0, 0));
+                    errors.add("NO", new Color(255, 255, 255));
+                })
+                .at(25.4, () -> {
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                })
+                .at(25.5, () -> {
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                    errors.add("NO", new Color(255, 255, 255));
+                })
+                .at(26, () -> {
+                    Sound.play("Resources/Audio/Error Buzz.wav", 0.1);
+                })
+                .at(29, () -> {
+                    Sound.play("Resources/Audio/Error Buzz.wav", 0.1);
+                })
+                .at(32, () -> {
+                    Sound.play("Resources/Audio/Error Buzz.wav", 0.1);
+                })
+                .at(35, () -> {
+                    getSceneRenderer().stopThreads();
+                    getCamera().getFrame().dispose();
+                    System.exit(0);
                 });
+
+        for (double i = 25.6; i < 35; i += 0.1) {
+            templeSeq.at(i, () -> {
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+                errors.add("NO", new Color(255, 255, 255));
+            });
+        }
+
         addUpdatable(templeSeq);
 
         TriggerZone endZone = new TriggerZone(
