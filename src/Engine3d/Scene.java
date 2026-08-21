@@ -174,11 +174,6 @@ public class Scene implements Updatable
             tileRasterizer.render(camera, geometry, backgroundColour, skyBox);
         }
 
-        //Rasterize
-        try (Profiler.Span s = Profiler.span("raster")) {
-            tileRasterizer.render(camera, geometry, backgroundColour,skyBox);
-        }
-
         /*
         TODO: Add debug showing debugging stuff (eg. Wireframes)
         if (camera.debugging) {

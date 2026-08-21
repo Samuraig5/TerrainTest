@@ -69,9 +69,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
     }
     public List<Vector3D> getPoints() { return points; }
     public List<Vector3D> getPointsInWorld(Vector3D worldPos, Vector3D worldRot) {
-        copyPnF result = getCopyPnF();
-
-        return localToWorld(result.copiedPoints(),
+        return localToWorld(points,
                 getPosition().translated(worldPos),
                 getRotation().translated(worldRot));
     }
@@ -87,13 +85,11 @@ public class Mesh implements Translatable, Rotatable, Scalable
                                               Matrix4x4 viewMatrix, List<LightSource> lightSources)
     {
         try {
-            copyPnF result = getCopyPnF();
-
             Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(
                     Matrix4x4.get3dRotationMatrix(getRotation().translated(rotation)),
                     Matrix4x4.getTranslationMatrix(getPosition().translated(position))
             );
-            result = transform(worldTransform, result.copiedPoints, result.copiedFaces);
+            copyPnF result = transform(worldTransform, points, faces);
 
             // --- Backface cull (world space): keep only triangles facing the camera ---
             List<MeshTriangle> visible = new ArrayList<>();
@@ -143,23 +139,6 @@ public class Mesh implements Translatable, Rotatable, Scalable
             clippedTriangles.addAll(newTrigs);
         }
         return clippedTriangles;
-    }
-
-    /**
-     * Generates copies of the points and faces. The copied faces reference the copied points.
-     * @return a copyPnF result. The points can be accessed with result.copiedPoints() and the faces with result.copiedFaces()
-     */
-    private copyPnF getCopyPnF() {
-        Map<Vector3D, Vector3D> pointMap = new HashMap<>();
-        List<Vector3D> copiedPoints = new ArrayList<>();
-        for (int i = 0; i < points.size(); i++) {
-            copiedPoints.add(new Vector3D(points.get(i)));
-            pointMap.put(points.get(i), copiedPoints.get(i));
-        }
-
-        List<MeshTriangle> copiedFaces = generateCopyFaces(pointMap, faces);
-        copyPnF result = new copyPnF(copiedPoints, copiedFaces);
-        return result;
     }
 
     /**
