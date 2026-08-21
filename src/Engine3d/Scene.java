@@ -118,6 +118,7 @@ public class Scene implements Updatable
         //If they change between two objects on the same frame then the objects can "jitter"
         //This is also slightly more efficient.
         Vector3D constCamPos = new Vector3D(camera.getPosition());
+        Vector3D constCamDir = new Vector3D(camera.getDirection());
         Vector3D up = new Vector3D(0,1,0);
         Vector3D target = camera.getDirection().translated(constCamPos);
         Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);
@@ -153,7 +154,7 @@ public class Scene implements Updatable
          */
 
         try (Profiler.Span s = Profiler.span("filters")) {
-            for (ScreenFilter f : filters) f.apply(camera.getScreenBuffer());
+            for (ScreenFilter f : filters) f.apply(camera.getScreenBuffer(), constCamPos, constCamDir);
             filters.removeIf(ScreenFilter::isDone);
         }
     }

@@ -1,6 +1,8 @@
 package Engine3d.Rendering.Filters;
 
 import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
+import Math.Vector.Vector3D;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
@@ -12,7 +14,7 @@ public class GlitchFilter implements ScreenFilter, KeyListener {
     private final Random rng = new Random();
 
     @Override
-    public void apply(ScreenBuffer buffer) {
+    public void apply(ScreenBuffer buffer, Vector3D camPos, Vector3D camDir) {
         if (!active) return;
         double p = (System.nanoTime() * 1e-9 - startTime) / duration;
         if (p >= 1) { active = false; return; }

@@ -1,6 +1,8 @@
 package Engine3d.Rendering.Filters;
 
 import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
+import Math.Vector.Vector3D;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -17,7 +19,7 @@ public class WakeUpFilter implements ScreenFilter, KeyListener {
     }
 
     @Override
-    public void apply(ScreenBuffer buffer) {
+    public void apply(ScreenBuffer buffer, Vector3D camPos, Vector3D camDir) {
         int W = buffer.width(), H = buffer.height();
         int[] color = buffer.colourArray();
 

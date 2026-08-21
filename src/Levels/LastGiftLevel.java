@@ -8,6 +8,7 @@ import Engine3d.Model.ChunkPopulator;
 import Engine3d.Model.FloorFollower;
 import Engine3d.Model.ScatterChunkManager;
 import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Rendering.Filters.CensorFilter;
 import Engine3d.Rendering.Filters.GlitchFilter;
 import Engine3d.Rendering.Filters.WakeUpFilter;
 import Levels.Skyboxes.NightSkyBox;
@@ -92,7 +93,7 @@ public class LastGiftLevel extends Scene
             Object3D temple = loadFromFile("Resources/Models/Temple", "BloodTemple.obj");
             temple.translate(templeLocation);
 
-            spawnCollider(new Vector3D(1.5, 10, 1.5), templeLocation);
+            spawnCollider(new Vector3D(1.5, 5, 1.5), templeLocation); //Statue
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(5.1,0,2.25)));
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(5.1,0,-2.25)));
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-5.1,0,2.25)));
@@ -102,6 +103,7 @@ public class LastGiftLevel extends Scene
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(2.25,0,-5.1)));
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,5.1)));
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,-5.1)));
+
 
             GlitchFilter glitch = new GlitchFilter();
             addFilter(glitch);
@@ -114,6 +116,9 @@ public class LastGiftLevel extends Scene
                     }
             );
             addFilter(wake);
+
+            addFilter(new CensorFilter(getCamera(), templeLocation.translated(new Vector3D(-0.1, 4.25, 0.5)), 0.3, 0.3));
+
             getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
         }
         catch (IOException e1) {
