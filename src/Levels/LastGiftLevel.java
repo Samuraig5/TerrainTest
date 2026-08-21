@@ -119,7 +119,7 @@ public class LastGiftLevel extends Scene
             gaze.setOnWallHit(()->glitch.trigger(1,0.45));
             addUpdatable(gaze);
 
-            spawnGate(new Vector3D(0,0,10));
+            spawnGate(new Vector3D(0,0,200));
 
             getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
         }
@@ -163,7 +163,7 @@ public class LastGiftLevel extends Scene
                     Vector3D spawn = new Vector3D(0, 1, 0);
                     player.translate(spawn.translated(player.getPosition().inverted()));
                     player.rotate(player.getRotation().inverted().translated(new Vector3D(0,Math.toRadians(180),0)));
-                    spawnTemple(new Vector3D(0,0,-100));
+                    spawnTemple(new Vector3D(0,0,-200));
                 })
                 .at(4.5, blackText::hide);                          // reveal the temple world
         addUpdatable(gateSeq);

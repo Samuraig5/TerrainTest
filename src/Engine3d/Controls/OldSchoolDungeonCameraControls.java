@@ -116,7 +116,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
             case KeyEvent.VK_A -> aDown = true;
             case KeyEvent.VK_S -> sDown = true;
             case KeyEvent.VK_D -> dDown = true;
-            case KeyEvent.VK_SPACE -> spaceDown = true;
+            //case KeyEvent.VK_SPACE -> spaceDown = true;
             case KeyEvent.VK_SHIFT -> shiftDown = true;
             case KeyEvent.VK_CONTROL -> ctrlDown = true;
             case KeyEvent.VK_ESCAPE -> {

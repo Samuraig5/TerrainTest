@@ -15,6 +15,7 @@ public class MainMenu extends Menu {
 
     public MainMenu(JFrame frame) {
         super(frame);
+        launchGame();
     }
 
     @Override
