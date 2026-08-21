@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import Engine3d.DevTools.Profiler;
+import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
@@ -29,6 +30,8 @@ import Engine3d.Model.ObjParser;
 import Physics.Object3D;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
+import Physics.Triggers.TriggerZone;
+import Math.Box;
 
 public class Scene implements Updatable
 {
@@ -44,6 +47,7 @@ public class Scene implements Updatable
     protected List<AABBObject> AABBObjects = new ArrayList<>();
     protected List<DynamicAABBObject> dynamicAABBObjects = new ArrayList<>();
     protected List<StaticAABBObject> staticAABBObjects = new ArrayList<>();
+    private final List<TriggerZone> triggers = new ArrayList<>();
 
     //Makes sure we can't read game state while it is being written
     private final Object stateLock = new Object();
@@ -62,6 +66,13 @@ public class Scene implements Updatable
         sceneRenderer.grabFocus();
 
         camera.getFrame().repaint();
+
+        getSceneRenderer().addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override public void keyPressed(java.awt.event.KeyEvent e) {
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_F3)
+                    camera.debugging = !camera.debugging;
+            }
+        });
     }
     public SceneRenderer getSceneRenderer() {
         return sceneRenderer;
@@ -95,6 +106,9 @@ public class Scene implements Updatable
 
     public void addUpdatable(Updatable updatable) {
         updatables.add(updatable);
+        if (updatable instanceof TriggerZone tz) {
+            triggers.add(tz);
+        }
     }
 
     record RenderItem(Mesh mesh, Vector3D position, Vector3D rotation) {}
@@ -135,10 +149,20 @@ public class Scene implements Updatable
         //Compute Geometry
         List<Mesh.ProjectedTriangles> geometry;
         try (Profiler.Span s = Profiler.span("geometry")) {
-            geometry = frame.parallelStream()
-                    .map(o ->
-                            o.mesh.computeGeometry(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources))
-                    .toList();
+            geometry = new ArrayList<>(frame.parallelStream()
+                    .map(o -> o.mesh.computeGeometry(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources))
+                    .toList());   // ← wrap in ArrayList so we can add to it
+        }
+
+        if (camera.debugging) {
+            for (AABBObject o : AABBObjects)
+                geometry.add(debugBox(o.getAABBCollider().getAABB(), Color.WHITE, camera, constCamPos, viewMatrix));
+            for (TriggerZone t : triggers)
+                geometry.add(debugBox(t.getRegion(), Color.ORANGE, camera, constCamPos, viewMatrix));
+        }
+
+        try (Profiler.Span s = Profiler.span("raster")) {
+            tileRasterizer.render(camera, geometry, backgroundColour, skyBox);
         }
 
         //Rasterize
@@ -269,5 +293,16 @@ public class Scene implements Updatable
             }
         }
         return best;
+    }
+
+    private Mesh.ProjectedTriangles debugBox(AABB box, Color color, Camera camera,
+                                             Vector3D camPos, Matrix4x4 viewMatrix) {
+        BoxMesh mesh = new BoxMesh(new Box(box.min(), box.max()));   // built at world min/max
+        DrawInstructions di = new DrawInstructions(true, false, false, false); // wireframe only
+        di.wireFrameColour = color;
+        di.ignorePixelDepth = true;                                  // draw on top, see through walls
+        mesh.setDrawInstructions(di);
+        return mesh.computeGeometry(new Vector3D(0,0,0), new Vector3D(0,0,0),
+                camera, camPos, viewMatrix, lightSources);
     }
 }

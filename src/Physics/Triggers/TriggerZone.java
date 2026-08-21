@@ -22,7 +22,7 @@ public class TriggerZone implements Updatable {
     public TriggerZone onEnter(Runnable r) { this.onEnter = r; return this; }
     public TriggerZone onExit(Runnable r)  { this.onExit  = r; return this; }
     public TriggerZone repeatable()        { this.once = false; return this; }
-
+    public AABB getRegion() { return region; }
     @Override
     public void update(double deltaTime) {
         boolean inside = region.overlaps(watched.getAABBCollider().getAABB());
