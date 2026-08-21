@@ -1,12 +1,14 @@
 package Levels;
 
 import Engine3d.Audio.Sound;
+import Engine3d.Controls.Controller;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.Model.BillboardScatterMesh;
 import Engine3d.Model.ChunkPopulator;
 import Engine3d.Model.FloorFollower;
 import Engine3d.Model.ScatterChunkManager;
 import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Rendering.Filters.WakeUpFilter;
 import Levels.Skyboxes.NightSkyBox;
 import Physics.AABBCollisions.StaticAABBCollider;
 import Physics.Object3D;
@@ -39,6 +41,7 @@ public class LastGiftLevel extends Scene
         PlayerObject playerObject = new PlayerObject(this, (PlayerCamera) camera);
         playerObject.translate(new Vector3D(0,1,0));
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), playerObject);
+        cameraController.isEnabled(false);
 
         addUpdatable(cameraController);
 
@@ -99,11 +102,20 @@ public class LastGiftLevel extends Scene
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,5.1)));
             spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,-5.1)));
 
-            Clip music = Sound.playLoop("Resources/Audio/Hymn of the Cherubim.wav");
+            WakeUpFilter wake = new WakeUpFilter(
+                    ()->onWake(cameraController)
+            );
+            addFilter(wake);
+            getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
         }
         catch (IOException e1) {
             getSceneRenderer().logError("Can't find file ");
         }
+    }
+
+    private void onWake(Controller cameraController) {
+        cameraController.isEnabled(true);
+        Clip music = Sound.playLoop("Resources/Audio/Hymn of the Cherubim.wav");
     }
 
     private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {

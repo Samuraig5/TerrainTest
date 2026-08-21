@@ -67,6 +67,10 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
     @Override
     public void update(double deltaTime) {
+        if (!isEnabled()) {
+            return;
+        }
+
         Vector3D transDelta = new Vector3D(0,0,0);
         Vector3D rotDelta = new Vector3D(0,0,0);
 
@@ -145,7 +149,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         int deltaX = e.getXOnScreen() - center.x;
         int deltaY = e.getYOnScreen() - center.y;
 
-        if (centerCursor) {
+        if (isEnabled() && centerCursor) {
             Vector3D rotDelta = new Vector3D(Math.toRadians(deltaY) * mouseSensitivity, Math.toRadians(-deltaX) * mouseSensitivity, 0);
             playerObject.rotate(rotDelta);
         }

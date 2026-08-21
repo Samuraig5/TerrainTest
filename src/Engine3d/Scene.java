@@ -8,6 +8,7 @@ import Engine3d.DevTools.Profiler;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Rendering.Filters.ScreenFilter;
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
 import Engine3d.Rendering.SkyBox;
@@ -49,6 +50,7 @@ public class Scene implements Updatable
     private final TileRasterizer tileRasterizer = new TileRasterizer();
 
     private volatile SkyBox skyBox;
+    private final List<ScreenFilter> filters = new CopyOnWriteArrayList<>();
 
     public Scene(Camera camera) {
         this.camera = camera;
@@ -149,6 +151,11 @@ public class Scene implements Updatable
 
         }
          */
+
+        try (Profiler.Span s = Profiler.span("filters")) {
+            for (ScreenFilter f : filters) f.apply(camera.getScreenBuffer());
+            filters.removeIf(ScreenFilter::isDone);
+        }
     }
 
     public Camera getCamera() {return camera;}
@@ -160,7 +167,8 @@ public class Scene implements Updatable
     public void setSkyBox(SkyBox skyBox) {
         this.skyBox = skyBox;
     }
-
+    public void addFilter(ScreenFilter f)    { filters.add(f); }
+    public void removeFilter(ScreenFilter f) { filters.remove(f); }
     public void setGravity(double grav) {
         gravity = grav;
     }

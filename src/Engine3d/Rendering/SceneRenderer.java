@@ -73,11 +73,12 @@ public class SceneRenderer extends JPanel
         g.drawString(String.format("build: %.2f ms", Profiler.ms("buildScreenBuffer")), 20, 60);
         g.drawString(String.format("  geometry: %.2f ms", Profiler.ms("geometry")), 30, 78);
         g.drawString(String.format("  raster:   %.2f ms", Profiler.ms("raster")),   30, 96);
+        g.drawString(String.format("  filters:  %.2f ms", Profiler.ms("filters")), 30,114);
 
-        g.drawString("Updates/s: " + Math.round(Profiler.rate("updates")), 20, 130);
-        g.drawString(String.format("update: %.2f ms", Profiler.ms("update")), 20, 150);
-        g.drawString(String.format("  applyGravity:    %.2f ms", Profiler.ms("applyGravity")),    30, 168);
-        g.drawString(String.format("  handleCollision: %.2f ms", Profiler.ms("handleCollision")), 30, 186);
+        g.drawString("Updates/s: " + Math.round(Profiler.rate("updates")), 20, 140);
+        g.drawString(String.format("update: %.2f ms", Profiler.ms("update")), 20, 160);
+        g.drawString(String.format("  applyGravity:    %.2f ms", Profiler.ms("applyGravity")),    30, 178);
+        g.drawString(String.format("  handleCollision: %.2f ms", Profiler.ms("handleCollision")), 30, 196);
     }
 
     public void logError(String message) {

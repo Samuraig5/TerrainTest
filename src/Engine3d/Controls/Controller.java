@@ -13,6 +13,7 @@ public class Controller implements KeyListener, MouseListener, MouseMotionListen
 {
     private final List<Translatable> attachedTranslatables = new ArrayList<>();
     private final List<Rotatable> attachedRotatables = new ArrayList<>();
+    private boolean enabled = true;
 
     public Controller(SceneRenderer renderer)
     {
@@ -23,17 +24,23 @@ public class Controller implements KeyListener, MouseListener, MouseMotionListen
 
     public void attachTranslatable(Translatable translatable){attachedTranslatables.add(translatable);}
     public void attachRotatable(Rotatable rotatable) {attachedRotatables.add(rotatable);}
-    void updateTranslatables(Vector3D delta)
-    {
+    void updateTranslatables(Vector3D delta) {
         for (Translatable trans : attachedTranslatables) {
             trans.translate(delta);
         }
     }
-    void updateRotatables(Vector3D rotation)
-    {
+    void updateRotatables(Vector3D rotation) {
         for (Rotatable rot : attachedRotatables) {
             rot.rotate(rotation);
         }
+    }
+
+    public void isEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     @Override
