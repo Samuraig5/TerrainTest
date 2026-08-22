@@ -7,12 +7,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import Engine3d.DevTools.Profiler;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
-import Engine3d.Rendering.Camera;
-import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Rendering.*;
 import Engine3d.Rendering.Filters.ScreenFilter;
-import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
-import Engine3d.Rendering.SkyBox;
 import Math.Raycast.Ray;
 import Math.Raycast.RayCollision;
 import Math.Raycast.RayTriangle;
@@ -147,6 +144,9 @@ public class Scene implements Updatable
         Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);
         Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
 
+        Matrix4x4 viewProj = Matrix4x4.matrixMatrixMultiplication(viewMatrix, camera.getProjectionMatrix());
+        Frustum frustum = new Frustum(viewProj);
+
         frame.sort((o1, o2) -> {
             // Calculate distances to the camera
             double distance1 = o1.position.distanceTo(constCamPos);
@@ -159,15 +159,17 @@ public class Scene implements Updatable
         List<Mesh.ProjectedTriangles> geometry;
         try (Profiler.Span s = Profiler.span("geometry")) {
             geometry = new ArrayList<>(frame.parallelStream()
-                    .map(o -> o.mesh.computeGeometry(o.position, o.rotation, camera, constCamPos, viewMatrix, lightSources))
+                    .map(o -> o.mesh.computeGeometry(o.position, o.rotation,
+                            camera, constCamPos, frustum, viewMatrix,
+                            lightSources))
                     .toList());   // ← wrap in ArrayList so we can add to it
         }
 
         if (camera.debugging) {
             for (AABBObject o : AABBObjects)
-                geometry.add(debugBox(o.getAABBCollider().getAABB(), Color.WHITE, camera, constCamPos, viewMatrix));
+                geometry.add(debugBox(o.getAABBCollider().getAABB(), Color.WHITE, camera, constCamPos, viewMatrix, frustum));
             for (TriggerZone t : triggers)
-                geometry.add(debugBox(t.getRegion(), Color.ORANGE, camera, constCamPos, viewMatrix));
+                geometry.add(debugBox(t.getRegion(), Color.ORANGE, camera, constCamPos, viewMatrix, frustum));
         }
 
         try (Profiler.Span s = Profiler.span("raster")) {
@@ -300,13 +302,13 @@ public class Scene implements Updatable
     }
 
     private Mesh.ProjectedTriangles debugBox(AABB box, Color color, Camera camera,
-                                             Vector3D camPos, Matrix4x4 viewMatrix) {
+                                             Vector3D camPos, Matrix4x4 viewMatrix, Frustum frustum) {
         BoxMesh mesh = new BoxMesh(new Box(box.min(), box.max()));   // built at world min/max
         DrawInstructions di = new DrawInstructions(true, false, false, false); // wireframe only
         di.wireFrameColour = color;
         di.ignorePixelDepth = true;                                  // draw on top, see through walls
         mesh.setDrawInstructions(di);
         return mesh.computeGeometry(new Vector3D(0,0,0), new Vector3D(0,0,0),
-                camera, camPos, viewMatrix, lightSources);
+                camera, camPos, frustum, viewMatrix, lightSources);
     }
 }

@@ -13,11 +13,15 @@ public class Main {
     public static void main(String[] args)
     {
         JFrame frame = new JFrame("Hell");
+        ImageIcon imgicon = new ImageIcon("Resources/Textures/The White Sign.png");
+        frame.setIconImage(imgicon.getImage());
+
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        //frame.setUndecorated(true);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+         frame.setUndecorated(true);
 
         frame.setLocationRelativeTo(null);
 

@@ -71,6 +71,7 @@ public class ObjParser
             System.err.println("Error reading obj file: " + e.getMessage());
             return null;
         }
+        mesh.recomputeLocalBounds();
         return mesh;
     }
 

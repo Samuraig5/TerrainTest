@@ -61,6 +61,9 @@ public abstract class Camera implements Rotatable, Translatable {
     public MeshTriangle projectTriangle(MeshTriangle in) {
         return projectionMatrix.multiplyWithTriangle(in);
     }
+    public Matrix4x4 getProjectionMatrix() {
+        return projectionMatrix;
+    }
     public Vector3D getScreenDimensions() {
         return new Vector3D(window.getWidth(), window.getHeight(), 0);
     }

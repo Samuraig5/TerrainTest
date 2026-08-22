@@ -1,6 +1,7 @@
 package Engine3d.Model;
 
 import Engine3d.Lighting.LightSource;
+import Engine3d.Rendering.Frustum;
 import Math.*;
 import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
@@ -22,6 +23,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
     protected List<MeshTriangle> faces = new CopyOnWriteArrayList<>();
     protected Vector3D meshOffrot = new Vector3D(0,0,0,1);
     protected Vector3D meshOffset = new Vector3D(0,0,0,1);
+    protected Vector3D localMin, localMax;
     private record copyPnF(List<Vector3D> copiedPoints, List<MeshTriangle> copiedFaces) { }
     private DrawInstructions drawInstructions;
     public Mesh() {
@@ -59,6 +61,7 @@ public class Mesh implements Translatable, Rotatable, Scalable
         }
         points = newPoints;                                              // replace the list
         faces = new CopyOnWriteArrayList<>(generateCopyFaces(pointMap, faces)); // rebuild faces onto new vectors
+        recomputeLocalBounds();
     }
     public Vector3D getPosition() {return meshOffset;}
     public DrawInstructions getDrawInstructions() {
@@ -83,13 +86,22 @@ public class Mesh implements Translatable, Rotatable, Scalable
 
     public record ProjectedTriangles(List<MeshTriangle> meshTriangles, DrawInstructions drawInstructions) { }
     public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos,
-                                              Matrix4x4 viewMatrix, List<LightSource> lightSources)
-    {
+                                              Frustum frustum, Matrix4x4 viewMatrix, List<LightSource> lightSources) {
         try {
             Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(
                     Matrix4x4.get3dRotationMatrix(getRotation().translated(rotation)),
                     Matrix4x4.getTranslationMatrix(getPosition().translated(position))
             );
+
+            // --- Frustum cull: skip the whole mesh if its world AABB is off-screen ---
+            if (localMin != null) {
+                Vector3D[] mm = new Vector3D[2];
+                worldAABB(worldTransform, localMin, localMax, mm);
+                if (!frustum.isVisible(mm[0], mm[1])) {
+                    return new ProjectedTriangles(new ArrayList<>(), drawInstructions);
+                }
+            }
+
             copyPnF result = transform(worldTransform, points, faces);
 
             // --- Backface cull (world space): keep only triangles facing the camera ---
@@ -396,11 +408,13 @@ public class Mesh implements Translatable, Rotatable, Scalable
     }
 
     private copyPnF transform(Matrix4x4 transformMatrix, List<Vector3D> points, List<MeshTriangle> faces) {
-        Map<Vector3D, Vector3D> pointMap = new HashMap<>();
-        List<Vector3D> newPoints = new ArrayList<>(points.size());
-        for (Vector3D p : points) {
+        int n = points.size();
+        Map<Vector3D, Vector3D> pointMap = new HashMap<>(n * 2);
+        List<Vector3D> newPoints = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            Vector3D p = points.get(i);
             Vector3D tp = transformMatrix.matrixVectorManipulation(p);
-            pointMap.put(p,tp);
+            pointMap.put(p, tp);
             newPoints.add(tp);
         }
         return new copyPnF(newPoints, generateCopyFaces(pointMap, faces));
@@ -472,5 +486,36 @@ public class Mesh implements Translatable, Rotatable, Scalable
                     tf.matrixVectorManipulation(p[2])));
         }
         return out;
+    }
+
+    /** Scan the local-space points once and cache the bounds. */
+    public void recomputeLocalBounds() {
+        if (points == null || points.isEmpty()) { localMin = localMax = null; return; }
+        double mnX=Double.MAX_VALUE, mnY=Double.MAX_VALUE, mnZ=Double.MAX_VALUE;
+        double mxX=-Double.MAX_VALUE, mxY=-Double.MAX_VALUE, mxZ=-Double.MAX_VALUE;
+        for (Vector3D p : points) {
+            if (p.x()<mnX) mnX=p.x();  if (p.x()>mxX) mxX=p.x();
+            if (p.y()<mnY) mnY=p.y();  if (p.y()>mxY) mxY=p.y();
+            if (p.z()<mnZ) mnZ=p.z();  if (p.z()>mxZ) mxZ=p.z();
+        }
+        localMin = new Vector3D(mnX,mnY,mnZ);
+        localMax = new Vector3D(mxX,mxY,mxZ);
+    }
+
+    private static void worldAABB(Matrix4x4 wt, Vector3D lo, Vector3D hi,
+                                  Vector3D[] outMinMax) {
+        double mnX=Double.MAX_VALUE, mnY=Double.MAX_VALUE, mnZ=Double.MAX_VALUE;
+        double mxX=-Double.MAX_VALUE, mxY=-Double.MAX_VALUE, mxZ=-Double.MAX_VALUE;
+        for (int i=0;i<8;i++) {
+            Vector3D c = new Vector3D((i&1)==0?lo.x():hi.x(),
+                    (i&2)==0?lo.y():hi.y(),
+                    (i&4)==0?lo.z():hi.z());
+            Vector3D w = wt.matrixVectorManipulation(c);   // local → world
+            if (w.x()<mnX) mnX=w.x(); if (w.x()>mxX) mxX=w.x();
+            if (w.y()<mnY) mnY=w.y(); if (w.y()>mxY) mxY=w.y();
+            if (w.z()<mnZ) mnZ=w.z(); if (w.z()>mxZ) mxZ=w.z();
+        }
+        outMinMax[0] = new Vector3D(mnX,mnY,mnZ);
+        outMinMax[1] = new Vector3D(mxX,mxY,mxZ);
     }
 }

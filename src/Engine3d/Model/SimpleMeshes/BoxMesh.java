@@ -67,6 +67,7 @@ public class BoxMesh extends Mesh
                 new Vector3D(max.x(), max.y(), max.z()),
                 new Vector3D(max.x(), min.y(), max.z()),
         });
+        recomputeLocalBounds();
     }
 
     private void buildPoints(Vector3D size) {

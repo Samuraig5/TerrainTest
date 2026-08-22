@@ -7,6 +7,7 @@ import java.util.List;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
+import Engine3d.Rendering.Frustum;
 import Engine3d.Rendering.Material;
 import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
@@ -37,11 +38,10 @@ public class BillboardScatterMesh extends Mesh{
     public void add(Wind wind) { this.wind = wind; }
 
     @Override
-    public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation,
-                                              Camera camera, Vector3D cameraPos,
-                                              Matrix4x4 vieMatrix, List<LightSource> lightSources) {
+    public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos,
+                                              Frustum frustum, Matrix4x4 viewMatrix, List<LightSource> lightSources) {
         rebuildQuads(camera);
-        return super.computeGeometry(position,rotation,camera,cameraPos,vieMatrix,lightSources);
+        return super.computeGeometry(position,rotation,camera,cameraPos, frustum, viewMatrix, lightSources);
     }
 
     private void rebuildQuads(Camera camera) {
