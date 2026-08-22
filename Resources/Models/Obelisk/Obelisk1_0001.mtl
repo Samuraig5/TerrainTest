@@ -1,0 +1,13 @@
+# Blender 3.4.0 MTL File: 'Obelisk1_0001.blend'
+# www.blender.org
+
+newmtl map_Obelisk_01
+Ns 11.111113
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd Marble_Base_color.png

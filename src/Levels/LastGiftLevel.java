@@ -120,6 +120,7 @@ public class LastGiftLevel extends Scene
             addUpdatable(gaze);
 
             spawnGate(new Vector3D(0,0,200));
+            spawnObelisks(new Vector3D(0,0,10));
 
             getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
         }
@@ -174,6 +175,33 @@ public class LastGiftLevel extends Scene
                 player).onEnter(()-> gateSeq.start());
 
         addUpdatable(progressionZone);
+    }
+
+    private void spawnObelisks(Vector3D obeliskLocation) {
+        spawnObelisk(obeliskLocation, new Vector3D(0,0,0), new Vector3D(1,1,1));
+
+        spawnObelisk(obeliskLocation.translated(
+                new Vector3D(100,-10,10)),
+                new Vector3D(Math.toRadians(10),Math.toRadians(45),Math.toRadians(15)),
+                new Vector3D(10,10,10));
+        spawnObelisk(obeliskLocation.translated(
+                new Vector3D(80,-15,-40)),
+                new Vector3D(Math.toRadians(20),Math.toRadians(20),Math.toRadians(5)),
+                new Vector3D(8,8,8));
+        spawnObelisk(obeliskLocation.translated(
+                new Vector3D(-25,-10,50)),
+                new Vector3D(Math.toRadians(15),Math.toRadians(10),Math.toRadians(15)),
+                new Vector3D(5,5,5));
+        spawnObelisk(obeliskLocation.translated(
+                new Vector3D(-120,-10,70)),
+                new Vector3D(Math.toRadians(-20),Math.toRadians(40),Math.toRadians(-15)),
+                new Vector3D(10,10,10));
+    }
+    private void spawnObelisk(Vector3D location, Vector3D rotation, Vector3D scale) {
+        Object3D obelisk = loadFromFile("Resources/Models/Obelisk", "Obelisk1_0001.obj");
+        obelisk.rotate(rotation);
+        obelisk.getMesh().scale(scale);
+        obelisk.translate(location);
     }
 
     private void spawnTemple(Vector3D templeLocation) {
