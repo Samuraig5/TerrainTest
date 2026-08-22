@@ -33,4 +33,13 @@ public final class Frustum {
         }
         return true;
     }
+
+    public boolean isSphereVisible(Vector3D c, double r) {
+        for (double[] pl : p) {
+            double d   = pl[0]*c.x() + pl[1]*c.y() + pl[2]*c.z() + pl[3];
+            double len = Math.sqrt(pl[0]*pl[0] + pl[1]*pl[1] + pl[2]*pl[2]);
+            if (d < -r * len) return false;   // sphere fully behind this plane
+        }
+        return true;
+    }
 }

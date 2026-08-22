@@ -20,13 +20,26 @@ public class BillboardScatterMesh extends Mesh{
 
     private volatile List<Instance> instances = new ArrayList<>();
     private final BufferedImage sprite;
+    private final Material matA;
+    private final Material matB;
     private Wind wind = new Wind(new Vector3D(0,0,0),0,0,0);
+    private double maxDrawDist = 50;
 
     public BillboardScatterMesh(BufferedImage sprite) {
         super();
         this.sprite = sprite;
         setDrawInstructions(
                 new DrawInstructions(false,false,true,false));
+
+        matA = makeMaterial(new Vector2D(0, 1), new Vector2D(1, 1), new Vector2D(0, 0));
+        matB = makeMaterial(new Vector2D(0, 0), new Vector2D(1, 1), new Vector2D(1, 0));
+    }
+
+    private Material makeMaterial(Vector2D t0, Vector2D t1, Vector2D t2) {
+        Material m = new Material(t0, t1, t2);
+        m.setTexture(sprite);           // TileRasterizer skips the texture branch if this is null
+        m.setBaseColour(Color.WHITE);   // diffuse must be white, or mul(texel, diffuse) darkens the sprite
+        return m;
     }
 
     public void add(Instance i) {
@@ -40,11 +53,11 @@ public class BillboardScatterMesh extends Mesh{
     @Override
     public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos,
                                               Frustum frustum, Matrix4x4 viewMatrix, List<LightSource> lightSources) {
-        rebuildQuads(camera);
+        rebuildQuads(camera, cameraPos, frustum);
         return super.computeGeometry(position,rotation,camera,cameraPos, frustum, viewMatrix, lightSources);
     }
 
-    private void rebuildQuads(Camera camera) {
+    private void rebuildQuads(Camera camera, Vector3D camPos, Frustum frustum) {
         double time = System.nanoTime() * 1e-9;
 
         List<Instance> snap = this.instances;
@@ -58,10 +71,18 @@ public class BillboardScatterMesh extends Mesh{
         List<MeshTriangle>  newFaces  = new ArrayList<>(snap.size() * 2);
 
         for (Instance in : snap) {
+            Vector3D p = in.position();
+
+            // (a) distance cull — grass doesn't need to draw 500 units away
+            double dx = p.x() - camPos.x(), dz = p.z() - camPos.z();
+            if (dx*dx + dz*dz > maxDrawDist * maxDrawDist) continue;
+
+            // (b) frustum cull — treat the quad as a sphere at its centre
+            if (!frustum.isSphereVisible(p, Math.max(in.width(), in.height()))) continue;
+
             double hw = in.width() * 0.5;
             double h  = in.height();
             double rx = right.x() * hw, rz = right.z() * hw;   // right.y() is 0
-            Vector3D p = in.position();
 
             // Per-flower wind sway (top of the quad only)
             double phase = (p.x() + p.z()) * wind.waveLength;
@@ -77,22 +98,15 @@ public class BillboardScatterMesh extends Mesh{
             newPoints.add(bl); newPoints.add(br); newPoints.add(tl); newPoints.add(tr);
 
             MeshTriangle t1 = new MeshTriangle(bl, br, tl);
-            t1.setMaterial(makeMaterial(new Vector2D(0, 1), new Vector2D(1, 1), new Vector2D(0, 0)));
+            t1.setMaterial(matA);
             newFaces.add(t1);
 
             MeshTriangle t2 = new MeshTriangle(tl, br, tr);
-            t2.setMaterial(makeMaterial(new Vector2D(0, 0), new Vector2D(1, 1), new Vector2D(1, 0)));
+            t2.setMaterial(matB);
             newFaces.add(t2);
         }
 
         this.points = newPoints;   // protected in Mesh
         this.faces  = newFaces;    // assigning an ArrayList is fine — field is declared as List
-    }
-
-    private Material makeMaterial(Vector2D t0, Vector2D t1, Vector2D t2) {
-        Material m = new Material(t0, t1, t2);
-        m.setTexture(sprite);           // TileRasterizer skips the texture branch if this is null
-        m.setBaseColour(Color.WHITE);   // diffuse must be white, or mul(texel, diffuse) darkens the sprite
-        return m;
     }
 }
