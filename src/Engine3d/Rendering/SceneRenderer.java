@@ -59,7 +59,6 @@ public class SceneRenderer extends JPanel
         else {
             System.err.println("Engine3d.Rendering.SceneRenderer: No scene is loaded!");
         }
-        repaint();
     }
 
     private void paintActiveScene(Graphics g)
@@ -117,6 +116,7 @@ public class SceneRenderer extends JPanel
                     synchronized (activeScene.getCamera()) {
                         activeScene.getCamera().swapBuffers();
                     }
+                    repaint();
                 }
                 long remaining = targetPeriod - (System.nanoTime() - frameStart);
                 if (remaining > 0) {

@@ -21,7 +21,7 @@ public class Main {
         frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-         frame.setUndecorated(true);
+        frame.setUndecorated(true);
 
         frame.setLocationRelativeTo(null);
 
