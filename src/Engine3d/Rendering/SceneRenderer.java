@@ -104,7 +104,10 @@ public class SceneRenderer extends JPanel
         }
 
         bufferThread = new Thread(() -> {
+            final long targetPeriod = 16_666_667L; // ns for 60 FPS
+
             while (!Thread.currentThread().isInterrupted()) {
+                long frameStart = System.nanoTime();
                 if (activeScene != null) {
                     try (Profiler.Span s = Profiler.span("buildScreenBuffer")) {
                         activeScene.buildScreenBuffer();
@@ -115,11 +118,13 @@ public class SceneRenderer extends JPanel
                         activeScene.getCamera().swapBuffers();
                     }
                 }
-
-                try {
-                    Thread.sleep(16);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
+                long remaining = targetPeriod - (System.nanoTime() - frameStart);
+                if (remaining > 0) {
+                    try {
+                        Thread.sleep(remaining / 1_000_000, (int)(remaining % 1_000_000));
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         });
