@@ -51,10 +51,10 @@ public class BillboardScatterMesh extends Mesh{
     public void add(Wind wind) { this.wind = wind; }
 
     @Override
-    public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos,
+    public ProjectedTriangles computeGeometry(Vector3D scale, Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos,
                                               Frustum frustum, Matrix4x4 viewMatrix, List<LightSource> lightSources) {
         rebuildQuads(camera, cameraPos, frustum);
-        return super.computeGeometry(position,rotation,camera,cameraPos, frustum, viewMatrix, lightSources);
+        return super.computeGeometry(scale, position,rotation,camera,cameraPos, frustum, viewMatrix, lightSources);
     }
 
     private void rebuildQuads(Camera camera, Vector3D camPos, Frustum frustum) {

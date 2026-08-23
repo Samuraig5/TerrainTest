@@ -85,13 +85,16 @@ public class Mesh implements Translatable, Rotatable, Scalable
     }
 
     public record ProjectedTriangles(List<MeshTriangle> meshTriangles, DrawInstructions drawInstructions) { }
-    public ProjectedTriangles computeGeometry(Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos,
+    public ProjectedTriangles computeGeometry(Vector3D scale, Vector3D position, Vector3D rotation, Camera camera, Vector3D cameraPos,
                                               Frustum frustum, Matrix4x4 viewMatrix, List<LightSource> lightSources) {
         try {
-            Matrix4x4 worldTransform = Matrix4x4.matrixMatrixMultiplication(
-                    Matrix4x4.get3dRotationMatrix(getRotation().translated(rotation)),
-                    Matrix4x4.getTranslationMatrix(getPosition().translated(position))
-            );
+            Matrix4x4 worldTransform =
+                    Matrix4x4.matrixMatrixMultiplication(
+                            Matrix4x4.getScalingMatrix(scale),
+                            Matrix4x4.matrixMatrixMultiplication(
+                                    Matrix4x4.get3dRotationMatrix(getRotation().translated(rotation)),
+                                    Matrix4x4.getTranslationMatrix(getPosition().translated(position))
+            ));
 
             // --- Frustum cull: skip the whole mesh if its world AABB is off-screen ---
             if (localMin != null) {

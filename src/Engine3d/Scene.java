@@ -117,7 +117,7 @@ public class Scene implements Updatable
         }
     }
 
-    record RenderItem(Mesh mesh, Vector3D position, Vector3D rotation) {}
+    record RenderItem(Mesh mesh, Vector3D scale, Vector3D position, Vector3D rotation) {}
     public void buildScreenBuffer() {
         camera.getScreenBuffer().clear(backgroundColour);
 
@@ -128,6 +128,7 @@ public class Scene implements Updatable
             for (Object3D obj : objects) {
                 frame.add(new RenderItem(
                         obj.getMesh(),
+                        new Vector3D(obj.getScale()),
                         new Vector3D(obj.getPosition()),
                         new Vector3D(obj.getRotation())
                 ));
@@ -159,7 +160,7 @@ public class Scene implements Updatable
         List<Mesh.ProjectedTriangles> geometry;
         try (Profiler.Span s = Profiler.span("geometry")) {
             geometry = new ArrayList<>(frame.parallelStream()
-                    .map(o -> o.mesh.computeGeometry(o.position, o.rotation,
+                    .map(o -> o.mesh.computeGeometry(o.scale, o.position, o.rotation,
                             camera, constCamPos, frustum, viewMatrix,
                             lightSources))
                     .toList());   // ← wrap in ArrayList so we can add to it
@@ -308,7 +309,7 @@ public class Scene implements Updatable
         di.wireFrameColour = color;
         di.ignorePixelDepth = true;                                  // draw on top, see through walls
         mesh.setDrawInstructions(di);
-        return mesh.computeGeometry(new Vector3D(0,0,0), new Vector3D(0,0,0),
+        return mesh.computeGeometry(new Vector3D(1,1,1), new Vector3D(0,0,0), new Vector3D(0,0,0),
                 camera, camPos, frustum, viewMatrix, lightSources);
     }
 }

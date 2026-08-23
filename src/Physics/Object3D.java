@@ -19,6 +19,7 @@ public class Object3D implements Translatable, Rotatable
     private Mesh mesh;
     protected Vector3D rotation = new Vector3D(0,0,0);
     protected Vector3D position = new Vector3D(0,0,0);
+    protected Vector3D scale = new Vector3D(1,1,1);
 
     public Object3D(Scene scene) {
         this.scene = scene;
@@ -79,6 +80,16 @@ public class Object3D implements Translatable, Rotatable
         return position;
     }
 
+    public Vector3D getScale() { return scale; }
+    public void setScale(Vector3D scale) {
+        this.scale = scale;
+    }
+    public void scaleBy(Vector3D delta) {
+        this.scale = new Vector3D(
+                scale.x()*delta.x(),
+                scale.y()*delta.y(),
+                scale.z()*delta.z());
+    }
     public Scene getScene() {return scene;}
 
     // === DEBUGGING ===

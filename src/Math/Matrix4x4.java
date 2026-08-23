@@ -153,6 +153,16 @@ public class Matrix4x4
         rotZ.mat[3][3] = 1f;
         return rotZ;
     }
+
+    public static Matrix4x4 getScalingMatrix(Vector3D s) {
+        Matrix4x4 m = new Matrix4x4(); // identity
+        m.mat[0][0] = s.x();
+        m.mat[1][1] = s.y();
+        m.mat[2][2] = s.z();
+        m.mat[3][3] = 1;
+        return m;
+    }
+
     public static Matrix4x4 get3dRotationMatrix(Vector3D rotation){
         Matrix4x4 rotMat = Matrix4x4.matrixMatrixMultiplication(getRotationMatrixZ(rotation.z()), getRotationMatrixX(rotation.x()));
         rotMat = Matrix4x4.matrixMatrixMultiplication(rotMat, getRotationMatrixY(rotation.y()));
