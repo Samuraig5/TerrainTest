@@ -128,4 +128,12 @@ public class Drawer
         int tol = (int) (tolerance*255);
         return c.getRed() <= tol && c.getGreen() <= tol && c.getBlue() <= tol && c.getAlpha() == 0;
     }
+
+    public Vector2D windowToBuffer(double mx, double my) {
+        var buf = camera.getScreenBuffer().getBufferedImage();
+        Vector3D win = camera.getScreenDimensions();
+        double sc = Math.min(win.x()/buf.getWidth(), win.y()/buf.getHeight());
+        double ox = (win.x()-buf.getWidth()*sc)/2, oy = (win.y()-buf.getHeight()*sc)/2;
+        return new Vector2D((mx-ox)/sc, (my-oy)/sc);
+    }
 }

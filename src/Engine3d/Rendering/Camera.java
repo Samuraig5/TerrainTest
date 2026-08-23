@@ -2,6 +2,7 @@ package Engine3d.Rendering;
 
 import Math.Matrix4x4;
 import Math.MeshTriangle;
+import Math.Raycast.Ray;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.ScreenDrawing.Drawer;
 import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
@@ -88,5 +89,18 @@ public abstract class Camera implements Rotatable, Translatable {
     @Override
     public Vector3D getDirection(Vector3D base) {
         return Matrix4x4.get3dRotationMatrix(getRotation()).matrixVectorMultiplication(base);
+    }
+
+    public Ray rayFromBuffer(double bx, double by) {
+        var buf = getScreenBuffer().getBufferedImage();
+        double ndcX = 2*bx/buf.getWidth() - 1;      // flip here if the X-mirror needs it
+        double ndcY = 1 - 2*by/buf.getHeight();
+        double t = Math.tan(Math.toRadians(fov)/2);
+        Vector3D fwd = getDirection().normalized();
+        Vector3D right = fwd.crossProduct(new Vector3D(0,1,0)).normalized();
+        Vector3D up = right.crossProduct(fwd).normalized();
+        Vector3D dir = fwd.translated(right.scaled(ndcX*t*getAspectRatio()))
+                .translated(up.scaled(ndcY*t)).normalized();
+        return new Ray(null, new Vector3D(getPosition()), dir);
     }
 }

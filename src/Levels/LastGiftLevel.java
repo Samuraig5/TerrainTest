@@ -2,6 +2,8 @@ package Levels;
 
 import Engine3d.Audio.Sound;
 import Engine3d.Controls.Controller;
+import Engine3d.Controls.CreativeCamera;
+import Engine3d.Controls.EditorController;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.Model.BillboardScatterMesh;
 import Engine3d.Model.ChunkPopulator;
@@ -52,6 +54,40 @@ public class LastGiftLevel extends Scene
 
         player = new PlayerObject(this, (PlayerCamera) camera);
         player.translate(new Vector3D(0,1,0));
+
+        // --- PLAYER mode: existing gameplay controls ---
+        OldSchoolDungeonCameraControls playerCtrl =
+                new OldSchoolDungeonCameraControls(getSceneRenderer(), player);
+        playerCtrl.isEnabled(true);
+        addUpdatable(playerCtrl);
+
+        // --- EDITOR mode: fly-cam mover + editing overlay ---
+        CreativeCamera editorCam = new CreativeCamera(this, (PlayerCamera) camera);
+        ((PlayerCamera) camera).setPlayerObject(player);   // editorCam's ctor stole the camera; give it back
+
+        EditorController editorCtrl =
+                new EditorController(getSceneRenderer(), editorCam, this, camera); // mover + rendering cam
+        editorCtrl.isEnabled(false);
+        addUpdatable(editorCtrl);
+        setEditorUpdatable(editorCtrl);
+
+        // --- toggle ---
+        getSceneRenderer().addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override public void keyPressed(java.awt.event.KeyEvent e) {
+                if (e.getKeyCode() != java.awt.event.KeyEvent.VK_F1) {
+                    return;
+                }
+                boolean toEditor = !editorCtrl.isEnabled();
+                editorCtrl.isEnabled(toEditor);
+                playerCtrl.isEnabled(!toEditor);
+                setEditorMode(toEditor);
+                ((PlayerCamera) camera).setPlayerObject(toEditor ? editorCam : player);
+                if (!toEditor) {
+                    setSelected(null);
+                }
+            }
+        });
+
         OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), player);
         cameraController.isEnabled(false);
 

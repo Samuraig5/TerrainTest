@@ -157,7 +157,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         lastMouseX = e.getX();
         lastMouseY = e.getY();
 
-        if (centerCursor) {
+        if (isEnabled() && centerCursor) {
             centerCursor(center);
         }
     }

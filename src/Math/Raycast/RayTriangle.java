@@ -32,4 +32,22 @@ public final class RayTriangle {
         if (t < EPS) return Double.NaN;                  // hit is at/behind the origin
         return t;
     }
+
+    public static double intersectAABB(Vector3D o, Vector3D d, Vector3D min, Vector3D max) {
+        double tmin = Double.NEGATIVE_INFINITY, tmax = Double.POSITIVE_INFINITY;
+        // X
+        if (Math.abs(d.x()) < 1e-9) { if (o.x() < min.x() || o.x() > max.x()) return Double.NaN; }
+        else { double t1=(min.x()-o.x())/d.x(), t2=(max.x()-o.x())/d.x();
+            if (t1>t2){double t=t1;t1=t2;t2=t;} tmin=Math.max(tmin,t1); tmax=Math.min(tmax,t2); }
+        // Y
+        if (Math.abs(d.y()) < 1e-9) { if (o.y() < min.y() || o.y() > max.y()) return Double.NaN; }
+        else { double t1=(min.y()-o.y())/d.y(), t2=(max.y()-o.y())/d.y();
+            if (t1>t2){double t=t1;t1=t2;t2=t;} tmin=Math.max(tmin,t1); tmax=Math.min(tmax,t2); }
+        // Z
+        if (Math.abs(d.z()) < 1e-9) { if (o.z() < min.z() || o.z() > max.z()) return Double.NaN; }
+        else { double t1=(min.z()-o.z())/d.z(), t2=(max.z()-o.z())/d.z();
+            if (t1>t2){double t=t1;t1=t2;t2=t;} tmin=Math.max(tmin,t1); tmax=Math.min(tmax,t2); }
+        if (tmax < Math.max(tmin, 0)) return Double.NaN;    // behind or missed
+        return tmin >= 0 ? tmin : tmax;                     // origin outside vs inside
+    }
 }

@@ -37,6 +37,8 @@ public class Scene implements Updatable
     final SceneRenderer sceneRenderer = new SceneRenderer();
     protected Color backgroundColour = Color.BLACK;
     protected List<Object3D> objects = new CopyOnWriteArrayList<>();
+    private final java.util.concurrent.ConcurrentLinkedQueue<Runnable> editCommands = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    private volatile Object3D selected;
     List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 1d;
     protected List<Updatable> updatables = new CopyOnWriteArrayList<>();
@@ -52,6 +54,8 @@ public class Scene implements Updatable
 
     private volatile SkyBox skyBox;
     private final List<ScreenFilter> filters = new CopyOnWriteArrayList<>();
+    private volatile boolean editorMode = false;
+    private Engine3d.Time.Updatable editorUpdatable;
 
     public Scene(Camera camera) {
         this.camera = camera;
@@ -110,6 +114,11 @@ public class Scene implements Updatable
         staticAABBObjects.remove(object);
     }
 
+    public void enqueueEdit(Runnable r) { editCommands.add(r); }
+    public Object3D getSelected()       { return selected; }
+    public void setSelected(Object3D o) { this.selected = o; }
+    public java.util.List<Object3D> getObjects() { return objects; }
+
     public void addUpdatable(Updatable updatable) {
         updatables.add(updatable);
         if (updatable instanceof TriggerZone tz) {
@@ -166,6 +175,12 @@ public class Scene implements Updatable
                     .toList());   // ← wrap in ArrayList so we can add to it
         }
 
+        Object3D sel = selected;
+        if (sel != null && sel.getMesh() != null) {
+            AABB hb = sel.getMesh().getWorldAABB(sel.getPosition(), sel.getRotation(), sel.getScale());
+            if (hb != null) geometry.add(debugBox(hb, Color.YELLOW, camera, constCamPos, viewMatrix, frustum));
+        }
+
         if (camera.debugging) {
             for (AABBObject o : AABBObjects)
                 geometry.add(debugBox(o.getAABBCollider().getAABB(), Color.WHITE, camera, constCamPos, viewMatrix, frustum));
@@ -217,6 +232,14 @@ public class Scene implements Updatable
     @Override
     public void update(double deltaTime) {
         synchronized (stateLock) {
+            Runnable cmd;
+            while ((cmd = editCommands.poll()) != null) cmd.run();
+
+            if (editorMode) {
+                if (editorUpdatable != null) editorUpdatable.update(deltaTime);
+                return;
+            }
+
             for (Updatable updatable : updatables) {
                 updatable.update(deltaTime);
             }
@@ -311,5 +334,15 @@ public class Scene implements Updatable
         mesh.setDrawInstructions(di);
         return mesh.computeGeometry(new Vector3D(1,1,1), new Vector3D(0,0,0), new Vector3D(0,0,0),
                 camera, camPos, frustum, viewMatrix, lightSources);
+    }
+
+    public void setEditorMode(boolean b) {
+        editorMode = b;
+    }
+    public boolean isEditorMode() {
+        return editorMode;
+    }
+    public void setEditorUpdatable(Engine3d.Time.Updatable u) {
+        editorUpdatable = u;
     }
 }

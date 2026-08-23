@@ -108,12 +108,15 @@ public class Mesh implements Translatable, Rotatable, Scalable
             copyPnF result = transform(worldTransform, points, faces);
 
             // --- Backface cull (world space): keep only triangles facing the camera ---
+            boolean cull = !drawInstructions.drawWireFrame;      // wireframe boxes want every edge
             List<MeshTriangle> visible = new ArrayList<>();
             for (MeshTriangle tri : result.copiedFaces()) {
                 Vector3D n = tri.getNormal();
-                Vector3D camRay = tri.getPoints()[0].translated(cameraPos.inverted());  // point - camera
-                if (n.dotProduct(camRay) >= 0) { continue; } //skip back-face
-                visible.add(tri);   // front-facing
+                if (cull) {
+                    Vector3D camRay = tri.getPoints()[0].translated(cameraPos.inverted());  // point - camera
+                    if (n.dotProduct(camRay) >= 0) { continue; } // skip back-face
+                }
+                visible.add(tri);
 
                 if (drawInstructions.doShading) {
                     shadeTriangle(tri, n, lightSources);
@@ -503,6 +506,19 @@ public class Mesh implements Translatable, Rotatable, Scalable
         }
         localMin = new Vector3D(mnX,mnY,mnZ);
         localMax = new Vector3D(mxX,mxY,mxZ);
+    }
+
+    public AABB getWorldAABB(Vector3D pos, Vector3D rot, Vector3D scale) {
+        if (localMin == null) recomputeLocalBounds();
+        if (localMin == null) return null;                 // empty mesh
+        Matrix4x4 wt = Matrix4x4.matrixMatrixMultiplication(
+                Matrix4x4.getScalingMatrix(scale),
+                Matrix4x4.matrixMatrixMultiplication(
+                        Matrix4x4.get3dRotationMatrix(getRotation().translated(rot)),
+                        Matrix4x4.getTranslationMatrix(getPosition().translated(pos))));
+        Vector3D[] mm = new Vector3D[2];
+        worldAABB(wt, localMin, localMax, mm);
+        return new AABB(mm[0], mm[1]);
     }
 
     private static void worldAABB(Matrix4x4 wt, Vector3D lo, Vector3D hi,

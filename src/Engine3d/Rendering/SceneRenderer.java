@@ -78,6 +78,13 @@ public class SceneRenderer extends JPanel
             g.drawString(String.format("  applyGravity:    %.2f ms", Profiler.ms("applyGravity")), 30, 178);
             g.drawString(String.format("  handleCollision: %.2f ms", Profiler.ms("handleCollision")), 30, 196);
         }
+
+        if (activeScene.isEditorMode()) {
+            g.setColor(Color.WHITE);
+            int cx = getWidth()/2, cy = getHeight()/2;
+            g.drawLine(cx-10, cy, cx+10, cy);
+            g.drawLine(cx, cy-10, cx, cy+10);
+        }
     }
 
     public void logError(String message) {
