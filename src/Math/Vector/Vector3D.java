@@ -95,6 +95,17 @@ public class Vector3D {
     }
 
     /**
+     * Returns a signed unit vector along whichever world axis
+     * the direction points most strongly toward
+     */
+    public Vector3D dominantAxis() {
+        double ax = Math.abs(x()), ay = Math.abs(y()), az = Math.abs(z());
+        if (ax >= ay && ax >= az) return new Vector3D(Math.signum(x()), 0, 0);
+        if (ay >= ax && ay >= az) return new Vector3D(0, Math.signum(y()), 0);
+        return new Vector3D(0, 0, Math.signum(z()));
+    }
+
+    /**
      * Calculates the dot product of the vector and another vector.
      * The dot product projects one vector onto the other.
      * The magnitude of the projected vector is returned as the result.

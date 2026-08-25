@@ -9,7 +9,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Controller implements KeyListener, MouseListener, MouseMotionListener
+public class Controller implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener
 {
     private final List<Translatable> attachedTranslatables = new ArrayList<>();
     private final List<Rotatable> attachedRotatables = new ArrayList<>();
@@ -20,6 +20,7 @@ public class Controller implements KeyListener, MouseListener, MouseMotionListen
         renderer.addKeyListener(this);
         renderer.addMouseListener(this);
         renderer.addMouseMotionListener(this);
+        renderer.addMouseWheelListener(this);
     }
 
     public void attachTranslatable(Translatable translatable){attachedTranslatables.add(translatable);}
@@ -90,6 +91,11 @@ public class Controller implements KeyListener, MouseListener, MouseMotionListen
 
     @Override
     public void mouseMoved(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
 
     }
 }

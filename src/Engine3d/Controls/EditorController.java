@@ -14,22 +14,22 @@ import Physics.PlayerObject;
 import javax.swing.SwingUtilities;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 public class EditorController extends Controller implements Updatable {
     private final Scene scene;
+    private final SceneRenderer renderer;
     private final Camera camera;      // rendering cam, for rays
     private final CreativeCamera cam; // mover
 
     private final float stepSize = 8f, boost = 4f;
     private final float sensitivity = 0.3f;
+    private final double moveStep = 0.5f;
 
-    private boolean w, a, s, d, up, down, ctrl;
-    private boolean looking = false;
-    private int lastX, lastY;
-
-    private final SceneRenderer renderer;
+    private boolean w, a, s, d, up, down, ctrl, shift;
     private java.awt.Robot robot;
     private boolean recentering = false;
+
 
     public EditorController(SceneRenderer r, CreativeCamera cam, Scene scene, Camera camera) {
         super(r);
@@ -42,7 +42,7 @@ public class EditorController extends Controller implements Updatable {
 
     @Override public void update(double dt) {
         if (!isEnabled()) return;
-        double step = stepSize * dt * (ctrl ? boost : 1);
+        double step = stepSize * dt * (shift ? boost : 1);
         Vector3D m = new Vector3D(0,0,0);
         if (w)    m = m.translated(new Vector3D(0,0, step));
         if (s)    m = m.translated(new Vector3D(0,0,-step));
@@ -61,7 +61,8 @@ public class EditorController extends Controller implements Updatable {
             case KeyEvent.VK_S -> s = true;
             case KeyEvent.VK_D -> d = true;
             case KeyEvent.VK_SPACE   -> up = true;
-            case KeyEvent.VK_SHIFT   -> down = true;
+            case KeyEvent.VK_C   -> down = true;
+            case KeyEvent.VK_SHIFT -> shift = true;
             case KeyEvent.VK_CONTROL -> ctrl = true;
         }
     }
@@ -73,7 +74,8 @@ public class EditorController extends Controller implements Updatable {
             case KeyEvent.VK_S -> s = false;
             case KeyEvent.VK_D -> d = false;
             case KeyEvent.VK_SPACE   -> up = false;
-            case KeyEvent.VK_SHIFT   -> down = false;
+            case KeyEvent.VK_C   -> down = false;
+            case KeyEvent.VK_SHIFT -> shift = false;
             case KeyEvent.VK_CONTROL -> ctrl = false;
         }
     }
@@ -120,5 +122,25 @@ public class EditorController extends Controller implements Updatable {
             if (!Double.isNaN(tHit) && tHit < bestT) { bestT = tHit; best = o; }
         }
         return best;
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (!isEnabled()) {
+            return;
+        }
+        Object3D sel = scene.getSelected();
+        if (sel == null || sel instanceof PlayerObject) {
+            return;
+        }
+
+        // Axis of the world that best lines up with where the editor camera is looking
+        Vector3D axis = camera.getDirection().dominantAxis();
+
+        // Wheel up = negative rotation => push away (+axis); wheel down => pull closer
+        double amount = -e.getPreciseWheelRotation() * moveStep;
+        Vector3D delta = axis.scaled(amount);
+
+        scene.enqueueEdit(() -> sel.translate(delta));
     }
 }

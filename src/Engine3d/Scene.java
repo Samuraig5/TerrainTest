@@ -29,6 +29,7 @@ import Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
+import Physics.PlayerObject;
 import Physics.Triggers.TriggerZone;
 
 public class Scene implements Updatable
@@ -183,22 +184,20 @@ public class Scene implements Updatable
         }
 
         if (camera.debugging) {
-            for (AABBObject o : AABBObjects)
+            for (AABBObject o : AABBObjects) {
+                if (o instanceof PlayerObject) {
+                    continue;
+                }
                 geometry.add(debugBox(o.getAABBCollider().getAABB(), Color.WHITE, camera, constCamPos, viewMatrix, frustum));
-            for (TriggerZone t : triggers)
+            }
+            for (TriggerZone t : triggers) {
                 geometry.add(debugBox(t.getRegion(), Color.ORANGE, camera, constCamPos, viewMatrix, frustum));
+            }
         }
 
         try (Profiler.Span s = Profiler.span("raster")) {
             tileRasterizer.render(camera, geometry, backgroundColour, skyBox);
         }
-
-        /*
-        TODO: Add debug showing debugging stuff (eg. Wireframes)
-        if (camera.debugging) {
-
-        }
-         */
 
         try (Profiler.Span s = Profiler.span("filters")) {
             for (ScreenFilter f : filters) f.apply(camera.getScreenBuffer(), constCamPos, constCamDir);
