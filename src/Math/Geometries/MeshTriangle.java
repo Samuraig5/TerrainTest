@@ -1,9 +1,9 @@
-package Math;
+package Math.Geometries;
 
 import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.Material;
-import Engine3d.Translatable;
+import Engine3d.Objects.Translatable;
 
 public class MeshTriangle implements Translatable
 {

@@ -1,6 +1,6 @@
 package Physics.AABBCollisions;
 
-import Math.Box;
+import Math.Geometries.Box;
 import Math.Raycast.Ray;
 import Math.Vector.Vector3D;
 

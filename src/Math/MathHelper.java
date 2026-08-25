@@ -1,7 +1,5 @@
 package Math;
 
-import java.util.Arrays;
-
 public class MathHelper {
 
     public static double min3(double a, double b, double c) {

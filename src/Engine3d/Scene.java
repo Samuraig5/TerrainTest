@@ -7,9 +7,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import Engine3d.DevTools.Profiler;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
+import Engine3d.Objects.Object3D;
 import Engine3d.Rendering.*;
 import Engine3d.Rendering.Filters.ScreenFilter;
 import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
+import Engine3d.Rendering.Skyboxes.SkyBox;
+import Math.Geometries.Box;
+import Math.Geometries.MeshTriangle;
 import Math.Raycast.Ray;
 import Math.Raycast.RayCollision;
 import Math.Raycast.RayTriangle;
@@ -22,13 +26,10 @@ import Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Math.Matrix4x4;
 import Math.Vector.Vector3D;
-import Math.MeshTriangle;
 import Engine3d.Model.ObjParser;
-import Physics.Object3D;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
 import Physics.Triggers.TriggerZone;
-import Math.Box;
 
 public class Scene implements Updatable
 {

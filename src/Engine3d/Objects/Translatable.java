@@ -1,4 +1,4 @@
-package Engine3d;
+package Engine3d.Objects;
 
 import Math.Vector.Vector3D;
 

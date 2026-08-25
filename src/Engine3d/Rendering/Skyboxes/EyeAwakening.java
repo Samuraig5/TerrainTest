@@ -1,4 +1,4 @@
-package Levels.Skyboxes;
+package Engine3d.Rendering.Skyboxes;
 
 import Engine3d.Time.Updatable;
 

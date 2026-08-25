@@ -6,9 +6,8 @@ import Engine3d.Scene;
 import Engine3d.Time.Updatable;
 import Math.Raycast.Ray;
 import Math.Raycast.RayTriangle;
-import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
-import Physics.Object3D;
+import Engine3d.Objects.Object3D;
 import Physics.AABBCollisions.AABB;
 import Physics.PlayerObject;
 

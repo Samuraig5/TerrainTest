@@ -3,7 +3,7 @@ package Physics.AABBCollisions;
 import Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
 import Engine3d.Model.UnrotatableBox;
-import Engine3d.Translatable;
+import Engine3d.Objects.Translatable;
 import Physics.GJK_EPA.EPA;
 
 public abstract class AABBCollider implements Translatable

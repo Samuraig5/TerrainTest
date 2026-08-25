@@ -3,8 +3,8 @@ package Engine3d.Lighting;
 import Math.Matrix4x4;
 import Math.Vector.Vector3D;
 import Engine3d.Scene;
-import Engine3d.Rotatable;
-import Engine3d.Translatable;
+import Engine3d.Objects.Rotatable;
+import Engine3d.Objects.Translatable;
 
 import java.awt.*;
 

@@ -2,7 +2,7 @@ package Engine3d.Rendering.ScreenDrawing;
 
 import Math.Vector.Vector2D;
 import Engine3d.Rendering.Camera;
-import Math.MeshTriangle;
+import Math.Geometries.MeshTriangle;
 import Math.Vector.Vector3D;
 
 import java.awt.*;

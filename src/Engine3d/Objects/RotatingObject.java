@@ -1,7 +1,7 @@
-package Engine3d;
+package Engine3d.Objects;
 
+import Engine3d.Scene;
 import Engine3d.Time.Updatable;
-import Physics.Object3D;
 import Math.Vector.Vector3D;
 
 public class RotatingObject extends Object3D implements Updatable

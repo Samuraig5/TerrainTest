@@ -1,5 +1,6 @@
 package Math;
 
+import Math.Geometries.MeshTriangle;
 import Math.Vector.Vector3D;
 
 import java.util.List;

@@ -12,7 +12,7 @@ import Engine3d.Rendering.Material;
 import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
 import Math.Matrix4x4;
-import Math.MeshTriangle;
+import Math.Geometries.MeshTriangle;
 
 public class BillboardScatterMesh extends Mesh{
     public record Instance(Vector3D position, double width, double height) { }

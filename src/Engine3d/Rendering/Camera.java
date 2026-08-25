@@ -1,13 +1,13 @@
 package Engine3d.Rendering;
 
 import Math.Matrix4x4;
-import Math.MeshTriangle;
+import Math.Geometries.MeshTriangle;
 import Math.Raycast.Ray;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.ScreenDrawing.Drawer;
 import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
-import Engine3d.Rotatable;
-import Engine3d.Translatable;
+import Engine3d.Objects.Rotatable;
+import Engine3d.Objects.Translatable;
 
 import javax.swing.*;
 import java.awt.*;

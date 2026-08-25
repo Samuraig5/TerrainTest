@@ -2,9 +2,9 @@ package Engine3d.Model;
 
 import Engine3d.Scene;
 import Engine3d.Time.Updatable;
-import Engine3d.Translatable;
+import Engine3d.Objects.Translatable;
 import Math.Vector.Vector3D;
-import Physics.Object3D;
+import Engine3d.Objects.Object3D;
 
 import java.awt.image.BufferedImage;
 import java.util.*;

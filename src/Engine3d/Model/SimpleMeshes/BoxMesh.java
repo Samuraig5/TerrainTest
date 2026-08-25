@@ -1,11 +1,10 @@
 package Engine3d.Model.SimpleMeshes;
 
-import Math.Box;
-import Math.MeshTriangle;
+import Math.Geometries.Box;
+import Math.Geometries.MeshTriangle;
 import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
 import Engine3d.Model.Mesh;
-import Physics.Object3D;
 import Engine3d.Rendering.Material;
 
 import java.awt.*;

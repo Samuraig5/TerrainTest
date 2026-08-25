@@ -1,9 +1,8 @@
 package Engine3d.Model;
 
-import Math.Box;
+import Math.Geometries.Box;
 import Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
-import Physics.Object3D;
 
 public class UnrotatableBox extends BoxMesh {
     public UnrotatableBox(Vector3D size) {

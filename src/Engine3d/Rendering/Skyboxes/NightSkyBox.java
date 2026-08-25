@@ -1,8 +1,7 @@
-package Levels.Skyboxes;
+package Engine3d.Rendering.Skyboxes;
 
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.ScreenDrawing.ScreenBuffer;
-import Engine3d.Rendering.SkyBox;
 import Math.Vector.Vector3D;
 
 import java.awt.image.BufferedImage;

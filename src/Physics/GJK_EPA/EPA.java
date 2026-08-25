@@ -1,8 +1,8 @@
 package Physics.GJK_EPA;
 
 import Math.Vector.Vector3D;
-import Math.Line;
-import Physics.Object3D;
+import Math.Geometries.Line;
+import Engine3d.Objects.Object3D;
 
 import java.util.ArrayList;
 import java.util.Iterator;

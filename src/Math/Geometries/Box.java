@@ -1,4 +1,4 @@
-package Math;
+package Math.Geometries;
 
 import Math.Vector.Vector3D;
 

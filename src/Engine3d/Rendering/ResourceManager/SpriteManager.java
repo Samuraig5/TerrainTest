@@ -8,10 +8,8 @@ import java.io.IOException;
 public class SpriteManager extends ResourceManager<BufferedImage>
 {
     @Override
-    protected BufferedImage loadResource(String filepath)
-    {
-        try
-        {
+    protected BufferedImage loadResource(String filepath) {
+        try {
             return ImageIO.read(new File(filepath));
         }
         catch (IOException e1)

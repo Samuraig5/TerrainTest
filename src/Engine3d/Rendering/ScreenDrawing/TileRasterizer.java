@@ -2,8 +2,8 @@ package Engine3d.Rendering.ScreenDrawing;
 
 import Engine3d.Model.Mesh;
 import Engine3d.Rendering.DrawInstructions;
-import Engine3d.Rendering.SkyBox;
-import Math.MeshTriangle;
+import Engine3d.Rendering.Skyboxes.SkyBox;
+import Math.Geometries.MeshTriangle;
 import Engine3d.Rendering.Camera;
 import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;

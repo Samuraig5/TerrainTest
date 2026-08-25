@@ -1,7 +1,6 @@
 package Levels;
 
 import Engine3d.Audio.Sound;
-import Engine3d.Controls.Controller;
 import Engine3d.Controls.CreativeCamera;
 import Engine3d.Controls.EditorController;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
@@ -11,14 +10,12 @@ import Engine3d.Model.FloorFollower;
 import Engine3d.Model.ScatterChunkManager;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Rendering.Filters.*;
-import Levels.Skyboxes.EyeAwakening;
-import Levels.Skyboxes.NightSkyBox;
+import Engine3d.Rendering.Skyboxes.EyeAwakening;
+import Engine3d.Rendering.Skyboxes.NightSkyBox;
 import Levels.Utils.GazeLock;
 import Levels.Utils.Timeline;
-import Physics.AABBCollisions.StaticAABBCollider;
-import Physics.Object3D;
+import Engine3d.Objects.Object3D;
 import Physics.PlayerObject;
-import Engine3d.Lighting.HeadLight;
 import Engine3d.Lighting.LightSource;
 import Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;

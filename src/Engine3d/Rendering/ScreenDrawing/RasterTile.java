@@ -1,7 +1,7 @@
 package Engine3d.Rendering.ScreenDrawing;
 
 import Engine3d.Rendering.DrawInstructions;
-import Math.MeshTriangle;
+import Math.Geometries.MeshTriangle;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,19 +3,20 @@ package Engine3d.Model;
 import Engine3d.Lighting.LightSource;
 import Engine3d.Rendering.Frustum;
 import Math.*;
+import Math.Geometries.Line;
+import Math.Geometries.MeshTriangle;
 import Math.Vector.Vector2D;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.DrawInstructions;
-import Engine3d.Scalable;
+import Engine3d.Objects.Scalable;
 import Physics.AABBCollisions.AABB;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.Material;
-import Engine3d.Rotatable;
-import Engine3d.Translatable;
+import Engine3d.Objects.Rotatable;
+import Engine3d.Objects.Translatable;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Function;
 
 public class Mesh implements Translatable, Rotatable, Scalable
 {

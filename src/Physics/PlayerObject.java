@@ -1,12 +1,12 @@
 package Physics;
 
+import Engine3d.Objects.Object3D;
 import Engine3d.Rendering.Camera;
-import Math.Box;
+import Math.Geometries.Box;
 import Math.Matrix4x4;
 import Math.Raycast.Ray;
 import Engine3d.Model.UnrotatableBox;
 import Math.Raycast.RayCollision;
-import Physics.AABBCollisions.AABB;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
