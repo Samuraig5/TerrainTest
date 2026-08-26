@@ -25,9 +25,10 @@ public class EditorController extends Controller implements Updatable {
     private final float stepSize = 8f, boost = 4f;
     private final float sensitivity = 0.3f;
     private final double moveStep = 0.5f;
-    private final float rotStep  = (float) Math.toRadians(15);
+    private final double rotStep  = (float) Math.toRadians(15);
+    private final double scaleStep = 1f;
 
-    private boolean w, a, s, d, up, down, ctrl, shift;
+    private boolean w, a, s, d, up, down, ctrl, shift, alt;
     private java.awt.Robot robot;
     private boolean recentering = false;
 
@@ -65,6 +66,7 @@ public class EditorController extends Controller implements Updatable {
             case KeyEvent.VK_C   -> down = true;
             case KeyEvent.VK_SHIFT -> shift = true;
             case KeyEvent.VK_CONTROL -> ctrl = true;
+            case KeyEvent.VK_ALT -> alt = true;
         }
     }
 
@@ -78,6 +80,7 @@ public class EditorController extends Controller implements Updatable {
             case KeyEvent.VK_C   -> down = false;
             case KeyEvent.VK_SHIFT -> shift = false;
             case KeyEvent.VK_CONTROL -> ctrl = false;
+            case KeyEvent.VK_ALT -> alt = false;
         }
     }
 
@@ -141,7 +144,18 @@ public class EditorController extends Controller implements Updatable {
         // Wheel up = negative rotation => push away (+axis); wheel down => pull closer
         double amount = -e.getPreciseWheelRotation() * moveStep;
 
-        if (ctrl) {
+        if (ctrl && alt) {
+            double scaleDelta;
+            if (amount > 0) {
+                scaleDelta = 1.1f;
+            }
+            else if (amount < 0) {
+                scaleDelta = 0.9f;
+            } else {
+                scaleDelta = 0;
+            }
+            scene.enqueueEdit(() -> sel.scaleBy(new Vector3D(scaleDelta, scaleDelta, scaleDelta)));
+        } else if (ctrl) {
             Vector3D rotDelta = axis.scaled(amount * rotStep);
             scene.enqueueEdit(() -> sel.rotate(rotDelta));
         } else {

@@ -21,10 +21,18 @@ public class Vector3D {
     }
 
     public Vector3D(Vector3D source) {
-        this.x = source.x();
-        this.y = source.y();
-        this.z = source.z();
-        this.w = source.w();
+        if (source != null) {
+            this.x = source.x();
+            this.y = source.y();
+            this.z = source.z();
+            this.w = source.w();
+        }
+        else {
+            x = 0;
+            y = 0;
+            z = 0;
+            w = 0;
+        }
     }
 
     public double x() {return x;}
