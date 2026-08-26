@@ -25,6 +25,7 @@ public class EditorController extends Controller implements Updatable {
     private final float stepSize = 8f, boost = 4f;
     private final float sensitivity = 0.3f;
     private final double moveStep = 0.5f;
+    private final float rotStep  = (float) Math.toRadians(15);
 
     private boolean w, a, s, d, up, down, ctrl, shift;
     private java.awt.Robot robot;
@@ -139,8 +140,13 @@ public class EditorController extends Controller implements Updatable {
 
         // Wheel up = negative rotation => push away (+axis); wheel down => pull closer
         double amount = -e.getPreciseWheelRotation() * moveStep;
-        Vector3D delta = axis.scaled(amount);
 
-        scene.enqueueEdit(() -> sel.translate(delta));
+        if (ctrl) {
+            Vector3D rotDelta = axis.scaled(amount * rotStep);
+            scene.enqueueEdit(() -> sel.rotate(rotDelta));
+        } else {
+            Vector3D delta = axis.scaled(amount * moveStep);
+            scene.enqueueEdit(() -> sel.translate(delta));
+        }
     }
 }
