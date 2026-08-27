@@ -26,7 +26,6 @@ public class EditorController extends Controller implements Updatable {
     private final float sensitivity = 0.3f;
     private final double moveStep = 0.5f;
     private final double rotStep  = (float) Math.toRadians(15);
-    private final double scaleStep = 1f;
 
     private boolean w, a, s, d, up, down, ctrl, shift, alt;
     private java.awt.Robot robot;
@@ -86,7 +85,7 @@ public class EditorController extends Controller implements Updatable {
 
     @Override public void mousePressed(MouseEvent e) {
         if (!isEnabled()) return;
-        if (SwingUtilities.isLeftMouseButton(e)) {
+        if (SwingUtilities.isMiddleMouseButton(e)) {
             var buf = camera.getScreenBuffer().getBufferedImage();
             Ray ray = camera.rayFromBuffer(buf.getWidth()/2.0, buf.getHeight()/2.0);
             scene.enqueueEdit(() -> scene.setSelected(pick(ray)));
