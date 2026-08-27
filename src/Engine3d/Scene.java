@@ -8,6 +8,7 @@ import Engine3d.DevTools.Profiler;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Objects.Object3D;
+import Engine3d.Objects.ObjectSource;
 import Engine3d.Rendering.*;
 import Engine3d.Rendering.Filters.ScreenFilter;
 import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
@@ -226,6 +227,7 @@ public class Scene implements Updatable
             getSceneRenderer().logError("ObjParser couldn't find file: " + folderPath + "/" + filePath);
             object3D.setMesh(new Mesh());
         }
+        object3D.setObjectSource(new ObjectSource.ModelSource(folderPath, filePath));
         return object3D;
     }
 

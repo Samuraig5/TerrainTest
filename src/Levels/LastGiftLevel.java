@@ -166,7 +166,7 @@ public class LastGiftLevel extends Scene
         List<Object3D> gateParts = new ArrayList<>();
         Object3D gate = loadFromFile("Resources/Models/Gate", "gate.obj");
         gate.rotate(new Vector3D(0,Math.toRadians(180),0));
-        gate.getMesh().scale(new Vector3D(280, 280, 280));
+        gate.setScale(new Vector3D(280, 280, 280));
         gate.translate(gateLocation);
 
         gateParts.add(gate);
@@ -233,7 +233,7 @@ public class LastGiftLevel extends Scene
     private void spawnObelisk(Vector3D location, Vector3D rotation, Vector3D scale) {
         Object3D obelisk = loadFromFile("Resources/Models/Obelisk", "Obelisk1_0001.obj");
         obelisk.rotate(rotation);
-        obelisk.getMesh().scale(scale);
+        obelisk.setScale(scale);
         obelisk.translate(location);
     }
 

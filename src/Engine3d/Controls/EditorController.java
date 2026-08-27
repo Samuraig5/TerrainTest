@@ -4,6 +4,7 @@ import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Scene;
 import Engine3d.Time.Updatable;
+import Levels.Persistence.LevelIO;
 import Math.Raycast.Ray;
 import Math.Raycast.RayTriangle;
 import Math.Vector.Vector3D;
@@ -66,6 +67,23 @@ public class EditorController extends Controller implements Updatable {
             case KeyEvent.VK_SHIFT -> shift = true;
             case KeyEvent.VK_CONTROL -> ctrl = true;
             case KeyEvent.VK_ALT -> alt = true;
+
+            case KeyEvent.VK_K -> scene.enqueueEdit(() -> {
+                try {
+                    LevelIO.save(LevelIO.snapshot(scene), "Levels/saved/level1.txt");
+                    renderer.logError("Level saved.");   // your only on-screen log channel
+                } catch (java.io.IOException ex) {
+                    renderer.logError("Save failed: " + ex.getMessage());
+                }
+            });
+            case KeyEvent.VK_L -> scene.enqueueEdit(() -> {
+                try {
+                    LevelIO.restore(LevelIO.load("Levels/saved/level1.txt"), scene);
+                    renderer.logError("Level loaded.");
+                } catch (java.io.IOException ex) {
+                    renderer.logError("Load failed: " + ex.getMessage());
+                }
+            });
         }
     }
 

@@ -13,11 +13,20 @@ import java.util.List;
 
 public class Object3D implements Translatable, Rotatable
 {
-    private Scene scene;
+    private final Scene scene;
+    private ObjectSource objectSource;
+
     private Mesh mesh;
     protected Vector3D rotation = new Vector3D(0,0,0);
     protected Vector3D position = new Vector3D(0,0,0);
     protected Vector3D scale = new Vector3D(1,1,1);
+
+    public record ObjectRecord(
+            ObjectSource source,
+            double[] position,
+            double[] rotation,
+            double[] scale
+    ) { }
 
     public Object3D(Scene scene) {
         this.scene = scene;
@@ -35,6 +44,13 @@ public class Object3D implements Translatable, Rotatable
 
         scene.addObject(this);
         setUpDebugging();
+    }
+
+    public void setObjectSource(ObjectSource source) {
+        this.objectSource = source;
+    }
+    public ObjectSource getObjectSource() {
+        return objectSource;
     }
 
     public void setMesh(Mesh mesh) {
