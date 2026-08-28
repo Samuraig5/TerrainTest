@@ -1,9 +1,13 @@
 package Engine3d;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import Engine3d.Controls.Controller;
+import Engine3d.DevTools.Console;
 import Engine3d.DevTools.Profiler;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
@@ -13,6 +17,7 @@ import Engine3d.Rendering.*;
 import Engine3d.Rendering.Filters.ScreenFilter;
 import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
 import Engine3d.Rendering.Skyboxes.SkyBox;
+import Levels.Persistence.LevelIO;
 import Math.Geometries.Box;
 import Math.Geometries.MeshTriangle;
 import Math.Raycast.Ray;
@@ -60,14 +65,19 @@ public class Scene implements Updatable
     private volatile boolean editorMode = false;
     private Engine3d.Time.Updatable editorUpdatable;
 
+    private final Console console = new Console(this);
+    private volatile boolean consoleOpen = false;
+    private final List<Controller> consoleSuspended = new ArrayList<>();
+
     public Scene(Camera camera) {
         this.camera = camera;
-        //if (camera instanceof PlayerCamera) {
-        //    new PlayerObject(this, (PlayerCamera) camera);
-        //}
+
         camera.getFrame().add(sceneRenderer);
         sceneRenderer.setActiveScene(this);
         sceneRenderer.grabFocus();
+
+        sceneRenderer.addKeyListener(console);
+        setUpConsole();
 
         camera.getFrame().repaint();
 
@@ -77,7 +87,67 @@ public class Scene implements Updatable
                     camera.debugging = !camera.debugging;
             }
         });
+
     }
+
+    private void setUpConsole() {
+        console.registerCommand("save",
+                args -> {
+            if (args.length < 2) {
+                console.println("usage: save <fileName>");
+                return;
+            }
+            String path = "Levels/saved/" + args[1] + ".txt";
+            enqueueEdit(() -> {
+                try {
+                    LevelIO.save(LevelIO.snapshot(this), path);
+                    console.println("Saved " + path);
+                }
+                catch (IOException e) {
+                    console.println("Save failed: " + e.getMessage());
+                }
+            });
+        });
+
+        console.registerCommand("load",
+                args -> {
+            if (args.length < 2) {
+                console.println("usage: load <fileName>");
+                return;
+            }
+            String path = "Levels/saved/" + args[1] + ".txt";
+            enqueueEdit(() -> {
+                try {
+                    LevelIO.restore(LevelIO.load(path), this);
+                    console.println("Loaded " + path);
+                }
+                catch (IOException e) {
+                    console.println("Load failed: " + e.getMessage());
+                }
+            });
+        });
+    }
+    public boolean isConsoleOpen()        {
+        return consoleOpen;
+    }
+    public void setConsoleOpen(boolean open) {
+        if (open) {
+            consoleSuspended.clear();
+            for (Updatable u : updatables) {
+                if (u instanceof Controller c && c.isEnabled()) {
+                    c.isEnabled(false);
+                    consoleSuspended.add(c);
+                }
+            }
+        }
+        else {
+            for (Controller c : consoleSuspended) {
+                c.isEnabled(true);
+            }
+            consoleSuspended.clear();
+        }
+    }
+
     public SceneRenderer getSceneRenderer() {
         return sceneRenderer;
     }
@@ -177,6 +247,10 @@ public class Scene implements Updatable
                             lightSources))
                     .toList());   // ← wrap in ArrayList so we can add to it
         }
+        catch (Exception e) {
+            console.println("Error when computing Geometry: " + e.getMessage());
+            return;
+        }
 
         Object3D sel = selected;
         if (sel != null && sel.getMesh() != null) {
@@ -224,7 +298,7 @@ public class Scene implements Updatable
         Object3D object3D = new Object3D(this);
         Mesh loaded = objParser.loadFromObjFile(object3D, folderPath, filePath);
         if (loaded == null) {
-            getSceneRenderer().logError("ObjParser couldn't find file: " + folderPath + "/" + filePath);
+            console.println("ObjParser couldn't find file: " + folderPath + "/" + filePath);
             object3D.setMesh(new Mesh());
         }
         object3D.setObjectSource(new ObjectSource.ModelSource(folderPath, filePath));
@@ -346,5 +420,9 @@ public class Scene implements Updatable
     }
     public void setEditorUpdatable(Engine3d.Time.Updatable u) {
         editorUpdatable = u;
+    }
+
+    public Console getConsole() {
+        return console;
     }
 }

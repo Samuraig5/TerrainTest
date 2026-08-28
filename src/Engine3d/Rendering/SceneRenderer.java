@@ -17,9 +17,6 @@ public class SceneRenderer extends JPanel
     private long lastTime;
 
     private Scene activeScene;
-    Vector3D errorMessagePos;
-    Vector3D errorPosDelta = new Vector3D(0, 20, 0);
-    List<String> errors = new ArrayList<>();
 
     public SceneRenderer()
     {
@@ -38,8 +35,6 @@ public class SceneRenderer extends JPanel
 
     public void setActiveScene(Scene activeScene) {
         this.activeScene = activeScene;
-
-        errorMessagePos = new Vector3D(20, activeScene.getCamera().getScreenDimensions().y()/2,0);
 
         startBuildThread();
         startUpdateThread();
@@ -85,10 +80,8 @@ public class SceneRenderer extends JPanel
             g.drawLine(cx-10, cy, cx+10, cy);
             g.drawLine(cx, cy-10, cx, cy+10);
         }
-    }
 
-    public void logError(String message) {
-        errors.add(message);
+        activeScene.getConsole().render(g, getWidth(), getHeight());
     }
 
     private double deltaTime()

@@ -158,7 +158,7 @@ public class LastGiftLevel extends Scene
             getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
         }
         catch (IOException e1) {
-            getSceneRenderer().logError("Can't find file ");
+            getConsole().println("Can't instantiate level: " + e1.getMessage());
         }
     }
 
