@@ -8,17 +8,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import Engine3d.Controls.Controller;
 import Engine3d.DevTools.Console;
-import Engine3d.DevTools.Profiler;
-import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Objects.Object3D;
 import Engine3d.Objects.ObjectSource;
 import Engine3d.Rendering.*;
 import Engine3d.Rendering.Filters.ScreenFilter;
-import Engine3d.Rendering.ScreenDrawing.TileRasterizer;
 import Engine3d.Rendering.Skyboxes.SkyBox;
 import Levels.Persistence.LevelIO;
-import Math.Geometries.Box;
 import Math.Geometries.MeshTriangle;
 import Math.Raycast.Ray;
 import Math.Raycast.RayCollision;
@@ -30,16 +26,21 @@ import Physics.AABBCollisions.StaticAABBObject;
 import Physics.GJK_EPA.GJK;
 import Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
-import Math.Matrix4x4;
 import Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
-import Physics.PlayerObject;
+import Physics.PhysicsSystem;
 import Physics.Triggers.TriggerZone;
 
-public class Scene implements Updatable
-{
+public class Scene implements Updatable {
+    private final RenderPipeline renderPipeline = new RenderPipeline();
+    private final PhysicsSystem physicsSystem = new PhysicsSystem();
+
+
+
+
+
     private final ObjParser objParser = new ObjParser();
     Camera camera;
     final SceneRenderer sceneRenderer = new SceneRenderer();
@@ -58,7 +59,6 @@ public class Scene implements Updatable
 
     //Makes sure we can't read game state while it is being written
     private final Object stateLock = new Object();
-    private final TileRasterizer tileRasterizer = new TileRasterizer();
 
     private volatile SkyBox skyBox;
     private final List<ScreenFilter> filters = new CopyOnWriteArrayList<>();
@@ -199,85 +199,8 @@ public class Scene implements Updatable
         }
     }
 
-    record RenderItem(Mesh mesh, Vector3D scale, Vector3D position, Vector3D rotation) {}
     public void buildScreenBuffer() {
-        camera.getScreenBuffer().clear(backgroundColour);
-
-        List<RenderItem> frame;
-
-        synchronized (stateLock) {
-            frame = new ArrayList<>(objects.size());
-            for (Object3D obj : objects) {
-                frame.add(new RenderItem(
-                        obj.getMesh(),
-                        new Vector3D(obj.getScale()),
-                        new Vector3D(obj.getPosition()),
-                        new Vector3D(obj.getRotation())
-                ));
-            }
-        }
-
-        //These values are purely based off the camera.
-        //If they change between two objects on the same frame then the objects can "jitter"
-        //This is also slightly more efficient.
-        Vector3D constCamPos = new Vector3D(camera.getPosition());
-        Vector3D constCamDir = new Vector3D(camera.getDirection());
-        Vector3D up = new Vector3D(0,1,0);
-        Vector3D target = camera.getDirection().translated(constCamPos);
-        Matrix4x4 cameraMatrix = Matrix4x4.getPointAtMatrix(constCamPos, target, up);
-        Matrix4x4 viewMatrix = cameraMatrix.quickMatrixInverse();
-
-        Matrix4x4 viewProj = Matrix4x4.matrixMatrixMultiplication(viewMatrix, camera.getProjectionMatrix());
-        Frustum frustum = new Frustum(viewProj);
-
-        frame.sort((o1, o2) -> {
-            // Calculate distances to the camera
-            double distance1 = o1.position.distanceTo(constCamPos);
-            double distance2 = o2.position.distanceTo(constCamPos);
-            // Sort objects by distance (closer first)
-            return Double.compare(distance1, distance2);
-        });
-
-        //Compute Geometry
-        List<Mesh.ProjectedTriangles> geometry;
-        try (Profiler.Span s = Profiler.span("geometry")) {
-            geometry = new ArrayList<>(frame.parallelStream()
-                    .map(o -> o.mesh.computeGeometry(o.scale, o.position, o.rotation,
-                            camera, constCamPos, frustum, viewMatrix,
-                            lightSources))
-                    .toList());   // ← wrap in ArrayList so we can add to it
-        }
-        catch (Exception e) {
-            console.println("Error when computing Geometry: " + e.getMessage());
-            return;
-        }
-
-        Object3D sel = selected;
-        if (sel != null && sel.getMesh() != null) {
-            AABB hb = sel.getMesh().getWorldAABB(sel.getPosition(), sel.getRotation(), sel.getScale());
-            if (hb != null) geometry.add(debugBox(hb, Color.YELLOW, camera, constCamPos, viewMatrix, frustum));
-        }
-
-        if (camera.debugging) {
-            for (AABBObject o : AABBObjects) {
-                if (o instanceof PlayerObject) {
-                    continue;
-                }
-                geometry.add(debugBox(o.getAABBCollider().getAABB(), Color.WHITE, camera, constCamPos, viewMatrix, frustum));
-            }
-            for (TriggerZone t : triggers) {
-                geometry.add(debugBox(t.getRegion(), Color.ORANGE, camera, constCamPos, viewMatrix, frustum));
-            }
-        }
-
-        try (Profiler.Span s = Profiler.span("raster")) {
-            tileRasterizer.render(camera, geometry, backgroundColour, skyBox);
-        }
-
-        try (Profiler.Span s = Profiler.span("filters")) {
-            for (ScreenFilter f : filters) f.apply(camera.getScreenBuffer(), constCamPos, constCamDir);
-            filters.removeIf(ScreenFilter::isDone);
-        }
+        renderPipeline.build(this, camera);
     }
 
     public Camera getCamera() {return camera;}
@@ -320,96 +243,8 @@ public class Scene implements Updatable
                 updatable.update(deltaTime);
             }
 
-            try (Profiler.Span s = Profiler.span("applyGravity")) {
-                for (Gravitational grav : gravitationals) {
-                    grav.applyGravity(gravity, deltaTime);
-                }
-            }
-
-            try (Profiler.Span s = Profiler.span("handleCollision")) {
-                for (int i = 0; i < dynamicAABBObjects.size(); i++) {
-                    for (int j = 0; j < staticAABBObjects.size(); j++) {
-                        dynamicAABBObjects.get(i).
-                                getAABBCollider().handleCollision(
-                                        staticAABBObjects.get(j).getAABBCollider());
-                    }
-                    for (int j = i+1; j < dynamicAABBObjects.size(); j++) {
-                        dynamicAABBObjects.get(i).
-                                getAABBCollider().handleCollision(
-                                        dynamicAABBObjects.get(j).getAABBCollider());
-                    }
-                }
-            }
+            physicsSystem.step(this, deltaTime);
         }
-    }
-
-    public RayCollision checkAndGetCollision(int numSteps, Ray ray) {
-        for (int i = 0; i < numSteps; i++) {
-            for (int j = 0; j < AABBObjects.size(); j++) {
-                try {
-                    AABBObject obj = AABBObjects.get(j);
-                    if (obj == ray.getSource()) { continue; }
-                    if (!obj.getAABBCollider().getAABB().collision(ray).isEmpty()) {
-                        if (GJK.boolSolveGJK(obj, ray)) {
-                            return new RayCollision(ray.getOrigin(), obj);
-                        }
-                    }
-                }
-                catch (NullPointerException e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-            ray.advance();
-        }
-        return null;
-    }
-    public boolean checkForCollision(int numSteps, Ray ray) {
-        if (checkAndGetCollision(numSteps, ray) != null) {
-            return true;
-        }
-        return false;
-    }
-
-    public void createCollisionMarker(Vector3D pos) {
-        Object3D marker = new Object3D(this);
-        marker.translate(pos);
-        Mesh mesh = new CubeMesh(marker, 0.25);
-        marker.setMesh(mesh);
-
-        mesh.setDrawInstructions(new DrawInstructions(true,false,false,false));
-
-        objects.add(marker);
-    }
-
-    public boolean boxOnGround(AABB probe) {
-        for (StaticAABBObject s : staticAABBObjects) {
-            if (s.getAABBCollider().getAABB().overlaps(probe)) return true;
-        }
-        return false;
-    }
-
-    public double groundDistanceBelow(Vector3D origin) {
-        Vector3D dir = Vector3D.DOWN();     // unit, so the result is a real distance
-        double best = Double.POSITIVE_INFINITY;
-        for (StaticAABBObject s : staticAABBObjects) {
-            for (MeshTriangle tri : s.getMesh().getFacesInWorld(s.getPosition(), s.getRotation())) {
-                Vector3D[] p = tri.getPoints();
-                double t = RayTriangle.intersect(origin, dir, p[0], p[1], p[2]);
-                if (!Double.isNaN(t) && t < best) best = t;
-            }
-        }
-        return best;
-    }
-
-    private Mesh.ProjectedTriangles debugBox(AABB box, Color color, Camera camera,
-                                             Vector3D camPos, Matrix4x4 viewMatrix, Frustum frustum) {
-        BoxMesh mesh = new BoxMesh(new Box(box.min(), box.max()));   // built at world min/max
-        DrawInstructions di = new DrawInstructions(true, false, false, false); // wireframe only
-        di.wireFrameColour = color;
-        di.ignorePixelDepth = true;                                  // draw on top, see through walls
-        mesh.setDrawInstructions(di);
-        return mesh.computeGeometry(new Vector3D(1,1,1), new Vector3D(0,0,0), new Vector3D(0,0,0),
-                camera, camPos, frustum, viewMatrix, lightSources);
     }
 
     public void setEditorMode(boolean b) {
@@ -424,5 +259,64 @@ public class Scene implements Updatable
 
     public Console getConsole() {
         return console;
+    }
+
+    public Color getBackgroundColour() {
+        return backgroundColour;
+    }
+
+    public List<RenderItem> snapshotFrame() {
+        synchronized (stateLock) {
+            List<RenderItem> frame = new ArrayList<>(objects.size());
+            for (Object3D obj : objects) {
+                frame.add(new RenderItem(
+                        obj.getMesh(),
+                        new Vector3D(obj.getScale()),
+                        new Vector3D(obj.getPosition()),
+                        new Vector3D(obj.getRotation())
+                ));
+            }
+            return frame;
+        }
+    }
+
+    public List<LightSource> getLightSources() {
+        return lightSources;
+    }
+
+    public List<AABBObject> getAABBObjects() {
+        return AABBObjects;
+    }
+
+    public List<TriggerZone> getTriggers() {
+        return triggers;
+    }
+
+    public SkyBox getSkybox() {
+        return skyBox;
+    }
+
+    public List<ScreenFilter> getFilters() {
+        return filters;
+    }
+
+    public List<Gravitational> getGravitationals() {
+        return gravitationals;
+    }
+
+    public double getGravity() {
+        return gravity;
+    }
+
+    public List<DynamicAABBObject> getDynamicAABBObjects() {
+        return dynamicAABBObjects;
+    }
+
+    public List<StaticAABBObject> getStaticAABBObjects() {
+        return staticAABBObjects;
+    }
+
+    public double groundDistanceBelow(Vector3D origin) {
+        return physicsSystem.groundDistanceBelow(this, origin);
     }
 }

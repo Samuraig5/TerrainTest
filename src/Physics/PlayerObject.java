@@ -144,11 +144,6 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         translate(momentum);
     }
 
-    public RayCollision cursorRayCast(int numSteps, double raySize) {
-        Ray ray = new Ray(this, getPosition().translated(getCameraOffset()) , camera.getDirection().scaled(raySize));
-        return getScene().checkAndGetCollision(numSteps, ray);
-    }
-
     public Vector3D findClosestPointToCollision(RayCollision rayCollision) {
         if (rayCollision == null) {return new Vector3D(0,0,0);}
         Vector3D col = rayCollision.collisionPoint;

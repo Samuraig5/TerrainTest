@@ -21,6 +21,7 @@ public class Console extends KeyAdapter {
     private final Map<String, Consumer<String[]>> commands = new HashMap<>();
 
     public Console(Scene scene) {
+        Log.bind(this);
         this.scene = scene;
     }
 

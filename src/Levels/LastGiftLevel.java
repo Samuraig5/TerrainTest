@@ -50,7 +50,7 @@ public class LastGiftLevel extends Scene
         backgroundColour = new Color(73, 0, 0);
 
         player = new PlayerObject(this, (PlayerCamera) camera);
-        player.translate(new Vector3D(0,1,0));
+        player.translate(new Vector3D(0,2,0));
 
         // --- PLAYER mode: existing gameplay controls ---
         OldSchoolDungeonCameraControls playerCtrl =
