@@ -8,22 +8,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import Engine3d.Controls.Controller;
 import Engine3d.DevTools.Console;
-import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Objects.Object3D;
 import Engine3d.Objects.ObjectSource;
 import Engine3d.Rendering.*;
 import Engine3d.Rendering.Filters.ScreenFilter;
 import Engine3d.Rendering.Skyboxes.SkyBox;
 import Levels.Persistence.LevelIO;
-import Math.Geometries.MeshTriangle;
-import Math.Raycast.Ray;
-import Math.Raycast.RayCollision;
-import Math.Raycast.RayTriangle;
-import Physics.AABBCollisions.AABB;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
-import Physics.GJK_EPA.GJK;
 import Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Math.Vector.Vector3D;
@@ -66,7 +59,6 @@ public class Scene implements Updatable {
     private Engine3d.Time.Updatable editorUpdatable;
 
     private final Console console = new Console(this);
-    private volatile boolean consoleOpen = false;
     private final List<Controller> consoleSuspended = new ArrayList<>();
 
     public Scene(Camera camera) {
@@ -127,9 +119,7 @@ public class Scene implements Updatable {
             });
         });
     }
-    public boolean isConsoleOpen()        {
-        return consoleOpen;
-    }
+
     public void setConsoleOpen(boolean open) {
         if (open) {
             consoleSuspended.clear();
