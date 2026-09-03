@@ -1,5 +1,6 @@
 package Menus;
 
+import Engine3d.GameEngine;
 import Engine3d.Rendering.PlayerCamera;
 import Levels.LastGiftLevel;
 
@@ -85,11 +86,8 @@ public class MainMenu extends Menu {
         frame.getContentPane().removeAll();
 
         PlayerCamera camera = new PlayerCamera(frame);
-        //new BloodGulch(camera);
-        //new TestLevel(camera);
-        //new TerrainLevel(camera);
-        //new GJKTest(camera);
-        new LastGiftLevel(camera);
+        LastGiftLevel level = new LastGiftLevel(camera);
+        new GameEngine(level);
 
         frame.revalidate();
         frame.repaint();

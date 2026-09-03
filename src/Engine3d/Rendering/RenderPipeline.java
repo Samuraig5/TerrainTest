@@ -24,10 +24,8 @@ import java.util.List;
 public class RenderPipeline {
     private final TileRasterizer tileRasterizer = new TileRasterizer();
 
-    public void build(Scene scene, Camera camera) {
+    public void build(Camera camera, Scene scene, List<RenderItem> frame) {
         camera.getScreenBuffer().clear(scene.getBackgroundColour());
-
-        List<RenderItem> frame = scene.snapshotFrame();
         List<LightSource> lightSources = scene.getLightSources();
 
         //These values are purely based off the camera.

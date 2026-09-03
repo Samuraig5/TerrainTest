@@ -4,6 +4,7 @@ import Engine3d.Audio.Sound;
 import Engine3d.Controls.CreativeCamera;
 import Engine3d.Controls.EditorController;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
+import Engine3d.DevTools.Log;
 import Engine3d.Model.BillboardScatterMesh;
 import Engine3d.Model.ChunkPopulator;
 import Engine3d.Model.FloorFollower;
@@ -158,7 +159,7 @@ public class LastGiftLevel extends Scene
             getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
         }
         catch (IOException e1) {
-            getConsole().println("Can't instantiate level: " + e1.getMessage());
+            Log.println("Can't instantiate level: " + e1.getMessage());
         }
     }
 
@@ -357,7 +358,7 @@ public class LastGiftLevel extends Scene
                     Sound.play("Resources/Audio/Error Buzz.wav", 0.1);
                 })
                 .at(35, () -> {
-                    getSceneRenderer().stopThreads();
+                    getEngine().getLoop().stop();
                     getCamera().getFrame().dispose();
                     System.exit(0);
                 });

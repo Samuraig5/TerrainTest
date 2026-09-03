@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import Engine3d.Controls.Controller;
 import Engine3d.DevTools.Console;
+import Engine3d.DevTools.Log;
 import Engine3d.Objects.Object3D;
 import Engine3d.Objects.ObjectSource;
 import Engine3d.Rendering.*;
@@ -23,23 +24,14 @@ import Math.Vector.Vector3D;
 import Engine3d.Model.ObjParser;
 import Engine3d.Time.Updatable;
 import Engine3d.Model.Mesh;
-import Physics.PhysicsSystem;
 import Physics.Triggers.TriggerZone;
 
-public class Scene implements Updatable {
-    private final RenderPipeline renderPipeline = new RenderPipeline();
-    private final PhysicsSystem physicsSystem = new PhysicsSystem();
-
-
-
-
-
+public class Scene {
     private final ObjParser objParser = new ObjParser();
     Camera camera;
     final SceneRenderer sceneRenderer = new SceneRenderer();
     protected Color backgroundColour = Color.BLACK;
     protected List<Object3D> objects = new CopyOnWriteArrayList<>();
-    private final java.util.concurrent.ConcurrentLinkedQueue<Runnable> editCommands = new java.util.concurrent.ConcurrentLinkedQueue<>();
     private volatile Object3D selected;
     List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 1d;
@@ -50,16 +42,13 @@ public class Scene implements Updatable {
     protected List<StaticAABBObject> staticAABBObjects = new ArrayList<>();
     private final List<TriggerZone> triggers = new ArrayList<>();
 
-    //Makes sure we can't read game state while it is being written
-    private final Object stateLock = new Object();
-
     private volatile SkyBox skyBox;
     private final List<ScreenFilter> filters = new CopyOnWriteArrayList<>();
     private volatile boolean editorMode = false;
     private Engine3d.Time.Updatable editorUpdatable;
 
-    private final Console console = new Console(this);
     private final List<Controller> consoleSuspended = new ArrayList<>();
+    private GameEngine gameEngine;
 
     public Scene(Camera camera) {
         this.camera = camera;
@@ -67,9 +56,6 @@ public class Scene implements Updatable {
         camera.getFrame().add(sceneRenderer);
         sceneRenderer.setActiveScene(this);
         sceneRenderer.grabFocus();
-
-        sceneRenderer.addKeyListener(console);
-        setUpConsole();
 
         camera.getFrame().repaint();
 
@@ -82,61 +68,7 @@ public class Scene implements Updatable {
 
     }
 
-    private void setUpConsole() {
-        console.registerCommand("save",
-                args -> {
-            if (args.length < 2) {
-                console.println("usage: save <fileName>");
-                return;
-            }
-            String path = "Levels/saved/" + args[1] + ".txt";
-            enqueueEdit(() -> {
-                try {
-                    LevelIO.save(LevelIO.snapshot(this), path);
-                    console.println("Saved " + path);
-                }
-                catch (IOException e) {
-                    console.println("Save failed: " + e.getMessage());
-                }
-            });
-        });
 
-        console.registerCommand("load",
-                args -> {
-            if (args.length < 2) {
-                console.println("usage: load <fileName>");
-                return;
-            }
-            String path = "Levels/saved/" + args[1] + ".txt";
-            enqueueEdit(() -> {
-                try {
-                    LevelIO.restore(LevelIO.load(path), this);
-                    console.println("Loaded " + path);
-                }
-                catch (IOException e) {
-                    console.println("Load failed: " + e.getMessage());
-                }
-            });
-        });
-    }
-
-    public void setConsoleOpen(boolean open) {
-        if (open) {
-            consoleSuspended.clear();
-            for (Updatable u : updatables) {
-                if (u instanceof Controller c && c.isEnabled()) {
-                    c.isEnabled(false);
-                    consoleSuspended.add(c);
-                }
-            }
-        }
-        else {
-            for (Controller c : consoleSuspended) {
-                c.isEnabled(true);
-            }
-            consoleSuspended.clear();
-        }
-    }
 
     public SceneRenderer getSceneRenderer() {
         return sceneRenderer;
@@ -177,7 +109,6 @@ public class Scene implements Updatable {
         staticAABBObjects.remove(object);
     }
 
-    public void enqueueEdit(Runnable r) { editCommands.add(r); }
     public Object3D getSelected()       { return selected; }
     public void setSelected(Object3D o) { this.selected = o; }
     public java.util.List<Object3D> getObjects() { return objects; }
@@ -187,10 +118,6 @@ public class Scene implements Updatable {
         if (updatable instanceof TriggerZone tz) {
             triggers.add(tz);
         }
-    }
-
-    public void buildScreenBuffer() {
-        renderPipeline.build(this, camera);
     }
 
     public Camera getCamera() {return camera;}
@@ -211,30 +138,11 @@ public class Scene implements Updatable {
         Object3D object3D = new Object3D(this);
         Mesh loaded = objParser.loadFromObjFile(object3D, folderPath, filePath);
         if (loaded == null) {
-            console.println("ObjParser couldn't find file: " + folderPath + "/" + filePath);
+            Log.println("ObjParser couldn't find file: " + folderPath + "/" + filePath);
             object3D.setMesh(new Mesh());
         }
         object3D.setObjectSource(new ObjectSource.ModelSource(folderPath, filePath));
         return object3D;
-    }
-
-    @Override
-    public void update(double deltaTime) {
-        synchronized (stateLock) {
-            Runnable cmd;
-            while ((cmd = editCommands.poll()) != null) cmd.run();
-
-            if (editorMode) {
-                if (editorUpdatable != null) editorUpdatable.update(deltaTime);
-                return;
-            }
-
-            for (Updatable updatable : updatables) {
-                updatable.update(deltaTime);
-            }
-
-            physicsSystem.step(this, deltaTime);
-        }
     }
 
     public void setEditorMode(boolean b) {
@@ -247,27 +155,21 @@ public class Scene implements Updatable {
         editorUpdatable = u;
     }
 
-    public Console getConsole() {
-        return console;
-    }
-
     public Color getBackgroundColour() {
         return backgroundColour;
     }
 
-    public List<RenderItem> snapshotFrame() {
-        synchronized (stateLock) {
-            List<RenderItem> frame = new ArrayList<>(objects.size());
-            for (Object3D obj : objects) {
-                frame.add(new RenderItem(
-                        obj.getMesh(),
-                        new Vector3D(obj.getScale()),
-                        new Vector3D(obj.getPosition()),
-                        new Vector3D(obj.getRotation())
-                ));
-            }
-            return frame;
+    public List<RenderItem> snapshotObjects() {
+        List<RenderItem> frame = new ArrayList<>(objects.size());
+        for (Object3D obj : objects) {
+            frame.add(new RenderItem(
+                    obj.getMesh(),
+                    new Vector3D(obj.getScale()),
+                    new Vector3D(obj.getPosition()),
+                    new Vector3D(obj.getRotation())
+            ));
         }
+        return frame;
     }
 
     public List<LightSource> getLightSources() {
@@ -307,6 +209,23 @@ public class Scene implements Updatable {
     }
 
     public double groundDistanceBelow(Vector3D origin) {
-        return physicsSystem.groundDistanceBelow(this, origin);
+        return gameEngine.getPhysics().groundDistanceBelow(this, origin);
+    }
+
+    public void setEngine(GameEngine gameEngine) {
+        this.gameEngine = gameEngine;
+    }
+    public GameEngine getEngine() {
+        return gameEngine;
+    }
+
+    public Updatable getEditorUpdatable() {
+        return editorUpdatable;
+    }
+
+    public void tickScripts(double dt) {
+        for (Updatable updatable : updatables) {
+            updatable.update(dt);
+        }
     }
 }

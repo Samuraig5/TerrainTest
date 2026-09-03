@@ -1,5 +1,6 @@
 package Engine3d.DevTools;
 
+import Engine3d.GameEngine;
 import Engine3d.Scene;
 
 import java.awt.*;
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class Console extends KeyAdapter {
-    private final Scene scene;
+    private final GameEngine gameEngine;
 
     private boolean open = false;
 
@@ -20,9 +21,9 @@ public class Console extends KeyAdapter {
     private final List<String> output = new ArrayList<>();
     private final Map<String, Consumer<String[]>> commands = new HashMap<>();
 
-    public Console(Scene scene) {
+    public Console(GameEngine gameEngine) {
         Log.bind(this);
-        this.scene = scene;
+        this.gameEngine = gameEngine;
     }
 
     // COMMANDS
@@ -40,7 +41,7 @@ public class Console extends KeyAdapter {
 
     public void toggle() {
         open = !open;
-        scene.setConsoleOpen(open);
+        gameEngine.setConsoleOpen(open);
         if (!open) {
             input.setLength(0);
         }

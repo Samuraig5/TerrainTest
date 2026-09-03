@@ -9,12 +9,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SceneRenderer extends JPanel
-{
-    private Thread updateThread;
-    private Thread bufferThread;
-    private volatile boolean running = true; // For controlled thread shutdown
-    private long lastTime;
+public class SceneRenderer extends JPanel {
 
     private Scene activeScene;
 
@@ -36,11 +31,7 @@ public class SceneRenderer extends JPanel
     public void setActiveScene(Scene activeScene) {
         this.activeScene = activeScene;
 
-        startBuildThread();
-        startUpdateThread();
-
         repaint();
-        //revalidate();
     }
 
     @Override
@@ -81,92 +72,8 @@ public class SceneRenderer extends JPanel
             g.drawLine(cx, cy-10, cx, cy+10);
         }
 
-        activeScene.getConsole().render(g, getWidth(), getHeight());
-    }
-
-    private double deltaTime()
-    {
-        long currentTime = System.nanoTime();
-        long deltaTime = currentTime - lastTime;
-        lastTime = currentTime;
-        return nanoToSec(deltaTime);
-    }
-
-    private double nanoToSec(long ns)
-    {
-        return (double) ns / 1_000_000_000;
-    }
-
-    private void startBuildThread() {
-        if (bufferThread != null && bufferThread.isAlive()) {
-            bufferThread.interrupt(); // Stop the current thread
+        if (activeScene.getEngine() != null) {
+            activeScene.getEngine().getConsole().render(g, getWidth(), getHeight());
         }
-
-        bufferThread = new Thread(() -> {
-            final long targetPeriod = 16_666_667L; // ns for 60 FPS
-
-            while (!Thread.currentThread().isInterrupted()) {
-                long frameStart = System.nanoTime();
-                if (activeScene != null) {
-                    try (Profiler.Span s = Profiler.span("buildScreenBuffer")) {
-                        activeScene.buildScreenBuffer();
-                    }
-                    Profiler.count("buffers");
-
-                    synchronized (activeScene.getCamera()) {
-                        activeScene.getCamera().swapBuffers();
-                    }
-                    repaint();
-                }
-                long remaining = targetPeriod - (System.nanoTime() - frameStart);
-                if (remaining > 0) {
-                    try {
-                        Thread.sleep(remaining / 1_000_000, (int)(remaining % 1_000_000));
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            }
-        });
-
-        bufferThread.start();
-    }
-
-    private void startUpdateThread() {
-        if (updateThread != null && updateThread.isAlive()) {
-            updateThread.interrupt();
-        }
-
-        updateThread = new Thread(() -> {
-            while (running) {
-                try {
-                    if (activeScene != null) {
-                        try (Profiler.Span s = Profiler.span("update")) {
-                            activeScene.update(deltaTime()); // Update game logic
-                        }
-                        Profiler.count("updates");
-                    }
-                }
-                catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
-
-                try {
-                    Thread.sleep(16); // ~60 FPS logic updates
-                } catch (InterruptedException ex) {
-                    System.err.println(ex.getMessage());
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
-
-        updateThread.start();
-    }
-
-    public void stopThreads() {
-        running = false;
-
-        if (bufferThread != null) bufferThread.interrupt();
-        if (updateThread != null) updateThread.interrupt();
     }
 }

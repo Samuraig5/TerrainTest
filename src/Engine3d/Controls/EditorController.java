@@ -89,7 +89,7 @@ public class EditorController extends Controller implements Updatable {
         if (SwingUtilities.isMiddleMouseButton(e)) {
             var buf = camera.getScreenBuffer().getBufferedImage();
             Ray ray = camera.rayFromBuffer(buf.getWidth()/2.0, buf.getHeight()/2.0);
-            scene.enqueueEdit(() -> scene.setSelected(pick(ray)));
+            scene.getEngine().enqueueEdit(() -> scene.setSelected(pick(ray)));
         }
     }
 
@@ -154,13 +154,13 @@ public class EditorController extends Controller implements Updatable {
             } else {
                 scaleDelta = 0;
             }
-            scene.enqueueEdit(() -> sel.scaleBy(new Vector3D(scaleDelta, scaleDelta, scaleDelta)));
+            scene.getEngine().enqueueEdit(() -> sel.scaleBy(new Vector3D(scaleDelta, scaleDelta, scaleDelta)));
         } else if (ctrl) {
             Vector3D rotDelta = axis.scaled(amount * rotStep);
-            scene.enqueueEdit(() -> sel.rotate(rotDelta));
+            scene.getEngine().enqueueEdit(() -> sel.rotate(rotDelta));
         } else {
             Vector3D delta = axis.scaled(amount * moveStep);
-            scene.enqueueEdit(() -> sel.translate(delta));
+            scene.getEngine().enqueueEdit(() -> sel.translate(delta));
         }
     }
 }
