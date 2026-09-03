@@ -1,16 +1,21 @@
 package Engine3d;
 
 import Engine3d.Controls.Controller;
+import Engine3d.Controls.EditorController;
 import Engine3d.DevTools.Console;
 import Engine3d.DevTools.Profiler;
+import Engine3d.Objects.Object3D;
 import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.RenderItem;
 import Engine3d.Rendering.RenderPipeline;
 import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Time.Updatable;
 import Levels.Persistence.LevelIO;
+import Levels.Utils.LevelBuilder;
 import Physics.PhysicsSystem;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +31,9 @@ public class GameEngine {
     private final Console console = new Console(this);
     private final List<Controller> consoleSuspended = new ArrayList<>();
 
+    private EditorController editorController;
+    private volatile boolean editorMode = false;
+
     private Scene activeScene;
 
     private final java.util.concurrent.ConcurrentLinkedQueue<Runnable> editCommands =
@@ -35,15 +43,26 @@ public class GameEngine {
         editCommands.add(r);
     }
 
-    public GameEngine(Scene scene) {
-        this.activeScene = scene;
-        this.camera = scene.getCamera();
-        this.renderer = scene.getSceneRenderer();
+    public GameEngine(Camera camera) {
+        this.camera = camera;
+        this.renderer = new SceneRenderer();
+
+        camera.getFrame().add(renderer);
+        renderer.grabFocus();
+        camera.getFrame().repaint();
 
         renderer.addKeyListener(console);
         setUpConsole();
 
-        scene.setEngine(this);
+        renderer.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_F3) {
+                    camera.debugging = !camera.debugging;
+                }
+            }
+        });
+
         this.loop = new GameLoop(this);
         loop.start();
     }
@@ -64,6 +83,17 @@ public class GameEngine {
         return physicsSystem;
     }
 
+    public SceneRenderer getRenderer() {
+        return renderer;
+    }
+
+    public void loadLevel(LevelBuilder builder) {
+        Scene scene = builder.build(this);
+        scene.setEngine(this);
+        this.activeScene = scene;
+        renderer.setActiveScene(scene);
+    }
+
     public void renderFrame() {
         if (activeScene == null) return;
         List<RenderItem> frame;
@@ -71,7 +101,7 @@ public class GameEngine {
             frame = activeScene.snapshotObjects();
         }
         try (Profiler.Span s = Profiler.span("buildScreenBuffer")) {
-            renderPipeline.build(camera, activeScene, frame);
+            renderPipeline.build(camera, activeScene, frame, getSelected());
         }
         Profiler.count("buffers");
         synchronized (camera) {
@@ -87,9 +117,8 @@ public class GameEngine {
                 Runnable cmd;
                 while ((cmd = editCommands.poll()) != null) cmd.run();
 
-                if (activeScene.isEditorMode()) {
-                    Updatable eu = activeScene.getEditorUpdatable();
-                    if (eu != null) eu.update(dt);
+                if (editorMode) {
+                    if (editorController != null) editorController.update(dt);
                 } else {
                     activeScene.tickScripts(dt);
                     physicsSystem.step(activeScene, dt);
@@ -102,7 +131,7 @@ public class GameEngine {
     public void setConsoleOpen(boolean open) {
         if (open) {
             consoleSuspended.clear();
-            for (Updatable u : activeScene.updatables) {
+            for (Updatable u : activeScene.getUpdatables()) {
                 if (u instanceof Controller c && c.isEnabled()) {
                     c.isEnabled(false);
                     consoleSuspended.add(c);
@@ -157,5 +186,18 @@ public class GameEngine {
 
     public Console getConsole() {
         return console;
+    }
+
+    public void setEditorController(EditorController e) {
+        this.editorController = e;
+    }
+    public boolean isEditorMode() {
+        return editorMode;
+    }
+    public void setEditorMode(boolean b) {
+        this.editorMode = b;
+    }
+    public Object3D getSelected() {
+        return editorController == null ? null : editorController.getSelected();
     }
 }

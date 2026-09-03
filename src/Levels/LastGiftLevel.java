@@ -5,15 +5,19 @@ import Engine3d.Controls.CreativeCamera;
 import Engine3d.Controls.EditorController;
 import Engine3d.Controls.OldSchoolDungeonCameraControls;
 import Engine3d.DevTools.Log;
+import Engine3d.GameEngine;
 import Engine3d.Model.BillboardScatterMesh;
 import Engine3d.Model.ChunkPopulator;
 import Engine3d.Model.FloorFollower;
 import Engine3d.Model.ScatterChunkManager;
+import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.DrawInstructions;
 import Engine3d.Rendering.Filters.*;
+import Engine3d.Rendering.SceneRenderer;
 import Engine3d.Rendering.Skyboxes.EyeAwakening;
 import Engine3d.Rendering.Skyboxes.NightSkyBox;
 import Levels.Utils.GazeLock;
+import Levels.Utils.LevelBuilder;
 import Levels.Utils.Timeline;
 import Engine3d.Objects.Object3D;
 import Physics.PlayerObject;
@@ -21,7 +25,6 @@ import Engine3d.Lighting.LightSource;
 import Math.Vector.Vector3D;
 import Engine3d.Model.SimpleMeshes.BoxMesh;
 import Physics.AABBCollisions.StaticAABBObject;
-import Engine3d.Rendering.Camera;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
 import Physics.Triggers.TriggerZone;
@@ -37,40 +40,57 @@ import java.util.List;
 import java.util.Random;
 
 
-public class LastGiftLevel extends Scene
-{
-    private PlayerObject player;
-    private GlitchFilter glitch;
+public class LastGiftLevel implements LevelBuilder {
+    private GameEngine engine;
 
+    private Camera camera;
+    private SceneRenderer renderer;
+
+    private Scene scene;
+
+    private PlayerObject player;
+
+    private GlitchFilter glitch;
     private EyeAwakening awakening;
     private GazeLock gaze;
 
-    public LastGiftLevel(Camera camera) {
-        super(camera);
 
-        backgroundColour = new Color(73, 0, 0);
+    @Override
+    public Scene build(GameEngine engine) {
+        this.engine = engine;
+        scene = new Scene();
+        scene.setEngine(engine);
+        camera = engine.getCamera();
+        renderer = engine.getRenderer();
 
-        player = new PlayerObject(this, (PlayerCamera) camera);
-        player.translate(new Vector3D(0,2,0));
+        setUpPlayer();
+        buildScene();
+
+        return scene;
+    }
+
+    private OldSchoolDungeonCameraControls playerCtrl;
+    private void setUpPlayer() {
+        player = new PlayerObject(scene, (PlayerCamera) camera);
+        player.translate(new Vector3D(0, 1, 0));
 
         // --- PLAYER mode: existing gameplay controls ---
-        OldSchoolDungeonCameraControls playerCtrl =
-                new OldSchoolDungeonCameraControls(getSceneRenderer(), player);
+        playerCtrl = new OldSchoolDungeonCameraControls(renderer, player);
         playerCtrl.isEnabled(true);
-        addUpdatable(playerCtrl);
+        scene.addUpdatable(playerCtrl);
 
         // --- EDITOR mode: fly-cam mover + editing overlay ---
-        CreativeCamera editorCam = new CreativeCamera(this, (PlayerCamera) camera);
+        CreativeCamera editorCam = new CreativeCamera(scene, (PlayerCamera) camera);
         ((PlayerCamera) camera).setPlayerObject(player);   // editorCam's ctor stole the camera; give it back
 
         EditorController editorCtrl =
-                new EditorController(getSceneRenderer(), editorCam, this, camera); // mover + rendering cam
+                new EditorController(renderer, editorCam, scene, camera); // mover + rendering cam
         editorCtrl.isEnabled(false);
-        addUpdatable(editorCtrl);
-        setEditorUpdatable(editorCtrl);
+        scene.addUpdatable(editorCtrl);
+        engine.setEditorController(editorCtrl);
 
         // --- toggle ---
-        getSceneRenderer().addKeyListener(new java.awt.event.KeyAdapter() {
+        renderer.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override public void keyPressed(java.awt.event.KeyEvent e) {
                 if (e.getKeyCode() != java.awt.event.KeyEvent.VK_F1) {
                     return;
@@ -78,20 +98,24 @@ public class LastGiftLevel extends Scene
                 boolean toEditor = !editorCtrl.isEnabled();
                 editorCtrl.isEnabled(toEditor);
                 playerCtrl.isEnabled(!toEditor);
-                setEditorMode(toEditor);
+                engine.setEditorMode(toEditor);
                 ((PlayerCamera) camera).setPlayerObject(toEditor ? editorCam : player);
                 if (!toEditor) {
-                    setSelected(null);
+                    editorCtrl.setSelected(null);
                 }
             }
         });
 
-        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(getSceneRenderer(), player);
+        OldSchoolDungeonCameraControls cameraController = new OldSchoolDungeonCameraControls(renderer, player);
         cameraController.isEnabled(false);
 
-        addUpdatable(cameraController);
+        scene.addUpdatable(cameraController);
+    }
 
-        LightSource sun = new LightSource(this);
+    private void buildScene() {
+        scene.setBackgroundColour(new Color(73, 0, 0));
+
+        LightSource sun = new LightSource(scene);
         sun.setRotation(new Vector3D(Math.toRadians(160),0,0));
         sun.setLightIntensity(5);
 
@@ -104,13 +128,13 @@ public class LastGiftLevel extends Scene
 
             NightSkyBox sky = new NightSkyBox(new Vector3D(0,0.28,1),
                     12, 500, 1234L, signImg, 75);
-            setSkyBox(sky);
+            scene.setSkyBox(sky);
             double floorSize = 50;
             StaticAABBObject ground = spawnWall(cimsonImg, new Vector3D(floorSize, 1, floorSize));
             ground.translate(Vector3D.DOWN().scaled(0.5));
 
             FloorFollower floorFollower = new FloorFollower(ground, player, 1.0);
-            addUpdatable(floorFollower);
+            scene.addUpdatable(floorFollower);
 
             ChunkPopulator flowers = (cx, cz, size, out) -> {
                 long seed = ((long) cx * 73856093L) ^ ((long) cz * 19349663L);
@@ -125,38 +149,38 @@ public class LastGiftLevel extends Scene
             };
 
             ScatterChunkManager flowerChunks =
-                    new ScatterChunkManager(this, player, roseImg, 3, 25, flowers,
+                    new ScatterChunkManager(scene, player, roseImg, 3, 25, flowers,
                             new BillboardScatterMesh.Wind(
                                     new Vector3D(1,0,0.25).normalized(),
                                     0.12,0.5,1
                             )
                     );
-            addUpdatable(flowerChunks);
+            scene.addUpdatable(flowerChunks);
 
             glitch = new GlitchFilter();
-            addFilter(glitch);
+            scene.addFilter(glitch);
 
             WakeUpFilter wake = new WakeUpFilter(
                     ()->{
-                        cameraController.isEnabled(true);
-                        getSceneRenderer().addKeyListener(glitch);
+                        playerCtrl.isEnabled(true);
+                        renderer.addKeyListener(glitch);
                         Clip music = Sound.playLoop("Resources/Audio/Hymn of the Cherubim.wav");
                     }
             );
-            addFilter(wake);
+            scene.addFilter(wake);
 
             awakening = new EyeAwakening(sky, 10.0);   // 10s turn
-            addUpdatable(awakening);
+            scene.addUpdatable(awakening);
 
             gaze = new GazeLock(player, new Vector3D(0, -0.2, 1),
                     18, 0.5);
             gaze.setOnWallHit(()->glitch.trigger(1,0.45));
-            addUpdatable(gaze);
+            scene.addUpdatable(gaze);
 
             spawnGate(new Vector3D(0,0,200));
             spawnObelisks(new Vector3D(0,0,10));
 
-            getSceneRenderer().addKeyListener(wake);   // renderer already holds keyboard focus
+            renderer.addKeyListener(wake);   // renderer already holds keyboard focus
         }
         catch (IOException e1) {
             Log.println("Can't instantiate level: " + e1.getMessage());
@@ -165,7 +189,7 @@ public class LastGiftLevel extends Scene
 
     private void spawnGate(Vector3D gateLocation) {
         List<Object3D> gateParts = new ArrayList<>();
-        Object3D gate = loadFromFile("Resources/Models/Gate", "gate.obj");
+        Object3D gate = scene.loadFromFile("Resources/Models/Gate", "gate.obj");
         gate.rotate(new Vector3D(0,Math.toRadians(180),0));
         gate.setScale(new Vector3D(280, 280, 280));
         gate.translate(gateLocation);
@@ -181,7 +205,7 @@ public class LastGiftLevel extends Scene
 
         GlitchFilter textGlitch = new GlitchFilter();
         BlackScreenText blackText = new BlackScreenText().effect(textGlitch);
-        addFilter(blackText);
+        scene.addFilter(blackText);
 
         Timeline gateSeq = new Timeline()
                 .at(0.0, () -> {
@@ -194,21 +218,21 @@ public class LastGiftLevel extends Scene
                     textGlitch.trigger(2.5,3.8);
                 })
                 .at(1.4, () -> {                                   // world swap — hidden behind full black
-                    for (Object3D p : gateParts) removeObject(p);
+                    for (Object3D p : gateParts) scene.removeObject(p);
                     Vector3D spawn = new Vector3D(0, 1, 0);
                     player.translate(spawn.translated(player.getPosition().inverted()));
                     player.rotate(player.getRotation().inverted().translated(new Vector3D(0,Math.toRadians(180),0)));
                     spawnTemple(new Vector3D(0,0,-200));
                 })
                 .at(4.5, blackText::hide);                          // reveal the temple world
-        addUpdatable(gateSeq);
+        scene.addUpdatable(gateSeq);
 
         TriggerZone progressionZone = new TriggerZone(
                 TriggerZone.box(gateLocation.translated(new Vector3D(0,2,0.25)),
                         new Vector3D(5,4,1)),
                 player).onEnter(()-> gateSeq.start());
 
-        addUpdatable(progressionZone);
+        scene.addUpdatable(progressionZone);
     }
 
     private void spawnObelisks(Vector3D obeliskLocation) {
@@ -232,14 +256,14 @@ public class LastGiftLevel extends Scene
                 new Vector3D(10,10,10));
     }
     private void spawnObelisk(Vector3D location, Vector3D rotation, Vector3D scale) {
-        Object3D obelisk = loadFromFile("Resources/Models/Obelisk", "Obelisk1_0001.obj");
+        Object3D obelisk = scene.loadFromFile("Resources/Models/Obelisk", "Obelisk1_0001.obj");
         obelisk.rotate(rotation);
         obelisk.setScale(scale);
         obelisk.translate(location);
     }
 
     private void spawnTemple(Vector3D templeLocation) {
-        Object3D temple = loadFromFile("Resources/Models/Temple", "BloodTemple.obj");
+        Object3D temple = scene.loadFromFile("Resources/Models/Temple", "BloodTemple.obj");
         temple.translate(templeLocation);
 
         spawnCollider(new Vector3D(1.5, 5, 1.5), templeLocation); //Statue
@@ -253,10 +277,10 @@ public class LastGiftLevel extends Scene
         spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,5.1)));
         spawnCollider(new Vector3D(0.5, 10, 0.5), templeLocation.translated(new Vector3D(-2.25,0,-5.1)));
 
-        addFilter(new CensorFilter(getCamera(), templeLocation.translated(new Vector3D(-0.1, 4.25, 0.5)), 0.3, 0.3));
+        scene.addFilter(new CensorFilter(scene.getEngine().getCamera(), templeLocation.translated(new Vector3D(-0.1, 4.25, 0.5)), 0.3, 0.3));
 
         PopupFilter errors = new PopupFilter();
-        addFilter(errors);
+        scene.addFilter(errors);
 
         Timeline templeSeq = new Timeline()
                 .at(0.0, () -> {
@@ -358,8 +382,8 @@ public class LastGiftLevel extends Scene
                     Sound.play("Resources/Audio/Error Buzz.wav", 0.1);
                 })
                 .at(35, () -> {
-                    getEngine().getLoop().stop();
-                    getCamera().getFrame().dispose();
+                    scene.getEngine().getLoop().stop();
+                    scene.getEngine().getCamera().getFrame().dispose();
                     System.exit(0);
                 });
 
@@ -382,19 +406,19 @@ public class LastGiftLevel extends Scene
             });
         }
 
-        addUpdatable(templeSeq);
+        scene.addUpdatable(templeSeq);
 
         TriggerZone endZone = new TriggerZone(
                 TriggerZone.box(templeLocation,
                         new Vector3D(6,4,6)),
                 player).onEnter(templeSeq::start);
 
-        addUpdatable(endZone);
+        scene.addUpdatable(endZone);
     }
 
 
     private StaticAABBObject spawnWall(BufferedImage sprite, Vector3D size) {
-        StaticAABBObject wall = new StaticAABBObject(this);
+        StaticAABBObject wall = new StaticAABBObject(scene);
         BoxMesh boxMesh = new BoxMesh(size);
         wall.setMesh(boxMesh);
         boxMesh.setTexture(sprite);
@@ -405,7 +429,7 @@ public class LastGiftLevel extends Scene
     }
 
     private StaticAABBObject spawnCollider(Vector3D size, Vector3D pos) {
-        StaticAABBObject c = new StaticAABBObject(this);
+        StaticAABBObject c = new StaticAABBObject(scene);
         BoxMesh box = new BoxMesh(size);
         c.setMesh(box);                                                  // builds the collider
         box.setDrawInstructions(new DrawInstructions(false, false, false, false)); // invisible

@@ -47,11 +47,10 @@ public class SceneRenderer extends JPanel {
         }
     }
 
-    private void paintActiveScene(Graphics g)
-    {
-        activeScene.getCamera().drawScreenBuffer(g); //This is the only non-UI call :helenaPepe:
+    private void paintActiveScene(Graphics g) {
+        activeScene.getEngine().getCamera().drawScreenBuffer(g); //This is the only non-UI call :helenaPepe:
 
-        if (activeScene.getCamera().debugging) {
+        if (activeScene.getEngine().getCamera().debugging) {
             g.setColor(Color.white);
             g.drawString("Buffers/s: " + Math.round(Profiler.rate("buffers")), 20, 40);
             g.drawString(String.format("build: %.2f ms", Profiler.ms("buildScreenBuffer")), 20, 60);
@@ -65,7 +64,7 @@ public class SceneRenderer extends JPanel {
             g.drawString(String.format("  handleCollision: %.2f ms", Profiler.ms("handleCollision")), 30, 196);
         }
 
-        if (activeScene.isEditorMode()) {
+        if (activeScene.getEngine().isEditorMode()) {
             g.setColor(Color.WHITE);
             int cx = getWidth()/2, cy = getHeight()/2;
             g.drawLine(cx-10, cy, cx+10, cy);

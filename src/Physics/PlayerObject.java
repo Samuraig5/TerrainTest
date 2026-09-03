@@ -29,8 +29,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     private static final double PROBE_UP = 0.5;   // start the ray above the feet
     private static final double SKIN     = 0.15;  // grounded if surface is within this of the
     private static final double INSET = 0.05;
-    public PlayerObject(Scene scene, PlayerCamera camera)
-    {
+    public PlayerObject(Scene scene, PlayerCamera camera) {
         super(scene);
         this.camera = camera;
         camera.setPlayerObject(this);

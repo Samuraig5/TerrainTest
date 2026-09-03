@@ -24,7 +24,7 @@ import java.util.List;
 public class RenderPipeline {
     private final TileRasterizer tileRasterizer = new TileRasterizer();
 
-    public void build(Camera camera, Scene scene, List<RenderItem> frame) {
+    public void build(Camera camera, Scene scene, List<RenderItem> frame, Object3D sel) {
         camera.getScreenBuffer().clear(scene.getBackgroundColour());
         List<LightSource> lightSources = scene.getLightSources();
 
@@ -65,7 +65,6 @@ public class RenderPipeline {
         }
 
         // Draw box around selected object
-        Object3D sel = scene.getSelected();
         if (sel != null && sel.getMesh() != null) {
             AABB hb = sel.getMesh().getWorldAABB(sel.getPosition(), sel.getRotation(), sel.getScale());
             if (hb != null) geometry.add(debugBox(hb, Color.YELLOW, camera, constCamPos, viewMatrix, frustum));

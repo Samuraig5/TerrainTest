@@ -1,20 +1,16 @@
 package Engine3d;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import Engine3d.Controls.Controller;
-import Engine3d.DevTools.Console;
 import Engine3d.DevTools.Log;
 import Engine3d.Objects.Object3D;
 import Engine3d.Objects.ObjectSource;
 import Engine3d.Rendering.*;
 import Engine3d.Rendering.Filters.ScreenFilter;
 import Engine3d.Rendering.Skyboxes.SkyBox;
-import Levels.Persistence.LevelIO;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
@@ -27,12 +23,11 @@ import Engine3d.Model.Mesh;
 import Physics.Triggers.TriggerZone;
 
 public class Scene {
+    private GameEngine gameEngine;
+
     private final ObjParser objParser = new ObjParser();
-    Camera camera;
-    final SceneRenderer sceneRenderer = new SceneRenderer();
     protected Color backgroundColour = Color.BLACK;
     protected List<Object3D> objects = new CopyOnWriteArrayList<>();
-    private volatile Object3D selected;
     List<LightSource> lightSources = new ArrayList<>();
     private double gravity = 1d;
     protected List<Updatable> updatables = new CopyOnWriteArrayList<>();
@@ -44,35 +39,6 @@ public class Scene {
 
     private volatile SkyBox skyBox;
     private final List<ScreenFilter> filters = new CopyOnWriteArrayList<>();
-    private volatile boolean editorMode = false;
-    private Engine3d.Time.Updatable editorUpdatable;
-
-    private final List<Controller> consoleSuspended = new ArrayList<>();
-    private GameEngine gameEngine;
-
-    public Scene(Camera camera) {
-        this.camera = camera;
-
-        camera.getFrame().add(sceneRenderer);
-        sceneRenderer.setActiveScene(this);
-        sceneRenderer.grabFocus();
-
-        camera.getFrame().repaint();
-
-        getSceneRenderer().addKeyListener(new java.awt.event.KeyAdapter() {
-            @Override public void keyPressed(java.awt.event.KeyEvent e) {
-                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_F3)
-                    camera.debugging = !camera.debugging;
-            }
-        });
-
-    }
-
-
-
-    public SceneRenderer getSceneRenderer() {
-        return sceneRenderer;
-    }
 
     public void addObject(Object3D object)
     {
@@ -109,8 +75,6 @@ public class Scene {
         staticAABBObjects.remove(object);
     }
 
-    public Object3D getSelected()       { return selected; }
-    public void setSelected(Object3D o) { this.selected = o; }
     public java.util.List<Object3D> getObjects() { return objects; }
 
     public void addUpdatable(Updatable updatable) {
@@ -119,8 +83,9 @@ public class Scene {
             triggers.add(tz);
         }
     }
-
-    public Camera getCamera() {return camera;}
+    public List<Updatable> getUpdatables() {
+        return updatables;
+    }
 
     public void addLight(LightSource lightSource) {
         lightSources.add(lightSource);
@@ -145,19 +110,10 @@ public class Scene {
         return object3D;
     }
 
-    public void setEditorMode(boolean b) {
-        editorMode = b;
-    }
-    public boolean isEditorMode() {
-        return editorMode;
-    }
-    public void setEditorUpdatable(Engine3d.Time.Updatable u) {
-        editorUpdatable = u;
-    }
-
     public Color getBackgroundColour() {
         return backgroundColour;
     }
+    public void setBackgroundColour(Color c) { this.backgroundColour = c; }
 
     public List<RenderItem> snapshotObjects() {
         List<RenderItem> frame = new ArrayList<>(objects.size());
@@ -217,10 +173,6 @@ public class Scene {
     }
     public GameEngine getEngine() {
         return gameEngine;
-    }
-
-    public Updatable getEditorUpdatable() {
-        return editorUpdatable;
     }
 
     public void tickScripts(double dt) {

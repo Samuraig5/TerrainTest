@@ -32,6 +32,7 @@ public class EditorController extends Controller implements Updatable {
     private java.awt.Robot robot;
     private boolean recentering = false;
 
+    private volatile Object3D selected;
 
     public EditorController(SceneRenderer r, CreativeCamera cam, Scene scene, Camera camera) {
         super(r);
@@ -40,6 +41,13 @@ public class EditorController extends Controller implements Updatable {
         try { robot = new java.awt.Robot(); } catch (java.awt.AWTException ex) { ex.printStackTrace(); }
         attachTranslatable(cam);
         attachRotatable(cam);
+    }
+
+    public Object3D getSelected() {
+        return selected;
+    }
+    public void setSelected(Object3D o) {
+        this.selected = o;
     }
 
     @Override public void update(double dt) {
@@ -89,7 +97,7 @@ public class EditorController extends Controller implements Updatable {
         if (SwingUtilities.isMiddleMouseButton(e)) {
             var buf = camera.getScreenBuffer().getBufferedImage();
             Ray ray = camera.rayFromBuffer(buf.getWidth()/2.0, buf.getHeight()/2.0);
-            scene.getEngine().enqueueEdit(() -> scene.setSelected(pick(ray)));
+            scene.getEngine().enqueueEdit(() -> setSelected(pick(ray)));
         }
     }
 
@@ -133,7 +141,7 @@ public class EditorController extends Controller implements Updatable {
         if (!isEnabled()) {
             return;
         }
-        Object3D sel = scene.getSelected();
+        Object3D sel = getSelected();
         if (sel == null || sel instanceof PlayerObject) {
             return;
         }

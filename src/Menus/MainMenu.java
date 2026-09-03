@@ -86,8 +86,8 @@ public class MainMenu extends Menu {
         frame.getContentPane().removeAll();
 
         PlayerCamera camera = new PlayerCamera(frame);
-        LastGiftLevel level = new LastGiftLevel(camera);
-        new GameEngine(level);
+        GameEngine engine = new GameEngine(camera);
+        engine.loadLevel(new LastGiftLevel());
 
         frame.revalidate();
         frame.repaint();
