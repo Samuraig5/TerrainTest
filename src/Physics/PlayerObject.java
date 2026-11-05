@@ -98,7 +98,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
             dist = Math.min(dist, getScene().groundDistanceBelow(origin));
         }
 
-        grounded = dist <= PROBE_UP + SKIN;
+        grounded = dist <= PROBE_UP + SKIN && momentum.y() <= 0;
         if (grounded) lastGroundedNanos = System.nanoTime();
     }
 
@@ -184,7 +184,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         boolean recentlyGrounded = now - lastGroundedNanos < COYOTE;   // coyote time
         boolean bufferedPress   = now - lastJumpRequestNanos < BUFFER; // jump buffering
         if (recentlyGrounded && bufferedPress) {
-            addMomentum(Vector3D.UP().scaled(0.35f));
+            momentum = momentum.y(0.35);
             lastJumpRequestNanos = 0;   // consume it
             lastGroundedNanos = 0;      // prevent double-jump
         }
