@@ -8,22 +8,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import Engine3d.Controls.Controller;
 import Engine3d.DevTools.Console;
-import Engine3d.Model.SimpleMeshes.CubeMesh;
 import Engine3d.Objects.Object3D;
 import Engine3d.Objects.ObjectSource;
 import Engine3d.Rendering.*;
 import Engine3d.Rendering.Filters.ScreenFilter;
 import Engine3d.Rendering.Skyboxes.SkyBox;
 import Levels.Persistence.LevelIO;
-import Math.Geometries.MeshTriangle;
-import Math.Raycast.Ray;
-import Math.Raycast.RayCollision;
-import Math.Raycast.RayTriangle;
-import Physics.AABBCollisions.AABB;
 import Physics.AABBCollisions.AABBObject;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
-import Physics.GJK_EPA.GJK;
 import Physics.Gravitational;
 import Engine3d.Lighting.LightSource;
 import Math.Vector.Vector3D;
@@ -36,10 +29,6 @@ import Physics.Triggers.TriggerZone;
 public class Scene implements Updatable {
     private final RenderPipeline renderPipeline = new RenderPipeline();
     private final PhysicsSystem physicsSystem = new PhysicsSystem();
-
-
-
-
 
     private final ObjParser objParser = new ObjParser();
     Camera camera;

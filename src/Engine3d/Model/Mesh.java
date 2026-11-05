@@ -480,10 +480,12 @@ public class Mesh implements Translatable, Rotatable, Scalable
         return new AABB(min, max);
     }
 
-    public List<MeshTriangle> getFacesInWorld(Vector3D worldPos, Vector3D worldRot) {
+    public List<MeshTriangle> getFacesInWorld(Vector3D scale, Vector3D worldPos, Vector3D worldRot) {
         Matrix4x4 tf = Matrix4x4.matrixMatrixMultiplication(
-                Matrix4x4.get3dRotationMatrix(getRotation().translated(worldRot)),
-                Matrix4x4.getTranslationMatrix(getPosition().translated(worldPos)));
+                Matrix4x4.getScalingMatrix(scale),
+                Matrix4x4.matrixMatrixMultiplication(
+                        Matrix4x4.get3dRotationMatrix(getRotation().translated(worldRot)),
+                        Matrix4x4.getTranslationMatrix(getPosition().translated(worldPos))));
         List<MeshTriangle> out = new ArrayList<>(faces.size());
         for (MeshTriangle f : faces) {
             Vector3D[] p = f.getPoints();

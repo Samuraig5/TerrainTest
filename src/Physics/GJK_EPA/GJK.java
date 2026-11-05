@@ -14,11 +14,6 @@ public class GJK
         return a.support(d).translated(b.support(d.inverted()).inverted());   // a(d) - b(-d)
     }
 
-    public static boolean boolSolveGJK(Object3D o1, Object3D o2) {
-        Simplex sim = solveGJK(o1, o2);
-        return sim != null;
-    }
-
     public static Simplex solveGJK(ConvexShape a, ConvexShape b) {
         Simplex simplex = new Simplex();
 
@@ -66,80 +61,6 @@ public class GJK
         }
     }
 
-    public static Simplex solveGJK(Object3D o1, Object3D o2) {
-        List<Vector3D> ver1 = o1.getMeshPointsInWorld();
-        List<Vector3D> ver2 = o2.getMeshPointsInWorld();
-
-        Simplex simplex = new Simplex();
-
-        Vector3D dir = o1.getPosition().translated(o2.getPosition().inverted()); //o1.pos - o2.pos
-        simplex.a(calculateNewVertex(ver1, ver2, dir));
-        simplex.incrementCount();
-
-        dir = simplex.a().inverted();
-
-        while (true)
-        {
-            simplex.shiftBack();
-            simplex.a(calculateNewVertex(ver1, ver2, dir));
-            simplex.incrementCount();
-
-            //If new support point isn't on opposite side of origin, it's impossible for the simplex to enclose the origin.
-            if (simplex.a().dotProduct(dir) < 0) {
-                return null;
-            }
-
-            switch (simplex.count()) {
-                case 2:
-                    dir = solveSimplex2(simplex, dir);
-                    break;
-                case 3:
-                    dir = solveSimplex3(simplex, dir);
-                    break;
-                case 4:
-                    dir = solveSimplex4(simplex, dir);
-                    if (dir == null) {
-                        return simplex;
-                    }
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Returns to most extreme vertex from the list in the provided direction.
-     * @param vertices list of vertices.
-     * @param direction direction to be checked.
-     * @return the most extreme vertex in the direction.
-     */
-    private static Vector3D supportFunction(List<Vector3D> vertices, Vector3D direction) {
-        Vector3D largestVertex = vertices.get(0);
-        double largestDot = largestVertex.dotProduct(direction);
-        for (int i = 1; i < vertices.size(); i++) {
-            Vector3D currentVertex = vertices.get(i);
-            double currentDot = currentVertex.dotProduct(direction);
-
-            if (currentDot > largestDot) {
-                largestDot = currentDot;
-                largestVertex = currentVertex;
-            }
-        }
-        return largestVertex;
-    }
-
-    /**
-     * Returns a new vertex based on the difference of the most extreme vertices in the lists.
-     * @param ver1 List of vertices 1.
-     * @param ver2 List of vertices 2.
-     * @param dir Direction to be checked.
-     * @return the difference of the most extreme vertices.
-     */
-    protected static Vector3D calculateNewVertex(List<Vector3D> ver1, List<Vector3D> ver2, Vector3D dir) {
-        Vector3D exrm1 = supportFunction(ver1, dir);
-        Vector3D exrm2 = supportFunction(ver2, dir.inverted());
-        return exrm1.translated(exrm2.inverted());
-    }
-
     /**
      * Finds the next point for the 1D (line) simplex to expand to.
      * @param simplex the simplex.
@@ -150,17 +71,12 @@ public class GJK
         Vector3D ab = simplex.b().translated(simplex.a().inverted()); //b - a
         Vector3D ao = simplex.a().inverted(); // -a
 
-        Vector3D res = ab.crossProduct(ao).crossProduct(ab);
-        if (res.magnitude() < 1e-12) {   // origin lies on the line ab: any perpendicular direction works
-            res = ab.crossProduct(Vector3D.RIGHT());
-            if (res.magnitude() < 1e-12) res = ab.crossProduct(Vector3D.UP());
-
-            return res;
-        }
-        else if (ab.sameDirection(ao)) {
-            //(Projected) Origin falls on the line
-            res = ab.crossProduct(ao);
-            res = res.crossProduct(ab);
+        if (ab.sameDirection(ao)) {
+            Vector3D res = ab.crossProduct(ao).crossProduct(ab);
+            if (res.magnitude() < 1e-12) {   // origin lies on the line ab
+                res = ab.crossProduct(Vector3D.RIGHT());
+                if (res.magnitude() < 1e-12) res = ab.crossProduct(Vector3D.UP());
+            }
             return res;
         }
         else {
@@ -270,56 +186,5 @@ public class GJK
             return solveSimplex3(simplex, dir);
         }
         return null;
-    }
-
-    //TODO: Make GJK generic and remove this specific implementation
-    public static boolean boolSolveGJK(Object3D o1, Ray o2) {
-        Simplex sim = solveGJK(o1, o2);
-        return sim != null;
-    }
-
-    public static Simplex solveGJK(Object3D o1, Ray o2) {
-        List<Vector3D> ver2 = o1.getMeshPointsInWorld();
-        List<Vector3D> ver1 = new ArrayList<>();
-        //ver1.add(o2.getOrigin().translated(o2.getDirection()));
-        ver1.add(o2.getOrigin());
-
-        Simplex simplex = new Simplex();
-
-        Vector3D dir = o1.getPosition().translated(o2.getDirection().inverted()); //o1.pos - o2.pos
-        simplex.a(calculateNewVertex(ver1, ver2, dir));
-        simplex.incrementCount();
-
-        dir = simplex.a().inverted();
-
-        int iterations = 0;
-        while (true)
-        {
-            if (++iterations > 512) return null;   // give up -> treat as "no collision this frame"
-
-            simplex.shiftBack();
-            simplex.a(calculateNewVertex(ver1, ver2, dir));
-            simplex.incrementCount();
-
-            //If new support point isn't on opposite side of origin, it's impossible for the simplex to enclose the origin.
-            if (simplex.a().dotProduct(dir) < 0) {
-                return null;
-            }
-
-            switch (simplex.count()) {
-                case 2:
-                    dir = solveSimplex2(simplex, dir);
-                    break;
-                case 3:
-                    dir = solveSimplex3(simplex, dir);
-                    break;
-                case 4:
-                    dir = solveSimplex4(simplex, dir);
-                    if (dir == null) {
-                        return simplex;
-                    }
-                    break;
-            }
-        }
     }
 }

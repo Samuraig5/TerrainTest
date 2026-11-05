@@ -6,6 +6,7 @@ import Engine3d.Scene;
 import Math.Geometries.MeshTriangle;
 import Math.Raycast.RayTriangle;
 import Math.Vector.Vector3D;
+import Physics.AABBCollisions.AABB;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
 
@@ -52,7 +53,14 @@ public class PhysicsSystem {
         double best = Double.POSITIVE_INFINITY;
 
         for (StaticAABBObject s : scene.getStaticAABBObjects()) {
-            for (MeshTriangle tri : s.getMesh().getFacesInWorld(s.getPosition(), s.getRotation())) {
+            AABB b = s.getAABBCollider().getAABB();
+            if (origin.x() < b.min().x() || origin.x() > b.max().x()
+                    || origin.z() < b.min().z() || origin.z() > b.max().z()
+                    || origin.y() < b.min().y()) {
+                continue;        // ray is beside or below it
+            }
+
+            for (MeshTriangle tri : s.getMesh().getFacesInWorld(s.getScale(), s.getPosition(), s.getRotation())) {
                 Vector3D[] p = tri.getPoints();
                 double t = RayTriangle.intersect(origin, dir, p[0], p[1], p[2]);
                 if (!Double.isNaN(t) && t < best) best = t;
