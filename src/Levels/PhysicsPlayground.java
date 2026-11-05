@@ -17,6 +17,8 @@ import Math.Vector.Vector3D;
 import Physics.AABBCollisions.StaticAABBObject;
 import Physics.PhysicsBody;
 import Physics.PlayerObject;
+import Physics.Shapes.ConvexShape;
+import Physics.Shapes.HullShape;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -313,8 +315,8 @@ public class PhysicsPlayground extends Scene
     }
 
     /**
-     * Non-convex shapes, each a single collider: a U, an L and an arch. You should be able to walk into
-     * the U and under the arch, but each collides as its convex hull, so you can't (yet).
+     * Non-convex shapes: a U, an L and an arch. Each is one object whose collider has one piece per box
+     * (see {@link #staticMesh}), so you can walk into the U, into the L's inside corner and under the arch.
      */
     private void buildConcaveStation(Vector3D o) {
         BlockMesh u = new BlockMesh(GREEN,
@@ -377,9 +379,18 @@ public class PhysicsPlayground extends Scene
         return obj;
     }
 
+    /** A static object for any mesh. A BlockMesh gets one collider piece per box instead of a single hull. */
     private StaticAABBObject staticMesh(Mesh mesh, Vector3D pos) {
         StaticAABBObject obj = new StaticAABBObject(this);
-        obj.setMesh(mesh);
+        obj.setMesh(mesh);   // builds a fresh collider, so the pieces have to be set after this
+        if (mesh instanceof BlockMesh blocks) {
+            List<ConvexShape> pieces = new ArrayList<>();
+            for (Box box : blocks.getBoxes()) {
+                // HullShape applies the owner's transform, so each piece sits exactly where its box is drawn
+                pieces.add(new HullShape(obj, new BoxMesh(box)));
+            }
+            obj.getAABBCollider().setShapes(pieces);
+        }
         obj.translate(pos);
         return obj;
     }
@@ -482,7 +493,10 @@ public class PhysicsPlayground extends Scene
         getConsole().registerCommand("reset", args -> enqueueEdit(this::resetCrates));
     }
 
-    /** One mesh built from several boxes. As a single collider it collides like its convex hull. */
+    /**
+     * One mesh built from several boxes. It renders as one mesh; {@link #staticMesh} turns each box
+     * into its own collider piece (a single hull would fill in the gaps between the boxes).
+     */
     private static class BlockMesh extends Mesh
     {
         // Same corner order and triangle winding as BoxMesh, so back-face culling agrees with it.
@@ -490,6 +504,8 @@ public class PhysicsPlayground extends Scene
                 {0, 1, 2}, {0, 2, 3}, {7, 6, 5}, {7, 5, 4}, {3, 2, 6}, {3, 6, 7},
                 {4, 5, 1}, {4, 1, 0}, {1, 5, 6}, {1, 6, 2}, {3, 7, 4}, {3, 4, 0}
         };
+
+        private final List<Box> boxes = new ArrayList<>();
 
         BlockMesh(Color colour, Box... boxes) {
             setDrawInstructions(flat());
@@ -499,7 +515,13 @@ public class PhysicsPlayground extends Scene
             recomputeLocalBounds();
         }
 
+        /** The boxes this mesh was built from, in the mesh's local space. */
+        List<Box> getBoxes() {
+            return List.copyOf(boxes);
+        }
+
         private void addBox(Box b, Color colour) {
+            boxes.add(b);
             Vector3D lo = b.min();
             Vector3D hi = b.max();
             Vector3D[] p = {
