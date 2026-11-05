@@ -44,6 +44,11 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         momentum = momentum.translated(delta);
     }
 
+    /** Stops all movement, e.g. after teleporting, so a long fall doesn't carry over. */
+    public void resetMomentum() {
+        momentum = new Vector3D(0, 0, 0);
+    }
+
     @Override
     public void onCollision(Vector3D appliedMove) {
         if (appliedMove.magnitude() == 0) return;

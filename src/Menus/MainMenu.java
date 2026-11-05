@@ -2,6 +2,7 @@ package Menus;
 
 import Engine3d.Rendering.PlayerCamera;
 import Levels.LastGiftLevel;
+import Levels.PhysicsPlayground;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,8 +13,16 @@ public class MainMenu extends Menu {
 
     public static final String GAME_NAME = "Bug Game";
 
+    private final String level;
+
     public MainMenu(JFrame frame) {
+        this(frame, null);
+    }
+
+    /** @param level name of the level to start ("playground" or "lastgift"); null starts LastGift. */
+    public MainMenu(JFrame frame, String level) {
         super(frame);
+        this.level = level;
         launchGame();
     }
 
@@ -89,10 +98,22 @@ public class MainMenu extends Menu {
         //new TestLevel(camera);
         //new TerrainLevel(camera);
         //new GJKTest(camera);
-        new LastGiftLevel(camera);
+        startLevel(camera);
 
         frame.revalidate();
         frame.repaint();
+    }
+
+    private void startLevel(PlayerCamera camera) {
+        String name = (level == null) ? "lastgift" : level.toLowerCase();
+        switch (name) {
+            case "playground", "physics" -> new PhysicsPlayground(camera);
+            case "lastgift" -> new LastGiftLevel(camera);
+            default -> {
+                System.err.println("Unknown level '" + level + "', starting LastGift instead");
+                new LastGiftLevel(camera);
+            }
+        }
     }
 
     // Stub method to open the settings.

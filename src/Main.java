@@ -11,6 +11,14 @@ public class Main {
     public static void main(String[] args) {
         boolean DEV_MODE = Arrays.asList(args).contains("DEV");
 
+        // level=<name> picks the starting level, e.g. level=playground. Without it, LastGift starts.
+        String level = null;
+        for (String arg : args) {
+            if (arg.startsWith("level=")) {
+                level = arg.substring("level=".length());
+            }
+        }
+
         JFrame frame = new JFrame("Hell");
         ImageIcon imgicon = new ImageIcon("Resources/Textures/The White Sign.png");
         frame.setIconImage(imgicon.getImage());
@@ -25,7 +33,7 @@ public class Main {
 
         frame.setLocationRelativeTo(null);
 
-        new MainMenu(frame);
+        new MainMenu(frame, level);
 
         frame.setVisible(true);
     }
