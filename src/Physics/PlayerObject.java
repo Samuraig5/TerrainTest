@@ -11,6 +11,7 @@ import Physics.AABBCollisions.DynamicAABBObject;
 import Math.Vector.Vector3D;
 import Engine3d.Rendering.PlayerCamera;
 import Engine3d.Scene;
+import Physics.Shapes.CylinderShape;
 
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class PlayerObject extends PhysicsBody
         Vector3D max = new Vector3D(SIZE.x()/2, SIZE.y(), SIZE.z()/2);
         UnrotatableBox playerMesh = new UnrotatableBox(new Box(min, max));
         setMesh(playerMesh);
+        getAABBCollider().setShape(new CylinderShape(this, SIZE.x() / 2, SIZE.y()));
     }
 
     public Vector3D getCameraOffset() {
@@ -50,14 +52,16 @@ public class PlayerObject extends PhysicsBody
     }
 
     private void updateGrounded() {
-        double hx = SIZE.x()/2 - INSET, hz = SIZE.z()/2 - INSET;
         Vector3D up = Vector3D.UP().scaled(PROBE_UP);
         Vector3D p  = getPosition();
 
+        double r = SIZE.x() / 2 - INSET;
+        double d = r / Math.sqrt(2);   // (±d, ±d) is r from the centre
+
         Vector3D[] offsets = {
                 new Vector3D(0, 0, 0),
-                new Vector3D( hx, 0,  hz), new Vector3D( hx, 0, -hz),
-                new Vector3D(-hx, 0,  hz), new Vector3D(-hx, 0, -hz),
+                new Vector3D( d, 0,  d), new Vector3D( d, 0, -d),
+                new Vector3D(-d, 0,  d), new Vector3D(-d, 0, -d),
         };
 
         double dist = Double.POSITIVE_INFINITY;

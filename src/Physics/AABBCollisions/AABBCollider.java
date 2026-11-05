@@ -78,4 +78,6 @@ public abstract class AABBCollider implements Translatable
     public Vector3D getPosition() {
         return obj.getPosition();
     }
+
+    public void setShape(ConvexShape shape) { convexShape = shape; }
 }
