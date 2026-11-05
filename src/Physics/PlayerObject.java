@@ -29,6 +29,9 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     private static final double PROBE_UP = 0.5;   // start the ray above the feet
     private static final double SKIN     = 0.15;  // grounded if surface is within this of the
     private static final double INSET = 0.05;
+
+    private static final double MAX_FALL = 0.45;   // per frame; under half a crate's height
+
     public PlayerObject(Scene scene, PlayerCamera camera)
     {
         super(scene);
@@ -70,6 +73,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         delta = delta.scaled(deltaTime);
         if (!isGrounded()) {
             momentum = momentum.translated(delta);
+            if (momentum.y() < -MAX_FALL) { momentum = momentum.y(-MAX_FALL); }
         }
         else {
             momentum = momentum.y(Math.max(momentum.y(), 0));

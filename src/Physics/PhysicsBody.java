@@ -14,8 +14,10 @@ public class PhysicsBody extends DynamicAABBObject implements Gravitational {
         translate(velocity);
     }
 
+    private static final double MAX_FALL = 0.45;   // per frame; under half a crate's height
     @Override public void applyGravity(double g, double dt) {
-        velocity = velocity.translated(Vector3D.DOWN().scaled(g * dt));   // always, no grounded check
+        velocity = velocity.translated(Vector3D.DOWN().scaled(g * dt));
+        if (velocity.y() < -MAX_FALL) { velocity = velocity.y(-MAX_FALL); }
     }
 
     @Override public void onCollision(Vector3D appliedMove) {
