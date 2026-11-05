@@ -1,8 +1,6 @@
 package Physics.GJK_EPA;
 
 import Math.Vector.Vector3D;
-import Math.Geometries.Line;
-import Engine3d.Objects.Object3D;
 import Physics.Shapes.ConvexShape;
 
 import java.util.ArrayList;
@@ -15,7 +13,7 @@ import static Physics.GJK_EPA.Polytope.outwardFace;
 public class EPA
 {
     private static final double THRESHOLD = 0.001;
-
+    private record Edge(Vector3D p1, Vector3D p2) {}
     public static Vector3D solveEPA(ConvexShape a, ConvexShape b) {
         Simplex solGJK = solveGJK(a, b);
 
@@ -39,7 +37,7 @@ public class EPA
             if (Math.abs(supportDistance - minDistance) > THRESHOLD) {
                 minDistance = Double.POSITIVE_INFINITY;
 
-                List<Line> uniqueEdges = new ArrayList<>();
+                List<Edge> uniqueEdges = new ArrayList<>();
 
                 //Remove all faces pointing in the direction of the support point
                 Iterator<Face> iterator = polytope.faces.iterator();
@@ -58,74 +56,7 @@ public class EPA
                 //Adding new faces
                 List<Face> newFaces = new ArrayList<>();
                 for (int i = 0; i < uniqueEdges.size(); i++) {
-                    Line edge = uniqueEdges.get(i);
-                    Face newFace = outwardFace(edge.p1(), edge.p2(), support);
-                    newFaces.add(newFace);
-                }
-
-                polytope.vertices.add(support);
-                polytope.faces.addAll(newFaces);
-
-                if (polytope.faces.size() > 256) {
-                    return minNormal.scaled(supportDistance + THRESHOLD);
-                }
-            }
-            if (stopper == 100) {
-                return Vector3D.UP().scaled(0.01f);
-            }
-            else {
-                stopper++;
-            }
-        }
-
-        return minNormal.scaled(minDistance + THRESHOLD);
-    }
-
-    public static Vector3D solveEPA(Object3D o1, Object3D o2) {
-        Simplex solGJK = solveGJK(o1, o2);
-        if (solGJK == null) { return new Vector3D(0,0,0); }
-
-        List<Vector3D> ver1 = o1.getMeshPointsInWorld();
-        List<Vector3D> ver2 = o2.getMeshPointsInWorld();
-
-        Polytope polytope = new Polytope(solGJK);
-
-        double minDistance = Double.POSITIVE_INFINITY;
-        Vector3D minNormal = new Vector3D(0,0,0);
-
-        int stopper = 0;
-        while (minDistance == Double.POSITIVE_INFINITY) {
-            Face minFace = getMinFace(polytope);
-            if (minFace == null) { return new Vector3D(0,0,0); }
-            minDistance = minFace.normal().dotProduct(minFace.a());
-            minNormal = minFace.normal();
-
-            Vector3D support = GJK.calculateNewVertex(ver1,ver2,minNormal);
-            double supportDistance = minNormal.dotProduct(support);
-
-            if (Math.abs(supportDistance - minDistance) > THRESHOLD) {
-                minDistance = Double.POSITIVE_INFINITY;
-
-                List<Line> uniqueEdges = new ArrayList<>();
-
-                //Remove all faces pointing in the direction of the support point
-                Iterator<Face> iterator = polytope.faces.iterator();
-                while (iterator.hasNext()) {
-                    Face face = iterator.next();
-                    if (face.normal().sameDirection(support.translated(face.a().inverted()))) {
-                        addIfUniqueEdge(uniqueEdges, face.a(), face.b());
-                        addIfUniqueEdge(uniqueEdges, face.b(), face.c());
-                        addIfUniqueEdge(uniqueEdges, face.c(), face.a());
-
-                        // Remove face efficiently
-                        iterator.remove();
-                    }
-                }
-
-                //Adding new faces
-                List<Face> newFaces = new ArrayList<>();
-                for (int i = 0; i < uniqueEdges.size(); i++) {
-                    Line edge = uniqueEdges.get(i);
+                    Edge edge = uniqueEdges.get(i);
                     Face newFace = outwardFace(edge.p1(), edge.p2(), support);
                     newFaces.add(newFace);
                 }
@@ -173,18 +104,18 @@ public class EPA
      * @param b Ending point for the new edge
      */
     private static void addIfUniqueEdge(
-            List<Line> edges,
+            List<Edge> edges,
             Vector3D a,
             Vector3D b) {
 
         for (int i = 0; i < edges.size(); i++) {
-            Line edge = edges.get(i);
+            Edge edge = edges.get(i);
             if (edge.p1() == b && edge.p2() == a) {
                 edges.remove(edge);
                 return;
             }
         }
 
-        edges.add(new Line(a, b));
+        edges.add(new Edge(a, b));
     }
 }

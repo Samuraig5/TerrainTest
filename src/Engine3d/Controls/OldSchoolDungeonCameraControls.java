@@ -31,6 +31,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
 
     private int lastMouseX = -1;
     private int lastMouseY = -1;
+    private double pendingPitch, pendingYaw;
 
     private SceneRenderer renderer;
     private Robot robot;
@@ -72,7 +73,6 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         }
 
         Vector3D transDelta = new Vector3D(0,0,0);
-        Vector3D rotDelta = new Vector3D(0,0,0);
 
         double adjStepSize = stepSize * deltaTime;
         double adjTurnStep = turnStep * deltaTime;
@@ -91,7 +91,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         if (dDown) {transDelta = transDelta.translated(new Vector3D(-adjStepSize, 0, 0));}
 
         playerObject.localTranslate(transDelta);
-        playerObject.rotate(rotDelta);
+        playerObject.rotate(takeLook());
     }
 
     @Override
@@ -150,8 +150,7 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
         int deltaY = e.getYOnScreen() - center.y;
 
         if (isEnabled() && centerCursor) {
-            Vector3D rotDelta = new Vector3D(Math.toRadians(deltaY) * mouseSensitivity, Math.toRadians(-deltaX) * mouseSensitivity, 0);
-            playerObject.rotate(rotDelta);
+            addLook(Math.toRadians(deltaY) * mouseSensitivity, Math.toRadians(-deltaX) * mouseSensitivity);
         }
 
         lastMouseX = e.getX();
@@ -172,5 +171,17 @@ public class OldSchoolDungeonCameraControls extends Controller implements Updata
     @Override
     public void mouseClicked(MouseEvent e) {
 
+    }
+
+    private synchronized void addLook(double pitch, double yaw) {
+        pendingPitch += pitch;
+        pendingYaw   += yaw;
+    }
+
+    private synchronized Vector3D takeLook() {
+        Vector3D d = new Vector3D(pendingPitch, pendingYaw, 0);
+        pendingPitch = 0;
+        pendingYaw = 0;
+        return d;
     }
 }
