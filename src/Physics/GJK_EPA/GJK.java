@@ -3,15 +3,67 @@ package Physics.GJK_EPA;
 import Math.Vector.Vector3D;
 import Engine3d.Objects.Object3D;
 import Math.Raycast.Ray;
+import Physics.Shapes.ConvexShape;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GJK
 {
+    static Vector3D minkowskiSupport(ConvexShape a, ConvexShape b, Vector3D d) {
+        return a.support(d).translated(b.support(d.inverted()).inverted());   // a(d) - b(-d)
+    }
+
     public static boolean boolSolveGJK(Object3D o1, Object3D o2) {
         Simplex sim = solveGJK(o1, o2);
         return sim != null;
+    }
+
+    public static Simplex solveGJK(ConvexShape a, ConvexShape b) {
+        Simplex simplex = new Simplex();
+
+        Vector3D dir = a.center().translated(b.center().inverted());
+
+        // Guardrail against zero vector if the centers line up.
+        if (dir.magnitude() < 1e-9) {
+            dir = Vector3D.RIGHT();
+        }
+
+        simplex.a(minkowskiSupport(a,b,dir));
+        simplex.incrementCount();
+
+        dir = simplex.a().inverted();
+
+        int iterations = 0;
+        while (true)
+        {
+            if (++iterations > 64) return null;           // 64 is plenty for convex shapes
+            if (dir.magnitude() < 1e-12) return null;     // origin on the simplex = touching, zero depth
+
+            simplex.shiftBack();
+            simplex.a(minkowskiSupport(a,b,dir));
+            simplex.incrementCount();
+
+            //If new support point isn't on opposite side of origin, it's impossible for the simplex to enclose the origin.
+            if (simplex.a().dotProduct(dir) < 0) {
+                return null;
+            }
+
+            switch (simplex.count()) {
+                case 2:
+                    dir = solveSimplex2(simplex, dir);
+                    break;
+                case 3:
+                    dir = solveSimplex3(simplex, dir);
+                    break;
+                case 4:
+                    dir = solveSimplex4(simplex, dir);
+                    if (dir == null) {
+                        return simplex;
+                    }
+                    break;
+            }
+        }
     }
 
     public static Simplex solveGJK(Object3D o1, Object3D o2) {

@@ -3,6 +3,7 @@ package Physics.GJK_EPA;
 import Math.Vector.Vector3D;
 import Math.Geometries.Line;
 import Engine3d.Objects.Object3D;
+import Physics.Shapes.ConvexShape;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,6 +15,71 @@ import static Physics.GJK_EPA.Polytope.outwardFace;
 public class EPA
 {
     private static final double THRESHOLD = 0.001;
+
+    public static Vector3D solveEPA(ConvexShape a, ConvexShape b) {
+        Simplex solGJK = solveGJK(a, b);
+
+        if (solGJK == null) { return null; }
+
+        Polytope polytope = new Polytope(solGJK);
+
+        double minDistance = Double.POSITIVE_INFINITY;
+        Vector3D minNormal = new Vector3D(0,0,0);
+
+        int stopper = 0;
+        while (minDistance == Double.POSITIVE_INFINITY) {
+            Face minFace = getMinFace(polytope);
+            if (minFace == null) { return null; }
+            minDistance = minFace.normal().dotProduct(minFace.a());
+            minNormal = minFace.normal();
+
+            Vector3D support = GJK.minkowskiSupport(a,b,minNormal);
+            double supportDistance = minNormal.dotProduct(support);
+
+            if (Math.abs(supportDistance - minDistance) > THRESHOLD) {
+                minDistance = Double.POSITIVE_INFINITY;
+
+                List<Line> uniqueEdges = new ArrayList<>();
+
+                //Remove all faces pointing in the direction of the support point
+                Iterator<Face> iterator = polytope.faces.iterator();
+                while (iterator.hasNext()) {
+                    Face face = iterator.next();
+                    if (face.normal().sameDirection(support.translated(face.a().inverted()))) {
+                        addIfUniqueEdge(uniqueEdges, face.a(), face.b());
+                        addIfUniqueEdge(uniqueEdges, face.b(), face.c());
+                        addIfUniqueEdge(uniqueEdges, face.c(), face.a());
+
+                        // Remove face efficiently
+                        iterator.remove();
+                    }
+                }
+
+                //Adding new faces
+                List<Face> newFaces = new ArrayList<>();
+                for (int i = 0; i < uniqueEdges.size(); i++) {
+                    Line edge = uniqueEdges.get(i);
+                    Face newFace = outwardFace(edge.p1(), edge.p2(), support);
+                    newFaces.add(newFace);
+                }
+
+                polytope.vertices.add(support);
+                polytope.faces.addAll(newFaces);
+
+                if (polytope.faces.size() > 256) {
+                    return minNormal.scaled(supportDistance + THRESHOLD);
+                }
+            }
+            if (stopper == 100) {
+                return Vector3D.UP().scaled(0.01f);
+            }
+            else {
+                stopper++;
+            }
+        }
+
+        return minNormal.scaled(minDistance + THRESHOLD);
+    }
 
     public static Vector3D solveEPA(Object3D o1, Object3D o2) {
         Simplex solGJK = solveGJK(o1, o2);

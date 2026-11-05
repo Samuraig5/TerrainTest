@@ -33,7 +33,7 @@ public class Box
     }
 
     public Vector3D getCenterPoint() {
-        return (min.translated(max.scaled(0.5f)));
+        return min.translated(max).scaled(0.5f);
     }
 
     public List<Plane> getPlanes() {
