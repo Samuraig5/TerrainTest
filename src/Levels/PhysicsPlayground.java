@@ -16,6 +16,7 @@ import Math.Geometries.MeshTriangle;
 import Math.Vector.Vector3D;
 import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
+import Physics.PhysicsBody;
 import Physics.PlayerObject;
 
 import javax.imageio.ImageIO;
@@ -58,7 +59,7 @@ public class PhysicsPlayground extends Scene
 
     private final PlayerObject player;
     private final List<Station> stations = new ArrayList<>();
-    private final List<DynamicAABBObject> crates = new ArrayList<>();
+    private final List<PhysicsBody> crates = new ArrayList<>();
     private final List<Vector3D> crateHomes = new ArrayList<>();
 
     public PhysicsPlayground(Camera camera) {
@@ -355,7 +356,7 @@ public class PhysicsPlayground extends Scene
     }
 
     private void crate(Color colour, double weight, Vector3D pos) {
-        DynamicAABBObject obj = new DynamicAABBObject(this);
+        PhysicsBody obj = new PhysicsBody(this);
         obj.setMesh(paint(new BoxMesh(footprint(1, 1, 1)), colour));
         obj.getAABBCollider().setWeight(weight);
         obj.translate(pos);
