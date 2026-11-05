@@ -14,7 +14,6 @@ import Engine3d.Scene;
 import Math.Geometries.Box;
 import Math.Geometries.MeshTriangle;
 import Math.Vector.Vector3D;
-import Physics.AABBCollisions.DynamicAABBObject;
 import Physics.AABBCollisions.StaticAABBObject;
 import Physics.PhysicsBody;
 import Physics.PlayerObject;
@@ -56,11 +55,12 @@ public class PhysicsPlayground extends Scene
     private static final Color PINK   = new Color(220, 110, 170);
 
     private record Station(String name, Vector3D origin) { }
+    private record CrateSpec(Color colour, double weight, Vector3D home) { }
 
     private final PlayerObject player;
     private final List<Station> stations = new ArrayList<>();
+    private final List<CrateSpec> crateSpecs = new ArrayList<>();
     private final List<PhysicsBody> crates = new ArrayList<>();
-    private final List<Vector3D> crateHomes = new ArrayList<>();
 
     public PhysicsPlayground(Camera camera) {
         super(camera);
@@ -91,6 +91,12 @@ public class PhysicsPlayground extends Scene
         addUpdatable(dt -> {
             if (player.getPosition().y() < KILL_Y) {
                 teleport(nearestStation());
+            }
+            for (int i = 0; i < crates.size(); i++) {          // crates that fell off the world start over
+                if (crates.get(i).getPosition().y() < KILL_Y) {
+                    removeObject(crates.get(i));
+                    crates.set(i, spawnCrate(crateSpecs.get(i)));
+                }
             }
         });
 
@@ -259,7 +265,12 @@ public class PhysicsPlayground extends Scene
         block(footprint(0.3, 2.5, 6), RED, at(o, 10.675, 0, 5));
     }
 
-    /** Pushable crates weighing 0.25, 1 and 9 (the player weighs 1), plus a row of three to push into each other. */
+    /**
+     * Front row: pushable crates weighing 0.25, 1 and 9 (the player weighs 1), plus a row of three to push
+     * into each other. Back row (z 9-15), all falling: crates dropped from 3, 8 and 20 above the floor, a
+     * stack of three, a crate landing on a 20° ramp, and a crate dropped from 25 onto a slab 0.05 thick.
+     * {@code reset} drops them all again.
+     */
     private void buildCrateStation(Vector3D o) {
         crate(YELLOW, 0.25, at(o, -6, 0, 4));
         crate(ORANGE, 1, at(o, -2, 0, 4));
@@ -268,6 +279,24 @@ public class PhysicsPlayground extends Scene
         crate(BLUE, 1, at(o, 7, 0, 3));
         crate(BLUE, 1, at(o, 7, 0, 4.1));
         crate(BLUE, 1, at(o, 7, 0, 5.2));
+
+        // Drops
+        crate(GREEN, 1, at(o, -4, 3, 11));
+        crate(GREEN, 1, at(o, -1.5, 8, 11));
+        crate(GREEN, 1, at(o, 1, 20, 11));
+
+        // Stack, with small gaps so each crate lands on the one below
+        crate(PURPLE, 1, at(o, 4.5, 0, 11));
+        crate(PURPLE, 1, at(o, 4.5, 1.1, 11));
+        crate(PURPLE, 1, at(o, 4.5, 2.2, 11));
+
+        // 20° ramp, low edge at z = 9, rising towards +Z; the crate lands about halfway up
+        block(new Box(new Vector3D(-1.5, -0.4, 0), new Vector3D(1.5, 0, 6)), TEAL, at(o, -9, 0, 9), deg(-20, 0, 0));
+        crate(ORANGE, 1, at(o, -9, 2.5, 12));
+
+        // Thin slab at height 3, crate dropped from 25: does it stop on the slab or fall through to the floor?
+        block(footprint(3, 0.05, 3), GREY, at(o, 9, 3, 12));
+        crate(RED, 1, at(o, 9, 25, 12));
     }
 
     /**
@@ -356,12 +385,17 @@ public class PhysicsPlayground extends Scene
     }
 
     private void crate(Color colour, double weight, Vector3D pos) {
+        CrateSpec spec = new CrateSpec(colour, weight, pos);
+        crateSpecs.add(spec);
+        crates.add(spawnCrate(spec));
+    }
+
+    private PhysicsBody spawnCrate(CrateSpec spec) {
         PhysicsBody obj = new PhysicsBody(this);
-        obj.setMesh(paint(new BoxMesh(footprint(1, 1, 1)), colour));
-        obj.getAABBCollider().setWeight(weight);
-        obj.translate(pos);
-        crates.add(obj);
-        crateHomes.add(pos);
+        obj.setMesh(paint(new BoxMesh(footprint(1, 1, 1)), spec.colour()));
+        obj.getAABBCollider().setWeight(spec.weight());
+        obj.translate(spec.home());
+        return obj;
     }
 
     /**
@@ -413,10 +447,11 @@ public class PhysicsPlayground extends Scene
         }
     }
 
+    /** Replaces every crate with a fresh one at its start position, so no velocity carries over. */
     private void resetCrates() {
         for (int i = 0; i < crates.size(); i++) {
-            DynamicAABBObject c = crates.get(i);
-            c.translate(crateHomes.get(i).translated(c.getPosition().inverted()));
+            removeObject(crates.get(i));
+            crates.set(i, spawnCrate(crateSpecs.get(i)));
         }
     }
 

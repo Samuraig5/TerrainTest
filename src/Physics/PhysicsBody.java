@@ -22,9 +22,15 @@ public class PhysicsBody extends DynamicAABBObject implements Gravitational {
         if (appliedMove.magnitude() == 0) return;
         Vector3D n = appliedMove.normalized();
         double into = velocity.dotProduct(n);
+
         if (into < 0) {
             velocity = velocity.translated(n.scaled(-into));   // remove only the into-surface part
+
+            double speed = velocity.magnitude();
+            double maxFriction = 0.6 * -into;
+            velocity = speed <= maxFriction ? new Vector3D(0, 0, 0) : velocity.scaled(1 - maxFriction / speed);
         }
+
         if (n.y() > 0.7) lastGroundNanos = System.nanoTime(); // pushed mostly upward = standing on something
     }
 

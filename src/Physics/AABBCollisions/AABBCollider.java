@@ -44,6 +44,9 @@ public abstract class AABBCollider implements Translatable
         Vector3D move = EPA.solveEPA(other.convexShape, this.convexShape);
         if (move == null) { return false; }
 
+        Vector3D n = move.normalized();
+        if (n.y() > 0.7) { move = new Vector3D(0, move.magnitude() / n.y(), 0); }   // walkable ground: push straight up
+
         move = move.scaled(1.0001);
 
 

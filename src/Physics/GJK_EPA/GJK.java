@@ -150,9 +150,16 @@ public class GJK
         Vector3D ab = simplex.b().translated(simplex.a().inverted()); //b - a
         Vector3D ao = simplex.a().inverted(); // -a
 
-        if (ab.sameDirection(ao)) {
+        Vector3D res = ab.crossProduct(ao).crossProduct(ab);
+        if (res.magnitude() < 1e-12) {   // origin lies on the line ab: any perpendicular direction works
+            res = ab.crossProduct(Vector3D.RIGHT());
+            if (res.magnitude() < 1e-12) res = ab.crossProduct(Vector3D.UP());
+
+            return res;
+        }
+        else if (ab.sameDirection(ao)) {
             //(Projected) Origin falls on the line
-            Vector3D res = ab.crossProduct(ao);
+            res = ab.crossProduct(ao);
             res = res.crossProduct(ab);
             return res;
         }
