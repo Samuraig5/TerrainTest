@@ -14,7 +14,7 @@ import Engine3d.Scene;
 
 import java.util.List;
 
-public class PlayerObject extends DynamicAABBObject implements Gravitational
+public class PlayerObject extends PhysicsBody
 {
     private Vector3D SIZE = new Vector3D(1, 1.8, 1);
     private Vector3D position = new Vector3D(0,0,0);
@@ -22,15 +22,12 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     private double pitch = 0; //LOOK: up/down, camera only
     private final Vector3D cameraOffset = new Vector3D(0,1.5,0);
     private Camera camera;
-    private Vector3D momentum = new Vector3D(0,0,0);
     private volatile boolean grounded = false;
     private volatile long lastGroundedNanos = 0;
 
     private static final double PROBE_UP = 0.5;   // start the ray above the feet
     private static final double SKIN     = 0.15;  // grounded if surface is within this of the
     private static final double INSET = 0.05;
-
-    private static final double MAX_FALL = 0.45;   // per frame; under half a crate's height
 
     public PlayerObject(Scene scene, PlayerCamera camera)
     {
@@ -43,41 +40,8 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         setMesh(playerMesh);
     }
 
-    public void addMomentum(Vector3D delta) {
-        momentum = momentum.translated(delta);
-    }
-
-    /** Stops all movement, e.g. after teleporting, so a long fall doesn't carry over. */
-    public void resetMomentum() {
-        momentum = new Vector3D(0, 0, 0);
-    }
-
-    @Override
-    public void onCollision(Vector3D appliedMove) {
-        if (appliedMove.magnitude() == 0) return;
-        Vector3D n = appliedMove.normalized();
-        double into = momentum.dotProduct(n);   // negative = moving into the surface
-        if (into < 0) {
-            momentum = new Vector3D(momentum.x() * 0.8, Math.max(momentum.y(), 0), momentum.z() * 0.8);
-        }
-    }
-
     public Vector3D getCameraOffset() {
         return cameraOffset;
-    }
-
-    @Override
-    public void applyGravity(double g, double deltaTime) {
-        Vector3D delta = Vector3D.DOWN();
-        delta = delta.scaled(g);
-        delta = delta.scaled(deltaTime);
-        if (!isGrounded()) {
-            momentum = momentum.translated(delta);
-            if (momentum.y() < -MAX_FALL) { momentum = momentum.y(-MAX_FALL); }
-        }
-        else {
-            momentum = momentum.y(Math.max(momentum.y(), 0));
-        }
     }
 
     @Override
@@ -102,7 +66,9 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
             dist = Math.min(dist, getScene().groundDistanceBelow(origin));
         }
 
-        grounded = dist <= PROBE_UP + SKIN && momentum.y() <= 0;
+        boolean onRay = dist <= PROBE_UP + SKIN;
+        grounded = (onRay || super.isGrounded()) && getVelocity().y() <= 0;
+
         if (grounded) lastGroundedNanos = System.nanoTime();
     }
 
@@ -125,6 +91,8 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
 
     public Vector3D getLookRotation() { return new Vector3D(pitch, rotation.y(), 0); }
 
+
+    public void resetMomentum() { setVelocity(new Vector3D(0, 0, 0)); }
     @Override
     public void translate(Vector3D delta) {
         position = position.translated(delta);
@@ -150,30 +118,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
     public void update(double deltaTime) {
         updateGrounded();
         tryJump();
-        translate(momentum);
-    }
-
-    public Vector3D findClosestPointToCollision(RayCollision rayCollision) {
-        if (rayCollision == null) {return new Vector3D(0,0,0);}
-        Vector3D col = rayCollision.collisionPoint;
-        //getScene().createCollisionMarker(col); //Spawns a cube at the collision for debuggung
-
-        Object3D target = rayCollision.collisionTarget;
-        Vector3D localCol = rayCollision.collisionTarget.getMesh().worldToLocal(col, target.getPosition(), target.getRotation());
-        List<Vector3D> targetPoints = rayCollision.collisionTarget.getMesh().getPoints();
-
-        Vector3D minPoint = targetPoints.get(0);
-        double minDistance = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < targetPoints.size(); i++) {
-            Vector3D targetPoint = targetPoints.get(i);
-            double targetDistance = localCol.distanceTo(targetPoint);
-            if (targetDistance < minDistance) {
-                minPoint = targetPoint;
-                minDistance = targetDistance;
-            }
-        }
-
-        return minPoint;
+        super.update(deltaTime);
     }
 
     // PlayerObject:
@@ -188,7 +133,7 @@ public class PlayerObject extends DynamicAABBObject implements Gravitational
         boolean recentlyGrounded = now - lastGroundedNanos < COYOTE;   // coyote time
         boolean bufferedPress   = now - lastJumpRequestNanos < BUFFER; // jump buffering
         if (recentlyGrounded && bufferedPress) {
-            momentum = momentum.y(0.35);
+            setVelocity(getVelocity().y(0.35));
             lastJumpRequestNanos = 0;   // consume it
             lastGroundedNanos = 0;      // prevent double-jump
         }

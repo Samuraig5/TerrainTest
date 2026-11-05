@@ -424,7 +424,7 @@ public class PhysicsPlayground extends Scene
         Vector3D target = stations.get(index).origin().translated(SPAWN);
         player.translate(target.translated(player.getPosition().inverted()));
         player.rotate(new Vector3D(0, -player.getRotation().y(), 0));   // face +Z
-        player.resetMomentum();
+            player.resetMomentum();
     }
 
     private int nearestStation() {

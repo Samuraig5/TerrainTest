@@ -5,8 +5,10 @@ import Math.Vector.Vector3D;
 import Physics.AABBCollisions.DynamicAABBObject;
 
 public class PhysicsBody extends DynamicAABBObject implements Gravitational {
-    private Vector3D velocity = new Vector3D(0, 0, 0);   // per frame, same as PlayerObject.momentum
+    private Vector3D velocity = new Vector3D(0, 0, 0);
     private long lastGroundNanos = 0;
+    private static final double MAX_FALL = 0.45;   // per frame; under half a crate's height
+
 
     public PhysicsBody(Scene scene) { super(scene); }
 
@@ -14,7 +16,6 @@ public class PhysicsBody extends DynamicAABBObject implements Gravitational {
         translate(velocity);
     }
 
-    private static final double MAX_FALL = 0.45;   // per frame; under half a crate's height
     @Override public void applyGravity(double g, double dt) {
         velocity = velocity.translated(Vector3D.DOWN().scaled(g * dt));
         if (velocity.y() < -MAX_FALL) { velocity = velocity.y(-MAX_FALL); }
@@ -38,5 +39,13 @@ public class PhysicsBody extends DynamicAABBObject implements Gravitational {
 
     @Override public boolean isGrounded() {
         return System.nanoTime() - lastGroundNanos < 100_000_000L;
+    }
+
+    protected Vector3D getVelocity() {
+        return velocity;
+    }
+
+    protected void setVelocity(Vector3D velocity) {
+        this.velocity = velocity;
     }
 }
